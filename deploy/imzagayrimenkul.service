@@ -1,0 +1,25 @@
+# ==============================================================
+# Systemd Service for İmza Gayrimenkul Flask App
+# ==============================================================
+# Place at: /etc/systemd/system/imzagayrimenkul.service
+# Then:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable imzagayrimenkul
+#   sudo systemctl start imzagayrimenkul
+# ==============================================================
+
+[Unit]
+Description=İmza Gayrimenkul Flask Application
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/imzagayrimenkul
+Environment="PATH=/opt/imzagayrimenkul/venv/bin"
+ExecStart=/opt/imzagayrimenkul/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

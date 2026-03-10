@@ -1,0 +1,89 @@
+flowchart LR
+    %% === PROJECT GOALS ===
+    %% Ultimate Goal: Develop a luxury real estate portfolio and PMS portal
+    %% Current Goal: Implement Contract Builder System and fix access issues
+
+    %% === START ===
+    %% @project_start [start, closed, 2026-02-28, ant]
+    project_start("Project Base<br/><sub>Initial luxury real estate project<br/>with Flask backend, SQLite DB,<br/>and Tailwind CSS frontend</sub>")
+
+    %% === COMPLETED WORK ===
+    %% @reorganization [ai-task, closed, 2026-02-28, ant]
+    reorganization("Codebase Reorganization<br/><sub>Moved clutter utility scripts to<br/>/scripts, added README.md, and<br/>improved docstrings</sub>")
+
+    %% @portal_login_issue [ai-task, closed, 2026-02-28, ant]
+    portal_login_issue("Portal Login Debugging<br/><sub>Investigated credentials and server<br/>access. Found that local server<br/>start is required for API access</sub>")
+
+    %% @contract_builder [ai-task, closed, 2026-02-28, ant]
+    contract_builder("Contract Builder System<br/><sub>Implemented a clause-based<br/>contract wizard with property<br/>auto-population for multiple types</sub>")
+
+    %% @server_init [ai-task, closed, 2026-03-01, ant]
+    server_init("Flask Server & DB Init<br/><sub>Started background Flask server<br/>on port 8000 and initialised<br/>SQLite DB with sample data</sub>")
+
+    %% @responsive_design [ai-task, closed, 2026-03-01, ant]
+    responsive_design("Responsive Portal UI<br/><sub>Implemented mobile full-screen<br/>sidebar toggle and ensured<br/>tablet layout matches desktop</sub>")
+
+    %% @ssl_deployment [ai-task, closed, 2026-03-06, ant]
+    ssl_deployment("SSL & Deployment Automation<br/><sub>Created Nginx reverse proxy config,<br/>Certbot auto-renewal via cron,<br/>systemd service, and one-command<br/>production setup script</sub>")
+
+    %% @similar_listings [ai-task, closed, 2026-03-06, ant]
+    similar_listings("Similar Listings Section<br/><sub>Added dynamic 'Buna Bakanlar<br/>Buna da Baktı' section to detay.html<br/>with API-driven card rendering<br/>and responsive grid layout</sub>")
+
+    %% @gemini_integration [ai-task, closed, 2026-03-10, ant]
+    gemini_integration("Gemini AI Integration<br/><sub>Implemented automated property<br/>description generation using<br/>Gemini 1.5 Flash API</sub>")
+
+    %% @dual_app_api [ai-task, closed, 2026-03-11, ant]
+    dual_app_api("Dual Mobile App API<br/><sub>Created JWT Auth for VIP Yatırım<br/>and Mahalle apps with role-based<br/>strict routing</sub>")
+
+    %% @neighborhood_noconflict [ai-task, closed, 2026-03-11, ant]
+    neighborhood_noconflict("Neighborhood No-Conflict API<br/><sub>Implemented Mahalle posts with<br/>ulasim, paylasim, yardim, duyuru<br/>categories and no-comments rule</sub>")
+
+    %% === FUTURE WORK ===
+    %% @system_setup [human-task, opened, 2026-02-28, user]
+    system_setup("Environment Setup (WSL)<br/><sub>Installing WSL and Node.js to<br/>support Claude Code and other<br/>modern development tools</sub>")
+
+    %% @ultimate_goal [end, opened, 2026-02-28, user]
+    ultimate_goal("Luxury Portal Live<br/><sub>Fully functional PMS with<br/>contracts, taxes, and portfolio<br/>management live for admins</sub>")
+
+    %% === CONNECTIONS ===
+    project_start --> reorganization
+    reorganization --> portal_login_issue
+    portal_login_issue --> contract_builder
+    contract_builder --> server_init
+    server_init --> responsive_design
+    responsive_design --> ssl_deployment
+    ssl_deployment --> similar_listings
+    similar_listings --> gemini_integration
+    gemini_integration --> dual_app_api
+    dual_app_api --> neighborhood_noconflict
+    neighborhood_noconflict --> system_setup
+    system_setup -.-> ultimate_goal
+
+    %% === RECENT WORK HIGHLIGHT ===
+    subgraph recent [RECENT]
+        neighborhood_noconflict
+    end
+
+    %% === STYLES ===
+    %% Closed tasks (soft purple)
+    style project_start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style reorganization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style portal_login_issue fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style contract_builder fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style server_init fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style responsive_design fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style ssl_deployment fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style similar_listings fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style gemini_integration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style dual_app_api fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style neighborhood_noconflict fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+
+    %% Recent work (bright purple highlight)
+    %% Handled in closed style above for consistency if closed and recent
+
+    %% Recent subgraph (dashed border)
+    style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
+
+    %% Open tasks (soft green)
+    style system_setup fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

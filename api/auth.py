@@ -1,0 +1,165 @@
+from functools import wraps
+from flask import Blueprint, request, jsonify, g
+from database import get_db_connection
+import hashlib
+import jwt
+import os
+import datetime
+
+auth_bp = Blueprint('auth', __name__)
+
+# Geliştirme ortamı için geçici bir JWT secret key. Prod. için .env'den alınmalıdır.
+JWT_SECRET = os.environ.get("JWT_SECRET", "imza-super-secret-key-2026")
+
+def hash_password(password):
+    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+INNER_ROLES = ["admin", "super_admin", "broker", "danisman"]
+
+def get_current_user():
+    token = request.headers.get('Authorization')
+    if not token:
+        return None
+        
+    # Standard Web Token (Hardcoded)
+    if token in ['Bearer admin-token', 'Bearer imza-super-admin-2026']:
+        return {'id': 1, 'role': 'admin', 'username': 'admin', 'circle': 'inner', 'app_route': 'both'}
+    
+    # Simple Web Token (Custom Format)
+    if token.startswith('Bearer token-'):
+        user_id = token.split('token-')[1]
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+        conn.close()
+        if user:
+            user_dict = dict(user)
+            user_dict['circle'] = 'inner' if user['role'] in INNER_ROLES else 'outer'
+            user_dict['app_route'] = get_app_route_for_role(user['role'])
+            return user_dict
+            
+    # JWT Mobile Token
+    if token.startswith('Bearer ey'):
+        jwt_token = token.split(' ')[1]
+        try:
+            payload = jwt.decode(jwt_token, JWT_SECRET, algorithms=["HS256"])
+            user_id = payload.get('user_id')
+            if user_id:
+                conn = get_db_connection()
+                user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+                conn.close()
+                if user:
+                    user_dict = dict(user)
+                    user_dict['circle'] = payload.get('circle')
+                    user_dict['app_route'] = payload.get('app_route')
+                    return user_dict
+        except jwt.ExpiredSignatureError:
+            return None # Handle token expiration appropriately
+        except jwt.InvalidTokenError:
+            return None
+            
+    return None
+
+def get_app_route_for_role(role):
+    """Belirli bir role sahip kullanıcının hangi uygulamalara girebileceğini belirler."""
+    if role in ["admin", "super_admin", "broker", "danisman", "m_sahibi"]:
+        return "both" # Hem Yatırım hem Mahalle
+    elif role in ["vip"]:
+        return "investment" # Sadece Yatırım App
+    elif role in ["kiraci", "standart"]:
+        return "neighborhood" # Sadece Mahalle App
+    return "neighborhood" # Default fallback
+
+def require_inner_circle(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+        if not user or user.get('circle') != 'inner':
+            return jsonify({'error': 'Unauthorized - Inner Circle Only'}), 403
+        g.user = user
+        return f(*args, **kwargs)
+    return wrapper
+
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({'error': 'Unauthorized'}), 401
+        g.user = user
+        return f(*args, **kwargs)
+    return wrapper
+
+@auth_bp.route('/api/login', methods=['POST'])
+def login():
+    """Web (Admin) Portalı için Basit Login"""
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    if not username or not password:
+        return jsonify({'error': 'Missing credentials'}), 400
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+    conn.close()
+    if user is None:
+        return jsonify({'error': 'Invalid username or password'}), 401
+    stored_hash = user['password_hash']
+    if stored_hash != hash_password(password):
+        return jsonify({'error': 'Invalid username or password'}), 401
+    
+    user_role = user['role']
+    circle = "inner" if user_role in INNER_ROLES else "outer"
+    token = f"token-{user['id']}"
+    
+    return jsonify({
+        'token': token, 
+        'role': user_role,
+        'circle': circle,
+        'username': user['username']
+    }), 200
+
+@auth_bp.route('/api/mobile/login', methods=['POST'])
+def mobile_login():
+    """Mobil Uygulamalar için JWT tabanlı Login"""
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    requested_app = data.get('app_type') # 'investment' veya 'neighborhood'
+
+    if not username or not password or not requested_app:
+        return jsonify({'error': 'Missing credentials or app_type'}), 400
+        
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+    conn.close()
+    
+    if user is None or user['password_hash'] != hash_password(password):
+        return jsonify({'error': 'Invalid username or password'}), 401
+        
+    user_role = user['role']
+    circle = "inner" if user_role in INNER_ROLES else "outer"
+    authorized_apps = get_app_route_for_role(user_role)
+    
+    # App giriş izni kontrolü
+    if authorized_apps != 'both' and authorized_apps != requested_app:
+        app_names = {"investment": "İmza Gayrimenkul & Yatırım", "neighborhood": "İmza Mahalle"}
+        return jsonify({'error': f'Yetkisiz Giriş. Rolünüz ({user_role}) {app_names.get(requested_app)} uygulaması için yetkili değil.'}), 403
+
+    # JWT Payload Oluşturma
+    payload = {
+        'user_id': user['id'],
+        'username': user['username'],
+        'role': user_role,
+        'circle': circle,
+        'app_route': requested_app,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=30) # 30 gün geçerli
+    }
+    
+    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    
+    return jsonify({
+        'token': token, 
+        'role': user_role,
+        'circle': circle,
+        'username': user['username'],
+        'app_route': authorized_apps
+    }), 200

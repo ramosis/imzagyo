@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İmza Gayrimenkul | Yatırım ve Mülk Yönetimi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a192f',
+                        gold: '#c5a059',
+                        modern: '#e17055',
+                        nature: '#1b4d3e',
+                        natureLight: '#f3e5ab',
+                        soft: '#f8fafc',
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Maybach Kapısı: Ağır ve Vakumlu Geçiş Mekaniği */
+        @media (min-width: 768px) {
+
+            html,
+            body {
+                height: 100%;
+                overflow: hidden;
+                /* JavaScript ile özel kaydırma yapacağız */
+            }
+
+            .main-wrapper {
+                height: 100%;
+                transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+                /* Maybach vakum eğrisi */
+                will-change: transform;
+            }
+
+            .intro-screen,
+            section.snap-section,
+            footer.snap-section {
+                height: 100vh;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                overflow: hidden;
+            }
+
+            section.snap-section,
+            footer.snap-section {
+                padding-top: 6rem;
+                /* Header payı */
+            }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .soft-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand-pattern {
+            background-image: radial-gradient(#c5a059 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.2);
+        }
+
+        .bento-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bento-card:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Arama Modalı */
+        #searchModal {
+            transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+        }
+
+        #searchModal .search-content {
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(-20px);
+        }
+
+        #searchModal.open .search-content {
+            transform: translateY(0);
+        }
+
+        /* Slider Animasyonları */
+        .slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide.active .slide-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mega Menu (Ağırbaşlı Açılış) */
+        .mega-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(15px);
+            transition: all 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .group:hover .mega-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        @media (min-width: 768px) {
+            .hero-dynamic {
+                flex-grow: 1;
+            }
+        }
+
+        /* Partner Logoları Kaydırma (Marquee) Efekti */
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .animate-marquee {
+            animation: marquee 35s linear infinite;
+        }
+
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
+
+        /* Header Dinamik Menü Metni (Ticker) Efekti */
+        @keyframes textSlide {
+
+            0%,
+            20% {
+                transform: translateY(0);
+            }
+
+            33%,
+            53% {
+                transform: translateY(-25%);
+            }
+
+            66%,
+            86% {
+                transform: translateY(-50%);
+            }
+
+            100% {
+                transform: translateY(-75%);
+            }
+        }
+
+        .animate-text-slide {
+            /* 9 Saniyelik döngü, lüks geçiş eğrisi */
+            animation: textSlide 9s infinite cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        /* Lux Curtain (Lüks Perde) Köprüsü */
+        .lux-curtain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0a192f;
+            z-index: 99999;
+            pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lux-curtain.hidden {
+            opacity: 0;
+        }
+    </style>
+    <script>
+        // Lux Curtain Bridge Logic (Fluid Outro, Luxury Intro)
+        function luxNavigate(url) {
+            const curtain = document.querySelector('.lux-curtain');
+            curtain.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)'; // Yumuşak ama akıcı (Sweet Spot)
+            curtain.classList.remove('hidden');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 450); // Perde kapanmaya yakınken geçiş yap
+        }
+
+        window.addEventListener('scroll', function () {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('glass-header');
+            } else {
+                header.classList.remove('glass-header');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Açılış (Intro) - Lüks ve Ağır
+            const curtain = document.querySelector('.lux-curtain');
+            curtain.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+            setTimeout(() => {
+                curtain.classList.add('hidden');
+            }, 100);
+
+            // Geri butonu için düzeltme (Bfcache)
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted) {
+                    const curtain = document.querySelector('.lux-curtain');
+                    curtain.classList.add('hidden');
+                }
+            });
+
+            // Link Yakalayıcı
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('.html') && !link.target && !e.ctrlKey && !e.shiftKey) {
+                    const targetUrl = link.href;
+                    const isInternal = targetUrl.includes(window.location.origin) || !targetUrl.startsWith('http');
+
+                    if (isInternal && !targetUrl.includes('#')) {
+                        e.preventDefault();
+                        luxNavigate(targetUrl);
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+
+<body class="text-slate-800 antialiased font-sans text-sm md:text-base">
+
+    <!-- Lux Curtain -->
+    <div class="lux-curtain"></div>
+
+    <!-- Tam Ekran Arama Modalı -->
+    <div id="searchModal"
+        class="fixed inset-0 z-[100] bg-navy/95 backdrop-blur-xl invisible opacity-0 flex flex-col justify-center items-center px-4">
+        <div class="absolute inset-0 brand-pattern opacity-10"></div>
+        <button onclick="toggleSearch()"
+            class="absolute top-8 right-8 text-gray-400 hover:text-gold transition-colors text-4xl z-10 focus:outline-none">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="w-full max-w-4xl relative z-10 search-content">
+            <h2 class="text-3xl md:text-5xl font-serif text-white mb-8 text-center uppercase tracking-tighter">Nereyi
+                Keşfetmek İstersiniz?</h2>
+            <div
+                class="bg-white rounded-full p-2 flex flex-col md:flex-row items-center shadow-2xl shadow-gold/20 text-navy">
+                <div
+                    class="flex-1 w-full md:w-auto px-6 py-4 md:py-0 border-b md:border-b-0 md:border-r border-gray-100">
+                    <div class="flex items-center text-gray-400">
+                        <i class="fa-solid fa-location-dot mr-3 text-gold text-xl"></i>
+                        <input type="text" placeholder="İlçe, mahalle, proje veya referans no..."
+                            class="w-full focus:outline-none font-medium bg-transparent text-lg">
+                    </div>
+                </div>
+                <div class="w-full md:w-56 px-6 py-4 md:py-0 border-b md:border-b-0 md:border-r border-gray-100">
+                    <select class="w-full focus:outline-none font-medium bg-transparent cursor-pointer text-lg">
+                        <option>İşlem Tipi</option>
+                        <option>Satılık</option>
+                        <option>Kiralık</option>
+                    </select>
+                </div>
+                <button onclick="location.href='arama.html#results'"
+                    class="w-full md:w-auto mt-2 md:mt-0 bg-gold hover:bg-yellow-600 text-navy px-10 py-5 rounded-full font-bold transition-all text-lg uppercase tracking-widest">
+                    Bul
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header (Sticky) -->
+    <header class="fixed w-full z-50 transition-all duration-300 flex flex-col border-b border-white/10">
+        <nav class="w-full glass-panel border-b border-gray-100 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-24">
+                    <!-- Logo -->
+                    <div class="flex-shrink-0 flex items-center cursor-pointer group/logo" onclick="goToSection(0)">
+                        <i
+                            class="fa-solid fa-signature text-gold text-3xl mr-3 group-hover/logo:scale-110 transition-transform"></i>
+                        <div class="flex flex-col">
+                            <span
+                                class="font-serif font-bold text-2xl md:text-3xl tracking-widest text-navy leading-none uppercase">İMZA</span>
+                            <span
+                                class="text-gold text-[7px] md:text-[8px] tracking-[0.4em] uppercase font-bold mt-1 text-left">Gayrimenkul
+                                Yatırım</span>
+                        </div>
+                    </div>
+
+                    <!-- Navigasyon Grubu -->
+                    <div class="flex items-center space-x-8 md:space-x-8 lg:space-x-12 h-full">
+                        <div class="hidden md:flex items-center space-x-8 lg:space-x-12 h-full">
+                            <button onclick="toggleSearch()"
+                                class="text-navy hover:text-gold font-bold transition-colors text-xs uppercase tracking-widest flex items-center gap-2 group whitespace-nowrap">
+                                <i
+                                    class="fa-solid fa-magnifying-glass text-gold group-hover:scale-110 transition-transform"></i>
+                                İlan Ara
+                            </button>
+
+                            <div class="group relative h-full flex items-center">
+                                <!-- Dinamik Ticker Butonu (Ok işareti kaldırıldı) -->
+                                <button
+                                    class="text-navy hover:text-gold font-bold transition-colors text-xs uppercase tracking-widest flex items-center gap-2 whitespace-nowrap outline-none h-full">
+                                    <div class="h-4 overflow-hidden relative w-[160px] text-left">
+                                        <div class="flex flex-col animate-text-slide">
+                                            <span class="block h-4 leading-4">Hizmetlerimiz</span>
+                                            <span class="block h-4 leading-4">Yatırımcı İlişkileri</span>
+                                            <span class="block h-4 leading-4">Ekosistemimiz</span>
+                                            <!-- Kesintisiz döngü için ilk öğenin kopyası -->
+                                            <span class="block h-4 leading-4">Hizmetlerimiz</span>
+                                        </div>
+                                    </div>
+                                </button>
+
+                                <!-- Premium Lüks Dropdown Menü (Sert Köşeli, Butonun Soluna Hizalı) -->
+                                <div class="mega-menu absolute left-0 top-[100%] w-64 pt-0 z-50">
+                                    <div
+                                        class="bg-navy rounded-none shadow-2xl shadow-navy/30 border border-gray-800 border-t-2 border-t-gold overflow-hidden flex flex-col p-0 text-left relative">
+                                        <!-- Arkaplan deseni -->
+                                        <div class="absolute inset-0 brand-pattern opacity-10 pointer-events-none">
+                                        </div>
+
+                                        <a href="kurumsal.html"
+                                            class="group/item relative flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-all duration-500 z-10 border-b border-gray-800">
+                                            <div class="flex items-center gap-4">
+                                                <i
+                                                    class="fa-solid fa-concierge-bell text-gold text-xs opacity-70 group-hover/item:opacity-100 transition-opacity"></i>
+                                                <span
+                                                    class="text-gray-300 group-hover/item:text-gold transition-colors text-[10px] font-bold uppercase tracking-[0.2em]">Kurumsal</span>
+                                            </div>
+                                            <i
+                                                class="fa-solid fa-arrow-right opacity-0 group-hover/item:opacity-100 group-hover/item:text-gold transform -translate-x-4 group-hover/item:translate-x-0 transition-all duration-500 text-xs"></i>
+                                        </a>
+
+                                        <a href="ekip.html"
+                                            class="group/item relative flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-all duration-500 z-10 border-b border-gray-800">
+                                            <div class="flex items-center gap-4">
+                                                <i
+                                                    class="fa-solid fa-user-tie text-gold text-xs opacity-70 group-hover/item:opacity-100 transition-opacity"></i>
+                                                <span
+                                                    class="text-gray-300 group-hover/item:text-gold transition-colors text-[10px] font-bold uppercase tracking-[0.2em]">Ekibimiz</span>
+                                            </div>
+                                            <i
+                                                class="fa-solid fa-arrow-right opacity-0 group-hover/item:opacity-100 group-hover/item:text-gold transform -translate-x-4 group-hover/item:translate-x-0 transition-all duration-500 text-xs"></i>
+                                        </a>
+
+                                        <a href="kariyer.html"
+                                            class="group/item relative flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-all duration-500 z-10 border-b border-gray-800">
+                                            <div class="flex items-center gap-4">
+                                                <i
+                                                    class="fa-solid fa-users text-gold text-xs opacity-70 group-hover/item:opacity-100 transition-opacity"></i>
+                                                <span
+                                                    class="text-gray-300 group-hover/item:text-gold transition-colors text-[10px] font-bold uppercase tracking-[0.2em]">Kariyer</span>
+                                            </div>
+                                            <i
+                                                class="fa-solid fa-arrow-right opacity-0 group-hover/item:opacity-100 group-hover/item:text-gold transform -translate-x-4 group-hover/item:translate-x-0 transition-all duration-500 text-xs"></i>
+                                        </a>
+
+                                        <a href="portal.html"
+                                            class="group/item relative flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-all duration-500 z-10">
+                                            <div class="flex items-center gap-4">
+                                                <i
+                                                    class="fa-solid fa-key text-gold text-xs opacity-70 group-hover/item:opacity-100 transition-opacity"></i>
+                                                <span
+                                                    class="text-gray-300 group-hover/item:text-gold transition-colors text-[10px] font-bold uppercase tracking-[0.2em]">İmza
+                                                    Portal</span>
+                                            </div>
+                                            <i
+                                                class="fa-solid fa-arrow-right opacity-0 group-hover/item:opacity-100 group-hover/item:text-gold transform -translate-x-4 group-hover/item:translate-x-0 transition-all duration-500 text-xs"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="portal.html"
+                                class="bg-navy hover:bg-gray-800 text-gold px-6 py-2.5 rounded-full font-bold transition-all gold-glow flex items-center gap-2 text-xs uppercase tracking-wider whitespace-nowrap shadow-lg shadow-navy/20"><i
+                                    class="fa-regular fa-user text-xs"></i> İmza Portal</a>
+                        </div>
+                        <div class="md:hidden flex items-center gap-4 text-navy">
+                            <button onclick="toggleSearch()" class="hover:text-gold text-xl"><i
+                                    class="fa-solid fa-magnifying-glass"></i></button>
+                            <button class="hover:text-gold text-2xl"><i class="fa-solid fa-bars"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Ana Kaydırma Sarmalayıcı -->
+    <div class="main-wrapper" id="mainWrapper">
+
+        <!-- Section 1: Intro -->
+        <div class="intro-screen">
+            <section class="relative pt-24 overflow-hidden bg-navy text-white hero-dynamic flex items-center"
+                id="heroSlider">
+
+                <div id="hero-slides-wrapper" class="absolute inset-0 z-0">
+                    <!-- Dinamik olarak JS ile doldurulacak -->
+                </div>
+
+                <!-- Slider Nav... -->
+                <div class="absolute bottom-6 md:bottom-10 left-0 right-0 z-20">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-left">
+                        <div class="flex space-x-3" id="slider-dots">
+                            <!-- JS İle Doldurulacak -->
+                        </div>
+                        <div class="flex space-x-4">
+                            <button
+                                class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-white hover:border-gold hover:text-gold transition-all backdrop-blur-sm"
+                                onclick="prevSlide()"><i class="fa-solid fa-chevron-left text-sm"></i></button>
+                            <button
+                                class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-white hover:border-gold hover:text-gold transition-all backdrop-blur-sm"
+                                onclick="nextSlide()"><i class="fa-solid fa-chevron-right text-sm"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Partners -->
+            <section class="py-4 md:py-6 bg-white border-b border-gray-50 flex-shrink-0 overflow-hidden">
+                <div class="relative flex overflow-x-hidden group max-w-7xl mx-auto">
+                    <div class="animate-marquee flex w-max items-center">
+                        <div class="flex items-center gap-12 md:gap-24 px-8 md:px-12 text-gray-400">
+                            <a href="#"
+                                class="flex items-center gap-3 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500"><i
+                                    class="fa-brands fa-aws text-2xl md:text-3xl text-gray-500"></i><span
+                                    class="font-bold font-serif text-xs tracking-widest uppercase">A-Mimarlık</span></a>
+                            <a href="#"
+                                class="flex items-center gap-3 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500"><i
+                                    class="fa-solid fa-helmet-safety text-xl md:text-2xl text-gray-500"></i><span
+                                    class="font-bold font-serif text-xs tracking-widest uppercase">Global
+                                    İnşaat</span></a>
+                            <a href="#"
+                                class="flex items-center gap-3 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500"><i
+                                    class="fa-solid fa-building-columns text-xl md:text-2xl text-gray-500"></i><span
+                                    class="font-bold font-serif text-xs tracking-widest uppercase">Z-Bank</span></a>
+                            <a href="#"
+                                class="flex items-center gap-3 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500"><i
+                                    class="fa-solid fa-couch text-xl md:text-2xl text-gray-500"></i><span
+                                    class="font-bold font-serif text-xs tracking-widest uppercase">Mobilya
+                                    Tasarım</span></a>
+                        </div>
+                        <div class="flex items-center gap-12 md:gap-24 px-8 md:px-12 text-gray-400" aria-hidden="true">
+                            <a href="#"
+                                class="flex items-center gap-3 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500"><i
+                                    class="fa-brands fa-aws text-2xl md:text-3xl"></i><span
+                                    class="font-bold font-serif text-xs tracking-widest uppercase">A-Mimarlık</span></a>
+                            <a href="#"
+                                class="flex items-center gap-3 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500"><i
+                                    class="fa-solid fa-helmet-safety text-xl md:text-2xl text-gray-500"></i><span
+                                    class="font-bold font-serif text-xs tracking-widest uppercase">Global
+                                    İnşaat</span></a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Kurumsal Bar -->
+            <section
+                class="bg-navy border-t border-gray-800 py-3 md:py-4 flex-shrink-0 text-gray-300 text-[9px] sm:text-xs relative overflow-hidden">
+                <div class="absolute inset-0 brand-pattern opacity-10"></div>
+                <div
+                    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row justify-between items-center gap-2">
+                    <div
+                        class="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 font-semibold uppercase tracking-widest text-gray-400">
+                        <a href="kurumsal.html" class="hover:text-gold transition-colors">Kurumsal</a>
+                        <a href="kariyer.html" class="hover:text-gold transition-colors">Kariyer</a>
+                        <a href="javascript:void(0)" onclick="goToSection(4)"
+                            class="hover:text-gold transition-colors text-gold">Yatırımcı İlişkileri</a>
+                    </div>
+                    <div class="flex items-center gap-6 font-medium">
+                        <a href="#"
+                            class="hover:text-white transition-colors flex items-center gap-2 italic">info@imzaemlak.com.tr</a>
+                        <a href="#" class="hover:text-white transition-colors flex items-center gap-2">444 0 000</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Section 2: Koleksiyonlar -->
+        <section id="seriler" class="snap-section bg-white border-b border-gray-100 text-navy">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
+                <div class="mb-10 md:mb-12 text-center">
+                    <h2 class="text-3xl md:text-5xl font-bold font-serif mb-4 uppercase tracking-tighter">Yaşam
+                        Koleksiyonları</h2>
+                    <div class="w-16 h-1 bg-gold mx-auto mb-4"></div>
+                    <p class="text-gray-400 text-sm max-w-lg mx-auto font-light">Gayrimenkul dünyasında üç farklı
+                        vizyon, binlerce farklı hikaye.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+                    <div onclick="trackUserInterest('prestij', 35000000); luxNavigate('koleksiyon.html?tip=prestij')"
+                        class="relative h-56 md:h-[450px] lg:h-[500px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/20 to-transparent text-left">
+                        </div>
+                        <div
+                            class="absolute bottom-6 md:bottom-10 left-6 md:left-10 right-6 md:right-10 text-white text-left">
+                            <div
+                                class="w-10 h-10 md:w-12 md:h-12 bg-gold rounded-2xl flex items-center justify-center text-navy mb-4 shadow-xl transform group-hover:-translate-y-2 transition-transform">
+                                <i class="fas fa-crown text-xl"></i>
+                            </div>
+                            <h3
+                                class="text-2xl md:text-3xl font-serif font-bold text-gold mb-2 uppercase tracking-tight text-left">
+                                Prestij</h3>
+                            <p
+                                class="text-[10px] md:text-sm text-gray-300 leading-relaxed font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-left">
+                                Lüks konut ve seçkin yalı portföyü.</p>
+                        </div>
+                    </div>
+                    <div onclick="trackUserInterest('modern', 12000000); luxNavigate('koleksiyon.html?tip=modern')"
+                        class="relative h-56 md:h-[450px] lg:h-[500px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80"
+                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-modern/90 via-navy/20 to-transparent opacity-80 text-left">
+                        </div>
+                        <div
+                            class="absolute bottom-6 md:bottom-10 left-6 md:left-10 right-6 md:right-10 text-white text-left">
+                            <div
+                                class="w-10 h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-white mb-4 shadow-xl transform group-hover:-translate-y-2 transition-transform">
+                                <i class="fas fa-city text-xl text-white"></i>
+                            </div>
+                            <h3
+                                class="text-2xl md:text-3xl font-serif font-bold text-white mb-2 uppercase tracking-tight text-left">
+                                Modern</h3>
+                            <p
+                                class="text-[10px] md:text-sm text-gray-200 leading-relaxed font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-left">
+                                Şehrin dinamizmini yansıtan projeler.</p>
+                        </div>
+                    </div>
+                    <div onclick="trackUserInterest('doga', 24000000); luxNavigate('koleksiyon.html?tip=doga')"
+                        class="relative h-56 md:h-[450px] lg:h-[500px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl text-left">
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"
+                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-nature/90 via-navy/20 to-transparent opacity-80 text-left">
+                        </div>
+                        <div
+                            class="absolute bottom-6 md:bottom-10 left-6 md:left-10 right-6 md:right-10 text-white text-left">
+                            <div
+                                class="w-10 h-10 md:w-12 md:h-12 bg-natureLight/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-natureLight mb-4 shadow-xl transform group-hover:-translate-y-2 transition-transform">
+                                <i class="fas fa-leaf text-xl text-natureLight"></i>
+                            </div>
+                            <h3
+                                class="text-2xl md:text-3xl font-serif font-bold text-natureLight mb-2 uppercase tracking-tight text-left text-natureLight">
+                                Doğa</h3>
+                            <p
+                                class="text-[10px] md:text-sm text-gray-200 leading-relaxed font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-left">
+                                Doğayla iç içe lüks yaşam alanları.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Portföyler -->
+        <section id="projeler" class="snap-section bg-soft text-navy">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 md:gap-10 mb-10 md:mb-12 text-center md:text-left">
+                    <div class="text-center md:text-left">
+                        <h2 class="text-3xl md:text-5xl font-bold text-navy font-serif mb-4 uppercase tracking-tighter">
+                            İmza Portföyler</h2>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-3" id="portfolio-tabs">
+                            <button onclick="renderPortfolios('tumu')" id="tab-tumu"
+                                class="bg-navy text-gold px-6 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl">Tümü</button>
+                            <button onclick="renderPortfolios('prestij')" id="tab-prestij"
+                                class="bg-white/80 text-gray-400 hover:text-navy px-6 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-100 transition-all">Prestij</button>
+                            <button onclick="renderPortfolios('modern')" id="tab-modern"
+                                class="bg-white/80 text-gray-400 hover:text-navy px-6 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-100 transition-all">Modern</button>
+                            <button onclick="renderPortfolios('doga')" id="tab-doga"
+                                class="bg-white/80 text-gray-400 hover:text-navy px-6 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-100 transition-all">Doğa</button>
+                        </div>
+                    </div>
+                    <button onclick="discoverAllPortfolios()"
+                        class="hidden md:block text-navy font-bold hover:text-gold transition-colors uppercase tracking-[0.2em] text-[10px] border-b-2 border-gold/30 pb-1 uppercase">Tümünü
+                        Keşfet &rarr;</button>
+                </div>
+
+
+                <div id="personalized-banner" class="hidden col-span-full"></div>
+                <div id="portfoy-list-container"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12 text-left">
+                    <div onclick="location.href='detay.html'"
+                        class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 flex flex-col border border-gray-50 text-left cursor-pointer">
+                        <div class="relative h-56 md:h-64 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            <div
+                                class="absolute top-6 left-6 bg-navy text-gold text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
+                                Satılık</div>
+                            <div
+                                class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-navy/80 to-transparent text-left text-white">
+                                <span class="font-serif font-bold text-2xl">₺35M</span>
+                            </div>
+                        </div>
+                        <div class="p-6 md:p-8 text-left">
+                            <h3
+                                class="font-bold text-navy text-lg md:text-xl group-hover:text-gold transition-colors mb-1 font-serif uppercase tracking-tight text-left">
+                                Boğaz Manzaralı Villa</h3>
+                            <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-6 text-left">
+                                İstanbul, Sarıyer</p>
+                            <div class="grid grid-cols-3 border-t border-gray-100 pt-6 gap-4 text-center">
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1">Oda</span><span
+                                        class="text-xs font-bold text-navy">6+2</span></div>
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1">Alan</span><span
+                                        class="text-xs font-bold text-navy">450m²</span></div>
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1">Tip</span><span
+                                        class="text-xs font-bold text-gold uppercase">Villa</span></div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-fire text-[8px]"></i> 145 kişi inceledi
+                                    </span>
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-gavel text-[8px]"></i> 2 aktif teklif
+                                    </span>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
+                                        class="text-navy font-bold">12 gün</span>
+                                </p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-fire text-[8px]"></i> 145 kişi inceledi
+                                    </span>
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-gavel text-[8px]"></i> 2 aktif teklif
+                                    </span>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
+                                        class="text-navy font-bold">12 gün</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div onclick="location.href='detay.html'"
+                        class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 flex flex-col border border-gray-50 text-left cursor-pointer">
+                        <div class="relative h-56 md:h-64 overflow-hidden text-left">
+                            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            <div
+                                class="absolute top-6 left-6 bg-modern text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
+                                Satılık</div>
+                            <div
+                                class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-navy/80 to-transparent text-left text-white">
+                                <span class="font-serif font-bold text-2xl">₺12M</span>
+                            </div>
+                        </div>
+                        <div class="p-6 md:p-8 text-left">
+                            <h3
+                                class="font-bold text-navy text-lg md:text-xl group-hover:text-gold transition-colors mb-1 font-serif uppercase tracking-tight text-left text-navy">
+                                Modern Loft Daire</h3>
+                            <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-6 text-left">
+                                İstanbul, Kadıköy</p>
+                            <div
+                                class="grid grid-cols-3 border-t border-gray-100 pt-6 gap-4 text-center text-navy text-left">
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1">Oda</span><span
+                                        class="text-xs font-bold text-navy">3+1</span></div>
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1">Alan</span><span
+                                        class="text-xs font-bold text-navy">165m²</span></div>
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1 text-navy">Tip</span><span
+                                        class="text-xs font-bold text-modern uppercase">Daire</span></div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-fire text-[8px]"></i> 89 kişi inceledi
+                                    </span>
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-gavel text-[8px]"></i> 1 aktif teklif
+                                    </span>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
+                                        class="text-navy font-bold">18 gün</span>
+                                </p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-fire text-[8px]"></i> 89 kişi inceledi
+                                    </span>
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-gavel text-[8px]"></i> 1 aktif teklif
+                                    </span>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
+                                        class="text-navy font-bold">18 gün</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div onclick="luxNavigate('detay.html?id=ekolojik-ev')"
+                        class="group cursor-pointer bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-2 border border-gray-100 flex flex-col h-full text-left">
+                        <div class="relative h-56 md:h-64 overflow-hidden text-left">
+                            <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            <div
+                                class="absolute top-6 left-6 bg-natureLight text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
+                                Satılık</div>
+                            <div
+                                class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-navy/80 to-transparent text-left text-white">
+                                <span class="font-serif font-bold text-2xl">₺24M</span>
+                            </div>
+                        </div>
+                        <div class="p-6 md:p-8 text-left">
+                            <h3
+                                class="font-bold text-navy text-lg md:text-xl group-hover:text-gold transition-colors mb-1 font-serif uppercase tracking-tight text-left text-navy">
+                                Ekolojik Orman Evi</h3>
+                            <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-6 text-left">
+                                Sakarya, Sapanca</p>
+                            <div
+                                class="grid grid-cols-3 border-t border-gray-100 pt-6 gap-4 text-center text-navy text-left">
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1">Oda</span><span
+                                        class="text-xs font-bold text-navy">4+1</span></div>
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1">Alan</span><span
+                                        class="text-xs font-bold text-navy">280m²</span></div>
+                                <div class="flex flex-col"><span
+                                        class="text-[8px] uppercase font-black text-gray-300 mb-1 text-navy">Tip</span><span
+                                        class="text-xs font-bold text-natureLight uppercase">Villa</span></div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-fire text-[8px]"></i> 67 kişi inceledi
+                                    </span>
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-gavel text-[8px]"></i> 3 aktif teklif
+                                    </span>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
+                                        class="text-navy font-bold">9 gün</span>
+                                </p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-fire text-[8px]"></i> 67 kişi inceledi
+                                    </span>
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
+                                        <i class="fa-solid fa-gavel text-[8px]"></i> 3 aktif teklif
+                                    </span>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
+                                        class="text-navy font-bold">9 gün</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section 3.5: Akıllı Ev Eşleştirme (Lifestyle Matching) -->
+        <section id="lifestyle-matcher" class="snap-section bg-navy text-white relative overflow-hidden">
+            <div class="absolute inset-0 brand-pattern opacity-10"></div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 text-center">
+                <div class="mb-10">
+                    <h2 class="text-3xl md:text-5xl font-bold font-serif mb-4 uppercase tracking-tighter">Bana Uygun
+                        Evi Bul</h2>
+                    <div class="w-16 h-1 bg-gold mx-auto mb-4"></div>
+                    <p class="text-gray-400 text-sm font-light max-w-lg mx-auto">Yaşam tarzınıza en uygun mülkü
+                        bulmak için birkaç soruya cevap verin.</p>
+                </div>
+
+                <!-- Soru Kartları -->
+                <div id="lm-questions" class="space-y-0">
+                    <!-- Soru 1 -->
+                    <div id="lm-q1" class="lm-question">
+                        <div
+                            class="bg-white/5 backdrop-blur-xl rounded-[2rem] p-8 md:p-12 border border-white/10 max-w-2xl mx-auto">
+                            <p class="text-gold text-[10px] font-bold uppercase tracking-widest mb-4">Soru 1 / 4</p>
+                            <h3 class="text-xl md:text-2xl font-serif font-bold mb-8">Günlük çalışma düzeniniz nasıl?
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button onclick="lmAnswer(1, 'remote')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i
+                                        class="fa-solid fa-laptop-house text-gold text-2xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                    <h4 class="font-bold text-white text-sm">Uzaktan Çalışıyorum</h4>
+                                    <p class="text-gray-400 text-xs mt-1">Evde geniş çalışma alanı lazım</p>
+                                </button>
+                                <button onclick="lmAnswer(1, 'office')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i
+                                        class="fa-solid fa-building text-gold text-2xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                    <h4 class="font-bold text-white text-sm">Ofise Gidiyorum</h4>
+                                    <p class="text-gray-400 text-xs mt-1">Ulaşım ve merkeze yakınlık önemli</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soru 2 -->
+                    <div id="lm-q2" class="lm-question hidden">
+                        <div
+                            class="bg-white/5 backdrop-blur-xl rounded-[2rem] p-8 md:p-12 border border-white/10 max-w-2xl mx-auto">
+                            <p class="text-gold text-[10px] font-bold uppercase tracking-widest mb-4">Soru 2 / 4</p>
+                            <h3 class="text-xl md:text-2xl font-serif font-bold mb-8">Evcil hayvanınız var mı?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button onclick="lmAnswer(2, 'pet_yes')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i
+                                        class="fa-solid fa-dog text-gold text-2xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                    <h4 class="font-bold text-white text-sm">Evet, Var</h4>
+                                    <p class="text-gray-400 text-xs mt-1">Bahçeli veya park yakını tercih</p>
+                                </button>
+                                <button onclick="lmAnswer(2, 'pet_no')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i
+                                        class="fa-solid fa-city text-gold text-2xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                    <h4 class="font-bold text-white text-sm">Hayır, Yok</h4>
+                                    <p class="text-gray-400 text-xs mt-1">Bahçe şartı önemli değil</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soru 3 -->
+                    <div id="lm-q3" class="lm-question hidden">
+                        <div
+                            class="bg-white/5 backdrop-blur-xl rounded-[2rem] p-8 md:p-12 border border-white/10 max-w-2xl mx-auto">
+                            <p class="text-gold text-[10px] font-bold uppercase tracking-widest mb-4">Soru 3 / 4</p>
+                            <h3 class="text-xl md:text-2xl font-serif font-bold mb-8">Sosyal hayat sizin için ne kadar
+                                önemli?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button onclick="lmAnswer(3, 'social')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i
+                                        class="fa-solid fa-champagne-glasses text-gold text-2xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                    <h4 class="font-bold text-white text-sm">Çok Önemli</h4>
+                                    <p class="text-gray-400 text-xs mt-1">Restoran, kafe ve gece hayatı</p>
+                                </button>
+                                <button onclick="lmAnswer(3, 'quiet')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i
+                                        class="fa-solid fa-tree text-gold text-2xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                    <h4 class="font-bold text-white text-sm">Sakin Tercih Ederim</h4>
+                                    <p class="text-gray-400 text-xs mt-1">Doğa, huzur ve sessizlik</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soru 4 -->
+                    <div id="lm-q4" class="lm-question hidden">
+                        <div
+                            class="bg-white/5 backdrop-blur-xl rounded-[2rem] p-8 md:p-12 border border-white/10 max-w-2xl mx-auto">
+                            <p class="text-gold text-[10px] font-bold uppercase tracking-widest mb-4">Soru 4 / 4</p>
+                            <h3 class="text-xl md:text-2xl font-serif font-bold mb-8">Ailenizin büyüklüğü nasıl?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <button onclick="lmAnswer(4, 'single')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i class="fa-solid fa-user text-gold text-2xl mb-3"></i>
+                                    <h4 class="font-bold text-white text-sm">Tekil</h4>
+                                </button>
+                                <button onclick="lmAnswer(4, 'couple')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i class="fa-solid fa-user-group text-gold text-2xl mb-3"></i>
+                                    <h4 class="font-bold text-white text-sm">Çift</h4>
+                                </button>
+                                <button onclick="lmAnswer(4, 'family')"
+                                    class="bg-white/10 hover:bg-gold/20 border border-white/10 hover:border-gold/50 rounded-2xl p-6 transition-all text-left group">
+                                    <i class="fa-solid fa-people-roof text-gold text-2xl mb-3"></i>
+                                    <h4 class="font-bold text-white text-sm">Aile (3+)</h4>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sonuç -->
+                    <div id="lm-result" class="lm-question hidden">
+                        <div
+                            class="bg-gradient-to-br from-gold/20 via-navy to-navy rounded-[2rem] p-8 md:p-12 border border-gold/30 max-w-2xl mx-auto shadow-2xl">
+                            <i class="fa-solid fa-sparkles text-gold text-4xl mb-6"></i>
+                            <h3 class="text-2xl md:text-3xl font-serif font-bold text-gold mb-4">Size En Uygun Portföy
+                            </h3>
+                            <div id="lm-match-card" class="bg-white/10 rounded-2xl p-6 mt-6 text-left">
+                                <!-- JS ile doldurulacak -->
+                            </div>
+                            <button onclick="resetLifestyle()"
+                                class="mt-8 border border-white/20 hover:bg-white/10 text-white px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest transition-all">
+                                <i class="fa-solid fa-rotate-left mr-2"></i> Tekrar Dene
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section 4: Yatırımcı Araçları -->
+        <section id="araclar" class="snap-section bg-white border-b border-gray-100 text-navy">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div
+                    class="mb-10 md:mb-12 text-center md:text-left flex flex-col md:flex-row justify-between items-end gap-6">
+                    <div>
+                        <h2 class="text-3xl md:text-5xl font-bold font-serif mb-4 uppercase tracking-tighter">Yatırımcı
+                            Rehberi</h2>
+                        <div class="w-16 h-1 bg-gold mx-auto md:mx-0 mb-4"></div>
+                        <p class="text-gray-400 text-sm max-w-lg font-light">Karar vermeden önce akıllı araçlarımızı
+                            kullanın, süreci şeffafça yönetin.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 text-left">
+                    <!-- Araç 5: AI Fırsat Rotası (YENİ) -->
+                    <div onclick="luxNavigate('ai_firsat_rotasi.html')"
+                        class="bg-navy rounded-[2rem] p-8 shadow-xl hover:-translate-y-2 transition-all duration-500 group cursor-pointer flex flex-col justify-between h-full relative overflow-hidden text-white">
+                        <div class="absolute inset-0 brand-pattern opacity-20"></div>
+                        <div
+                            class="absolute top-0 right-0 bg-gold text-navy text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest z-10">
+                            YENİ</div>
+                        <div class="relative z-10">
+                            <div
+                                class="w-14 h-14 bg-gold rounded-2xl flex items-center justify-center text-navy text-2xl mb-6 shadow-sm group-hover:scale-110 transition-all duration-500">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gold mb-2 uppercase tracking-wide">AI Fırsat Rotası</h3>
+                            <p class="text-gray-300 text-xs mb-6 font-light leading-relaxed">Yatırım profilinize en uygun mülkleri yapay zeka ile saniyeler içinde keşfedin.</p>
+                        </div>
+                        <span
+                            class="text-white font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 relative z-10 group-hover:text-gold transition-colors">Hemen Başla
+                            <i
+                                class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
+                    </div>
+
+                    <!-- Araç 3: Konut Kredisi -->
+                    <div onclick="luxNavigate('araclar.html?arac=kredi')"
+                        class="bg-soft rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-nature/30 transition-all duration-500 group cursor-pointer flex flex-col justify-between h-full">
+                        <div>
+                            <div
+                                class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-navy text-2xl mb-6 shadow-sm group-hover:scale-110 group-hover:bg-nature group-hover:text-natureLight transition-all duration-500">
+                                <i class="fa-solid fa-building-columns"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-navy mb-2 uppercase tracking-wide">Konut Kredisi</h3>
+                            <p class="text-gray-500 text-xs mb-6 font-light leading-relaxed">Güncel banka faiz
+                                oranlarıyla aylık ödeme planınızı detaylıca çıkarın.</p>
+                        </div>
+                        <span
+                            class="text-nature font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">Planla
+                            <i
+                                class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
+                    </div>
+
+                    <!-- Araç 2: Amortisman (ROI) -->
+                    <div onclick="luxNavigate('araclar.html?arac=roi')"
+                        class="bg-soft rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-modern/30 transition-all duration-500 group cursor-pointer flex flex-col justify-between h-full">
+                        <div>
+                            <div
+                                class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-navy text-2xl mb-6 shadow-sm group-hover:scale-110 group-hover:bg-modern group-hover:text-white transition-all duration-500">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-navy mb-2 uppercase tracking-wide">Amortisman (ROI)</h3>
+                            <p class="text-gray-500 text-xs mb-6 font-light leading-relaxed">Yatırım yapacağınız mülkün
+                                kendini kaç yılda amorti edeceğini analiz edin.</p>
+                        </div>
+                        <span
+                            class="text-modern font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">Analiz
+                            Et <i
+                                class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
+                    </div>
+
+                    <!-- Araç 1: Tapu Harcı -->
+                    <div onclick="luxNavigate('araclar.html?arac=tapu')"
+                        class="bg-soft rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-gold/30 transition-all duration-500 group cursor-pointer flex flex-col justify-between h-full">
+                        <div>
+                            <div
+                                class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-navy text-2xl mb-6 shadow-sm group-hover:scale-110 group-hover:bg-navy group-hover:text-gold transition-all duration-500">
+                                <i class="fa-solid fa-calculator"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-navy mb-2 uppercase tracking-wide">Tapu Harcı</h3>
+                            <p class="text-gray-500 text-xs mb-6 font-light leading-relaxed">Alım ve satım işlemlerinde
+                                çıkacak yasal harç bedellerini anında hesaplayın.</p>
+                        </div>
+                        <span
+                            class="text-gold font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">Hesapla
+                            <i
+                                class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
+                    </div>
+
+                    <!-- Araç 4: Vergi (GMSİ) -->
+                    <div onclick="luxNavigate('araclar.html?arac=vergi')"
+                        class="bg-navy rounded-[2rem] p-8 shadow-xl hover:-translate-y-2 transition-all duration-500 group cursor-pointer flex flex-col justify-between h-full relative overflow-hidden text-white">
+                        <div class="absolute inset-0 brand-pattern opacity-20"></div>
+                        <div
+                            class="absolute top-0 right-0 bg-gold text-navy text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest z-10">
+                            Önerilen</div>
+                        <div class="relative z-10">
+                            <div
+                                class="w-14 h-14 bg-gold rounded-2xl flex items-center justify-center text-navy text-2xl mb-6 shadow-sm group-hover:scale-110 transition-all duration-500">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gold mb-2 uppercase tracking-wide">Vergi Beyanı</h3>
+                            <p class="text-gray-300 text-xs mb-6 font-light leading-relaxed">Kira geliri veya değer
+                                artış kazancınız için vergi taslağınızı sistem hazırlasın.</p>
+                        </div>
+                        <span
+                            class="text-white font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 relative z-10 group-hover:text-gold transition-colors">Başla
+                            <i
+                                class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Hizmetler -->
+        <section id="hizmetler"
+            class="snap-section bg-navy relative overflow-hidden text-white border-t border-white/5">
+            <div class="absolute inset-0 brand-pattern opacity-10"></div>
+            <div
+                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-12 md:py-0 text-center md:text-left">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 lg:gap-24 text-left">
+                    <div class="lg:col-span-5 flex flex-col justify-center text-left">
+                        <div class="inline-block w-16 h-1 bg-gold mb-8 mx-auto md:mx-0"></div>
+                        <h2
+                            class="text-4xl md:text-6xl lg:text-7xl font-bold font-serif mb-6 leading-[1.1] tracking-tight uppercase text-left">
+                            Emlakta <br><span class="text-gold italic text-left">Yeni Vizyon</span></h2>
+                        <p
+                            class="text-gray-400 font-light mb-10 text-base md:text-lg leading-relaxed max-w-md mx-auto md:mx-0 text-left">
+                            Dijital mülk yönetimi ve yapay zeka destekli ekspertiz ile İmza güvencesinde.</p>
+                        <a href="portal.html"
+                            class="inline-flex items-center text-gold font-bold hover:text-white transition-all tracking-[0.3em] uppercase text-[10px] mx-auto md:mx-0 group text-left">İmza
+                            Portal'ı Keşfet <i
+                                class="fa-solid fa-arrow-right ml-4 group-hover:translate-x-3 transition-transform text-gold"></i></a>
+                    </div>
+                    <div class="lg:col-span-7 grid grid-cols-2 gap-4 md:gap-8 text-left">
+                        <div
+                            class="col-span-2 md:col-span-1 bg-white/5 backdrop-blur-2xl border border-white/10 p-10 lg:p-12 rounded-[3.5rem] bento-card cursor-pointer group hover:bg-white/10 transition-all text-left">
+                            <div
+                                class="w-14 h-14 bg-gold text-navy rounded-3xl flex items-center justify-center mb-8 text-2xl shadow-2xl group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-mobile-screen"></i>
+                            </div>
+                            <h3
+                                class="text-xl font-bold text-white mb-3 uppercase tracking-widest font-serif text-left">
+                                Mülk Yönetimi</h3>
+                            <p class="text-gray-400 text-[11px] md:text-sm font-light leading-relaxed mb-8 text-left">
+                                Kira ve aidatlarınızı dijital panelden yönetmenin konforunu yaşayın.</p>
+                            <span
+                                class="text-gold font-bold uppercase tracking-widest text-[9px] border-b-2 border-gold/20 pb-1 group-hover:border-gold transition-all text-left">Detaylar
+                                &rarr;</span>
+                        </div>
+                        <div
+                            class="col-span-2 md:col-span-1 bg-gradient-to-br from-gold/20 via-navy to-navy border border-gold/20 p-10 lg:p-12 rounded-[3.5rem] bento-card cursor-pointer group hover:border-gold/50 transition-all text-left">
+                            <div
+                                class="w-14 h-14 border-2 border-gold text-gold rounded-3xl flex items-center justify-center mb-8 text-2xl shadow-2xl group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-house-circle-check"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gold mb-3 uppercase tracking-widest font-serif text-left">
+                                Ekspertiz</h3>
+                            <p class="text-gray-400 text-[11px] md:text-sm font-light leading-relaxed mb-8 text-left">
+                                Mülkünüzün gerçek değerini şeffafça öğrenin.</p>
+                            <span
+                                class="text-white font-bold uppercase tracking-widest text-[9px] border-b-2 border-white/20 pb-1 group-hover:border-white transition-all text-left uppercase">Talebi
+                                Oluştur &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Footer -->
+        <footer
+            class="snap-section bg-navy text-white relative overflow-hidden border-t border-white/5 text-left uppercase">
+            <div
+                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-12 md:py-16 flex flex-col justify-between h-full text-left uppercase">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center border-b border-white/5 pb-12 md:pb-16 mb-12 md:mb-16 gap-8 md:gap-12 text-left uppercase">
+                    <div class="flex items-center text-left uppercase">
+                        <i class="fa-solid fa-signature text-gold text-4xl md:text-5xl mr-5"></i>
+                        <div class="flex flex-col text-left uppercase">
+                            <span
+                                class="font-serif font-bold text-2xl md:text-4xl tracking-[0.2em] text-white leading-none uppercase">İMZA</span>
+                            <span
+                                class="text-gold text-[9px] md:text-[10px] tracking-[0.5em] uppercase font-black mt-2 text-left uppercase">Gayrimenkul
+                                Yatırım</span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex flex-wrap justify-center gap-8 md:gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 text-left uppercase">
+                        <a href="arama.html" class="hover:text-gold transition-colors">Satılık</a>
+                        <a href="arama.html" class="hover:text-gold transition-colors">Kiralık</a>
+                        <a href="kurumsal.html" class="hover:text-gold transition-colors">Kurumsal</a>
+                        <a href="ekip.html" class="hover:text-gold transition-colors">Ekibimiz</a>
+                        <a href="kariyer.html" class="hover:text-gold transition-colors">Kariyer</a>
+                    </div>
+                    <div class="flex space-x-6 text-gray-500">
+                        <a href="#" class="hover:text-gold transition-all text-xl md:text-2xl"><i
+                                class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="hover:text-gold transition-all text-xl md:text-2xl"><i
+                                class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center text-[9px] md:text-[10px] text-gray-600 uppercase tracking-[0.2em] gap-6 md:gap-8 text-left uppercase">
+                    <p>© 2026 İmza Gayrimenkul Yatırım Limited Şirketi.</p>
+                    <div class="flex gap-4 md:gap-8">
+                        <a href="https://imzaemlak.com"
+                            class="hover:text-gold transition-colors border-b border-gray-800 lowercase">imzaemlak.com</a>
+                        <a href="https://imzaemlak.com.tr"
+                            class="hover:text-gold transition-colors border-b border-gray-800 lowercase">imzaemlak.com.tr</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scriptler -->
+    <script>
+        // Smooth Section Scroller - Maybach Etkisi
+        let currentSectionIndex = 0;
+        let isScrolling = false;
+        const mainWrapper = document.getElementById('mainWrapper');
+        const sections = document.querySelectorAll('.intro-screen, section.snap-section, footer.snap-section');
+
+        function goToSection(index) {
+            if (index < 0 || index >= sections.length || isScrolling) return;
+
+            isScrolling = true;
+            currentSectionIndex = index;
+
+            // Transform ile kaydırma
+            const yOffset = index * 100;
+            mainWrapper.style.transform = `translateY(-${yOffset}vh)`;
+
+            setTimeout(() => {
+                isScrolling = false;
+            }, 1200);
+        }
+
+        window.addEventListener('wheel', (e) => {
+            if (isScrolling) return;
+            if (e.deltaY > 50) {
+                goToSection(currentSectionIndex + 1);
+            } else if (e.deltaY < -50) {
+                goToSection(currentSectionIndex - 1);
+            }
+        }, { passive: false });
+
+        window.addEventListener('keydown', (e) => {
+            if (isScrolling) return;
+            if (e.key === 'ArrowDown') goToSection(currentSectionIndex + 1);
+            if (e.key === 'ArrowUp') goToSection(currentSectionIndex - 1);
+        });
+
+        let touchStartY = 0;
+        window.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
+        window.addEventListener('touchmove', (e) => {
+            if (isScrolling) return;
+            const touchEndY = e.touches[0].clientY;
+            if (touchStartY - touchEndY > 50) goToSection(currentSectionIndex + 1);
+            else if (touchEndY - touchStartY > 50) goToSection(currentSectionIndex - 1);
+        });
+
+        // Arama Modalı
+        function toggleSearch() {
+            const modal = document.getElementById('searchModal');
+            const body = document.body;
+            if (modal.classList.contains('invisible')) {
+                modal.classList.remove('invisible', 'opacity-0');
+                modal.classList.add('opacity-100', 'open');
+            } else {
+                modal.classList.remove('opacity-100', 'open');
+                modal.classList.add('opacity-0');
+                setTimeout(() => { modal.classList.add('invisible'); }, 400);
+            }
+        }
+
+        // Carousel Logic
+        let slides = [];
+        let dots = [];
+        let currentSlide = 0;
+        let slideInterval;
+
+        async function initHeroSlider() {
+            try {
+                const response = await fetch('/api/hero');
+                if (!response.ok) throw new Error("API Hatası");
+                const heroData = await response.json();
+
+                const wrapper = document.getElementById('hero-slides-wrapper');
+                const dotsContainer = document.getElementById('slider-dots');
+
+                wrapper.innerHTML = '';
+                dotsContainer.innerHTML = '';
+
+                if (heroData.length === 0) return; // Veri yoksa bir şey yapma
+
+                heroData.forEach((item, index) => {
+                    // Slayt Ekleme
+                    const slideHTML = `
+                    <div class="slide absolute inset-0 transition-opacity duration-1000 ${index === 0 ? 'opacity-100 z-10 active' : 'opacity-0 z-0'}">
+                        <div class="absolute inset-0 bg-cover bg-center text-left" style="background-image: url('${item.resim_url}');"></div>
+                        <div class="absolute inset-0 bg-navy/80"></div>
+                        <div class="absolute inset-0 brand-pattern opacity-20"></div>
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative h-full flex items-center w-full">
+                            <div class="max-w-4xl text-left">
+                                <p class="text-gold uppercase tracking-[0.4em] text-xs font-bold mb-4 md:mb-6 drop-shadow-md border-l-2 border-gold pl-4 slide-up italic">
+                                    ${item.alt_baslik}
+                                </p>
+                                <h1 class="text-4xl md:text-5xl lg:text-7xl font-bold font-serif mb-6 md:mb-8 leading-tight drop-shadow-xl slide-up" style="transition-delay: 0.1s;">
+                                    ${item.baslik_satir1} <br>
+                                    <span class="text-gold italic">${item.baslik_satir2}</span>
+                                </h1>
+                                <div class="flex flex-col sm:flex-row gap-4 slide-up" style="transition-delay: 0.2s;">
+                                    <button onclick="toggleSearch()" class="bg-gold hover:bg-yellow-600 text-navy px-8 py-4 rounded-full font-bold transition-all flex items-center justify-center gap-3 text-sm shadow-lg shadow-gold/20 uppercase tracking-widest">
+                                        <i class="fa-solid fa-magnifying-glass text-xs"></i> Detaylı Arama Yap
+                                    </button>
+                                    ${item.buton2_metin && item.buton2_link ?
+                            `<a href="javascript:void(0)" onclick="luxNavigate('${item.buton2_link}')"
+                                        class="border border-white/30 text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm backdrop-blur-sm uppercase tracking-widest">
+                                        ${item.buton2_metin}
+                                    </a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                    wrapper.innerHTML += slideHTML;
+
+                    // Dot Ekleme
+                    const dotHTML = `<button class="w-10 h-1 ${index === 0 ? 'bg-gold' : 'bg-white/30'} rounded-full transition-colors" onclick="goToSlide(${index})"></button>`;
+                    dotsContainer.innerHTML += dotHTML;
+                });
+
+                // Değişkenleri güncelle
+                slides = document.querySelectorAll('.hero-dynamic .slide');
+                dots = document.getElementById('slider-dots').children;
+                currentSlide = 0;
+
+                if (slides.length > 1) {
+                    resetInterval();
+                }
+
+            } catch (error) {
+                console.error("Hero slaytları yüklenemedi:", error);
+            }
+        }
+
+        function goToSlide(index) {
+            if (!slides || slides.length === 0) return;
+
+            slides[currentSlide].classList.remove('opacity-100', 'z-10', 'active');
+            slides[currentSlide].classList.add('opacity-0', 'z-0');
+            dots[currentSlide].classList.replace('bg-gold', 'bg-white/30');
+
+            currentSlide = index;
+
+            slides[currentSlide].classList.remove('opacity-0', 'z-0');
+            slides[currentSlide].classList.add('opacity-100', 'z-10', 'active');
+            dots[currentSlide].classList.replace('bg-white/30', 'bg-gold');
+
+            resetInterval();
+        }
+
+        function nextSlide() {
+            if (!slides || slides.length <= 1) return;
+            goToSlide((currentSlide + 1) % slides.length);
+        }
+
+        function prevSlide() {
+            if (!slides || slides.length <= 1) return;
+            goToSlide((currentSlide - 1 + slides.length) % slides.length);
+        }
+
+        function resetInterval() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, 7000);
+        }
+
+        // Portföy Fetch Logic
+        let allPortfolios = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Sliderı Yükle
+            await initHeroSlider();
+
+            // Portföyleri Yükle
+            try {
+                const response = await fetch('/api/portfoyler');
+                if (!response.ok) throw new Error("API Hatası");
+                allPortfolios = await response.json();
+
+                renderPortfolios('tumu'); // İlk açılışta hepsini render et
+            } catch (error) {
+                console.error("Portföyler yüklenemedi", error);
+                document.getElementById('portfoy-list-container').innerHTML = '<div class="col-span-full text-center py-12 text-red-500">Veriler yüklenirken bir hata oluştu.</div>';
+            }
+        });
+
+        function renderPortfolios(filterCategory) {
+            const container = document.getElementById('portfoy-list-container');
+            if (!container) return; // Prevent errors if on different page
+            container.innerHTML = '';
+
+            const filtered = filterCategory === 'tumu'
+                ? allPortfolios
+                : allPortfolios.filter(p => {
+                    const kolek = p.koleksiyon.toLowerCase();
+                    const filt = filterCategory.toLowerCase();
+                    // Koleksiyon "Doğa" veya "Prestij" veya "Modern" objelerine esitse ceker
+                    return kolek.includes(filt) || (kolek.includes('doğa') && filt === 'doga');
+                });
+
+            // Sadece ilk 3 tanesini ana sayfada gösteriyoruz
+            const portfoyGosterilecek = filtered.slice(0, 3);
+
+            portfoyGosterilecek.forEach(item => {
+                const isModern = item.koleksiyon.toLowerCase().includes('modern');
+                const isDoga = item.koleksiyon.toLowerCase().includes('doğa') || item.koleksiyon.toLowerCase().includes('doga');
+
+                let textColor = 'text-gold';
+                let typeColor = 'text-gold';
+                let tagColor = 'bg-navy text-gold';
+                let categoryType = 'Prestij';
+
+                if (isModern) {
+                    textColor = 'text-modern';
+                    typeColor = 'text-modern';
+                    tagColor = 'bg-modern text-white';
+                    categoryType = 'Modern';
+                } else if (isDoga) {
+                    textColor = 'text-natureLight';
+                    typeColor = 'text-natureLight';
+                    tagColor = 'bg-natureLight text-white';
+                    categoryType = 'Doğa';
+                }
+
+                // Çok basit bir format
+                const fiyatKisa = item.fiyat.replace('0.000', 'M').replace('.000', 'K').replace('₺', '').trim();
+
+                const html = `
+                <div onclick="luxNavigate('detay.html?id=${item.id}')"
+                    class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 flex flex-col border border-gray-50 text-left cursor-pointer h-full">
+                    <div class="relative h-56 md:h-64 overflow-hidden shrink-0">
+                        <img src="${item.resim_hero}"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute top-6 left-6 ${tagColor} text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
+                            Satılık</div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-navy/80 to-transparent text-left text-white">
+                            <span class="font-serif font-bold text-2xl truncate block w-full">₺${fiyatKisa}</span>
+                        </div>
+                    </div>
+                    <div class="p-6 md:p-8 text-left flex-1 flex flex-col justify-between">
+                        <div class="mb-4">
+                            <h3 class="font-bold text-navy text-lg md:text-xl group-hover:${textColor} transition-colors mb-1 font-serif uppercase tracking-tight text-left line-clamp-2">
+                                ${item.baslik1} ${item.baslik2}</h3>
+                            <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest text-left truncate">
+                                ${item.lokasyon}</p>
+                        </div>
+                        <div class="grid grid-cols-3 border-t border-gray-100 pt-6 gap-2 text-center mt-auto">
+                            <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Oda</span><span class="text-xs font-bold text-navy truncate">${item.oda}</span></div>
+                            <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Alan</span><span class="text-xs font-bold text-navy truncate">${item.alan}</span></div>
+                            <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Tip</span><span class="text-xs font-bold ${typeColor} uppercase truncate">${categoryType}</span></div>
+                        </div>
+                    </div>
+                </div>`;
+
+                container.innerHTML += html;
+            });
+            // Aktif Tab class güncellemesi
+            updateTabClasses(filterCategory);
+        }
+
+        function updateTabClasses(activeTabId) {
+            const container = document.getElementById('portfolio-tabs');
+            if (!container) return;
+            const buttons = container.querySelectorAll('button');
+
+            buttons.forEach(btn => {
+                // Button id formatı: tab-koleksiyon_ismi
+                // activeTabId 'tumu', 'prestij', 'modern', 'doga' vb.
+                if (btn.id === 'tab-' + activeTabId) {
+                    btn.className = 'bg-navy text-gold px-6 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl transition-all';
+                } else {
+                    btn.className = 'bg-white/80 text-gray-400 hover:text-navy px-6 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-100 transition-all';
+                }
+            });
+        }
+
+        function discoverAllPortfolios() {
+            if (activePortfolioTab === 'tumu') {
+                luxNavigate('arama.html');
+            } else {
+                luxNavigate(`arama.html?koleksiyon=${activePortfolioTab}`);
+            }
+        }
+
+
+        // --- PROGRESSIVE PROFILING: localStorage Kişiselleştirme ---
+        function trackUserInterest(collection, price) {
+            let interests = JSON.parse(localStorage.getItem('imza_interests') || '[]');
+            interests.push({ collection: collection, price: price, time: Date.now() });
+            // Son 20 etkileşimi tut
+            if (interests.length > 20) interests = interests.slice(-20);
+            localStorage.setItem('imza_interests', JSON.stringify(interests));
+        }
+
+        function getTopInterest() {
+            const interests = JSON.parse(localStorage.getItem('imza_interests') || '[]');
+            if (interests.length === 0) return null;
+            const counts = {};
+            interests.forEach(i => { counts[i.collection] = (counts[i.collection] || 0) + 1; });
+            return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+        }
+
+        function showPersonalizedBanner() {
+            const topInterest = getTopInterest();
+            if (!topInterest) return;
+
+            const bannerContainer = document.getElementById('personalized-banner');
+            if (!bannerContainer) return;
+
+            const collectionNames = { prestij: 'Prestij', modern: 'Modern', doga: 'Doğa' };
+            const name = collectionNames[topInterest] || topInterest;
+
+            bannerContainer.innerHTML = `
+                <div class="bg-gradient-to-r from-navy via-slate-800 to-navy rounded-[2rem] p-8 md:p-10 text-white relative overflow-hidden shadow-xl mb-10 border border-gold/20">
+                    <div class="absolute inset-0 brand-pattern opacity-10"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 bg-gold/20 rounded-2xl flex items-center justify-center">
+                                <i class="fa-solid fa-sparkles text-gold text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gold text-[10px] font-bold uppercase tracking-widest">Sizin İçin Seçtik</p>
+                                <h3 class="text-xl font-serif font-bold">${name} koleksiyonundan özel önerilerimiz var</h3>
+                            </div>
+                        </div>
+                        <button onclick="setPortfolioTab('${topInterest}')"
+                            class="bg-gold hover:bg-yellow-600 text-navy px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-gold/20 whitespace-nowrap">
+                            Keşfet <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            bannerContainer.classList.remove('hidden');
+        }
+
+        // Sayfa yüklendiğinde kişiselleştirilmiş banner'ı göster
+        document.addEventListener('DOMContentLoaded', () => { showPersonalizedBanner(); });
+
+
+        // --- LIFESTYLE MATCHING ENGINE ---
+        let lmAnswers = {};
+
+        function lmAnswer(qNum, answer) {
+            lmAnswers[qNum] = answer;
+            // Hide current, show next
+            document.getElementById('lm-q' + qNum).classList.add('hidden');
+            if (qNum < 4) {
+                document.getElementById('lm-q' + (qNum + 1)).classList.remove('hidden');
+            } else {
+                // Show result
+                showLifestyleResult();
+            }
+        }
+
+        function showLifestyleResult() {
+            const resultDiv = document.getElementById('lm-result');
+            const cardDiv = document.getElementById('lm-match-card');
+            resultDiv.classList.remove('hidden');
+
+            // Simple scoring algorithm
+            let scores = {
+                'Boğaz Manzaralı Villa': { score: 50, img: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=400&fit=crop', loc: 'Sarıyer, İstanbul', price: '₺35M', rooms: '6+2' },
+                'Modern Loft Daire': { score: 50, img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&fit=crop', loc: 'Kadıköy, İstanbul', price: '₺12M', rooms: '3+1' },
+                'Ekolojik Orman Evi': { score: 50, img: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&fit=crop', loc: 'Sapanca, Sakarya', price: '₺24M', rooms: '4+1' }
+            };
+
+            // Q1: Work style
+            if (lmAnswers[1] === 'remote') {
+                scores['Ekolojik Orman Evi'].score += 30;
+                scores['Boğaz Manzaralı Villa'].score += 20;
+            } else {
+                scores['Modern Loft Daire'].score += 30;
+            }
+
+            // Q2: Pets
+            if (lmAnswers[2] === 'pet_yes') {
+                scores['Ekolojik Orman Evi'].score += 25;
+                scores['Boğaz Manzaralı Villa'].score += 15;
+            } else {
+                scores['Modern Loft Daire'].score += 15;
+            }
+
+            // Q3: Social life
+            if (lmAnswers[3] === 'social') {
+                scores['Modern Loft Daire'].score += 30;
+                scores['Boğaz Manzaralı Villa'].score += 10;
+            } else {
+                scores['Ekolojik Orman Evi'].score += 30;
+            }
+
+            // Q4: Family size
+            if (lmAnswers[4] === 'family') {
+                scores['Boğaz Manzaralı Villa'].score += 30;
+                scores['Ekolojik Orman Evi'].score += 15;
+            } else if (lmAnswers[4] === 'single') {
+                scores['Modern Loft Daire'].score += 25;
+            } else {
+                scores['Boğaz Manzaralı Villa'].score += 10;
+                scores['Modern Loft Daire'].score += 10;
+            }
+
+            // Normalize scores to percentage
+            const maxPossible = 135; // max possible score
+            const sorted = Object.entries(scores).sort((a, b) => b[1].score - a[1].score);
+            const best = sorted[0];
+            const matchPercent = Math.min(99, Math.round((best[1].score / maxPossible) * 100));
+
+            cardDiv.innerHTML = `
+                <div class="flex gap-5 items-center">
+                    <img src="${best[1].img}" class="w-24 h-24 rounded-xl object-cover shadow-lg">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <h4 class="font-serif font-bold text-gold text-lg">${best[0]}</h4>
+                            <span class="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full">%${matchPercent} Uyumlu</span>
+                        </div>
+                        <p class="text-gray-400 text-xs"><i class="fa-solid fa-location-dot mr-1"></i> ${best[1].loc}</p>
+                        <p class="text-white font-bold mt-1">${best[1].price} <span class="text-gray-500 text-xs font-normal ml-2">${best[1].rooms}</span></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetLifestyle() {
+            lmAnswers = {};
+            document.getElementById('lm-result').classList.add('hidden');
+            document.querySelectorAll('.lm-question').forEach(q => q.classList.add('hidden'));
+            document.getElementById('lm-q1').classList.remove('hidden');
+        }
+
+    </script>
+</body>
+
+</html>

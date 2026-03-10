@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlanları Keşfet | İmza Gayrimenkul</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Leaflet Harita & Çizim Kütüphaneleri -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="static/js/kadikoy_besiktas.js"></script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a192f',
+                        gold: '#c5a059',
+                        modern: '#e17055',
+                        soft: '#f8fafc',
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Maybach Kapısı: Ağır ve Vakumlu Geçiş Mekaniği */
+        @media (min-width: 768px) {
+
+            html,
+            body {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .main-wrapper {
+                height: 100%;
+                transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+                will-change: transform;
+            }
+
+            section.snap-section {
+                height: 100vh;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                overflow: hidden;
+            }
+        }
+
+        .filter-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .filter-panel::-webkit-scrollbar-thumb {
+            background: #c5a059;
+            border-radius: 10px;
+        }
+
+        .map-placeholder {
+            background-image: radial-gradient(rgba(197, 160, 89, 0.2) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .brand-pattern {
+            background-image: radial-gradient(#c5a059 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+
+        /* Header Slide Down Animasyonu */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-animate {
+            animation: slideDown 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-up {
+            opacity: 0;
+            animation: slideUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Lux Curtain (Lüks Perde) Köprüsü */
+        .lux-curtain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0a192f;
+            z-index: 99999;
+            pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lux-curtain.hidden {
+            opacity: 0;
+        }
+    </style>
+    <script>
+        // Lux Curtain Bridge Logic (Fluid Outro, Luxury Intro)
+        function luxNavigate(url) {
+            const curtain = document.querySelector('.lux-curtain');
+            curtain.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            curtain.classList.remove('hidden');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 450);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Açılış (Intro) - Lüks ve Ağır
+            const curtain = document.querySelector('.lux-curtain');
+            curtain.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+            setTimeout(() => {
+                curtain.classList.add('hidden');
+            }, 100);
+
+            // Geri butonu için düzeltme (Bfcache)
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted) {
+                    const curtain = document.querySelector('.lux-curtain');
+                    curtain.classList.add('hidden');
+                }
+            });
+
+            // Link Yakalayıcı
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('.html') && !link.target && !e.ctrlKey && !e.shiftKey) {
+                    const targetUrl = link.href;
+                    if (targetUrl.includes('#')) return; // Hash linkleri atla
+
+                    const isInternal = targetUrl.includes(window.location.origin) || !targetUrl.startsWith('http');
+
+                    if (isInternal) {
+                        e.preventDefault();
+                        luxNavigate(targetUrl);
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+
+<body class="text-slate-800 antialiased font-sans flex flex-col h-screen">
+
+    <!-- Lux Curtain -->
+    <div class="lux-curtain"></div>
+
+    <!-- Header (Sabit) -->
+    <header class="fixed w-full z-50 border-b border-gray-100 bg-white/90 backdrop-blur-md header-animate">
+        <nav class="max-w-[1920px] mx-auto px-4 md:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="anasayfa.html" class="flex items-center group">
+                    <i class="fa-solid fa-signature text-gold text-xl mr-3"></i>
+                    <span class="font-serif font-bold text-lg tracking-widest text-navy uppercase text-left">İMZA</span>
+                </a>
+                <div class="flex items-center space-x-6">
+                    <a href="anasayfa.html"
+                        class="text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ana
+                        Sayfa</a>
+                    <a href="portal.html"
+                        class="bg-navy text-gold px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-navy/20">Portal</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="main-wrapper" id="mainWrapper">
+        <!-- Section 1: Search Focus (Hero) -->
+        <section class="snap-section bg-navy relative overflow-hidden flex flex-col items-center justify-center p-4">
+            <div class="absolute inset-0 brand-pattern opacity-20"></div>
+            <div class="max-w-4xl w-full text-center relative z-10 animate-up" style="animation-delay: 0.3s;">
+                <h1
+                    class="text-white font-serif font-bold text-4xl md:text-6xl mb-8 uppercase tracking-tighter text-left text-center">
+                    İmza Koleksiyonlarını <br><span class="text-gold italic">Keşfedin</span></h1>
+                <div
+                    class="bg-white rounded-full p-2 flex flex-col md:flex-row items-center shadow-2xl shadow-gold/20 text-navy">
+                    <div
+                        class="flex-1 w-full md:w-auto px-6 py-4 md:py-0 border-b md:border-b-0 md:border-r border-gray-100">
+                        <div class="flex items-center text-gray-400">
+                            <i class="fa-solid fa-location-dot mr-3 text-gold text-xl"></i>
+                            <input type="text" placeholder="İlçe, mahalle, proje veya referans no..."
+                                class="w-full focus:outline-none font-medium bg-transparent text-lg">
+                        </div>
+                    </div>
+                    <div
+                        class="w-full md:w-56 px-6 py-4 md:py-0 border-b md:border-b-0 md:border-r border-gray-100 text-left">
+                        <select class="w-full focus:outline-none font-medium bg-transparent cursor-pointer text-lg">
+                            <option>İşlem Tipi</option>
+                            <option>Satılık</option>
+                            <option>Kiralık</option>
+                        </select>
+                    </div>
+                    <button onclick="goToSection(1)"
+                        class="w-full md:w-auto mt-2 md:mt-0 bg-gold hover:bg-yellow-600 text-navy px-10 py-5 rounded-full font-bold transition-all text-lg uppercase tracking-widest">
+                        Listele
+                    </button>
+                </div>
+                <div
+                    class="mt-8 flex justify-center gap-8 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
+                    <span class="hover:text-gold cursor-pointer transition-colors">Satılık</span>
+                    <span class="hover:text-gold cursor-pointer transition-colors">Kiralık</span>
+                    <span class="hover:text-gold cursor-pointer transition-colors">Yatırım</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Results & Map View -->
+        <section class="snap-section bg-soft flex overflow-hidden !justify-start">
+            <div class="flex-1 flex overflow-hidden pt-16">
+                <!-- Sol Panel: İlan Listesi -->
+                <section class="w-full lg:w-[600px] xl:w-[750px] bg-white flex flex-col border-r border-gray-100">
+                    <div class="p-8 border-b border-gray-50 flex justify-between items-center text-left">
+                        <h2 class="font-serif font-bold text-navy text-xl uppercase tracking-tight text-left">İlanlar
+                            <span class="text-gold font-sans text-xs ml-2">(42 Kayıt)</span>
+                        </h2>
+                        <div class="flex gap-3">
+                            <button
+                                class="text-navy font-bold text-[10px] uppercase tracking-widest border-b-2 border-gold/20 pb-1">Filtreler
+                                <i class="fa-solid fa-sliders ml-1"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto p-8 space-y-10 filter-panel text-left">
+                        <!-- Dinamik İlan Listesi Konteyneri -->
+                        <div id="portfoy-list" class="space-y-10">
+                            <!-- JS tarafından veri bekleniyor... -->
+                            <div class="text-center py-10">Yükleniyor...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sağ Panel: Harita -->
+                <section class="hidden lg:block flex-1 bg-gray-100 relative">
+                    <div id="search-map" class="w-full h-full z-0"></div>
+
+                    <!-- Harita Üstü Floating Paneller / Butonlar -->
+                    <div class="absolute top-10 left-10 flex gap-4 z-10 pointer-events-none">
+                        <button id="btn-draw-polygon"
+                            class="pointer-events-auto bg-navy text-gold shadow-2xl px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-3 hover:bg-slate-800 transition-colors border border-gold/30">
+                            <i class="fa-solid fa-draw-polygon text-lg"></i> Bölge Çiz
+                        </button>
+                        <button id="btn-clear-polygon"
+                            class="pointer-events-auto hidden bg-red-500 text-white shadow-xl px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-colors border border-red-400">
+                            <i class="fa-solid fa-trash text-lg"></i> Çizimi İzole Et (İptal)
+                        </button>
+                    </div>
+
+                    <div
+                        class="absolute bottom-10 right-10 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-gray-100 z-10 pointer-events-none">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-navy mb-1"><i
+                                class="fa-solid fa-circle-info text-gold mr-1"></i> İnteraktif Harita</p>
+                        <p class="text-xs text-gray-500 font-medium">Satılık & Kiralık Tüm Portföyler</p>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+
+    <!-- Mobil Alt Bar -->
+    <div
+        class="lg:hidden fixed bottom-0 left-0 right-0 bg-white p-4 grid grid-cols-2 gap-4 border-t border-gray-100 z-50">
+        <button
+            class="bg-navy text-gold py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-3">
+            <i class="fa-solid fa-map-location-dot"></i> Harita
+        </button>
+        <button
+            class="bg-white border border-navy text-navy py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-3">
+            <i class="fa-solid fa-sliders"></i> Filtrele
+        </button>
+    </div>
+
+    <script>
+        // Smooth Section Scroller
+        let currentSectionIndex = 0;
+        let isScrolling = false;
+        const mainWrapper = document.getElementById('mainWrapper');
+        const sections = document.querySelectorAll('section.snap-section');
+
+        function goToSection(index) {
+            if (index < 0 || index >= sections.length || isScrolling || window.innerWidth < 768) return;
+            isScrolling = true;
+            currentSectionIndex = index;
+            const yOffset = index * 100;
+            mainWrapper.style.transform = `translateY(-${yOffset}vh)`;
+            setTimeout(() => { isScrolling = false; }, 1200);
+        }
+
+        window.addEventListener('wheel', (e) => {
+            if (isScrolling || window.innerWidth < 768) return;
+            // List panel içindeysek scroll'un oraya gitmesini istiyoruz, snap sadece dışarıda
+            const isInsideList = e.target.closest('.filter-panel');
+            if (isInsideList) return;
+
+            if (e.deltaY > 50) goToSection(currentSectionIndex + 1);
+            else if (e.deltaY < -50) goToSection(currentSectionIndex - 1);
+        }, { passive: false });
+
+        window.addEventListener('keydown', (e) => {
+            if (isScrolling || window.innerWidth < 768) return;
+            if (e.key === 'ArrowDown') goToSection(currentSectionIndex + 1);
+            if (e.key === 'ArrowUp') goToSection(currentSectionIndex - 1);
+        });
+
+        // Hash & Parameter Navigation Logic
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.hash === '#results' && window.innerWidth >= 768) {
+                // Kısa bir bekleme süresi vererek tasarımın yüklenmesini sağlıyor ve sonra yumuşakça aşağı kaydırıyoruz
+                setTimeout(() => {
+                    goToSection(1);
+                }, 400); // 400ms bekle ve sonra Maybach scroll efektini tetikle
+            }
+
+            // --- LEAFLET INTERAKTIF HARITA & DRAW (POLYGON) ---
+            let map = null;
+            let markersLayer = new L.FeatureGroup();
+            let drawControl = null;
+            let drawnItems = new L.FeatureGroup();
+            let allPortfoliosMarkerMap = new Map(); // id -> marker
+
+            function initSearchMap(portfoyler) {
+                if (map) map.remove();
+
+                // Default Istanbul Merkezi (İmza Ofis)
+                map = L.map('search-map').setView([41.0082, 28.9784], 11);
+
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; OpenStreetMap &copy; CARTO',
+                    subdomains: 'abcd',
+                    maxZoom: 20
+                }).addTo(map);
+
+                map.addLayer(markersLayer);
+                map.addLayer(drawnItems);
+
+                // Çizim Kontrollerini Ayarla
+                drawControl = new L.Control.Draw({
+                    draw: {
+                        polygon: {
+                            shapeOptions: {
+                                color: '#c5a059',
+                                weight: 3,
+                                fillColor: '#0a192f',
+                                fillOpacity: 0.2
+                            }
+                        },
+                        polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false
+                    },
+                    edit: { featureGroup: drawnItems, remove: false, edit: false }
+                });
+
+                // GeoJSON Sınırları (Özel Hizmet Bölgeleri)
+                if (typeof istanbulDistrictsGeoJSON !== 'undefined') {
+                    L.geoJSON(istanbulDistrictsGeoJSON, {
+                        style: function (feature) {
+                            return {
+                                color: feature.properties.color || '#c5a059',
+                                weight: 2,
+                                opacity: 0.8,
+                                fillOpacity: 0.1,
+                                dashArray: '5, 5'
+                            };
+                        },
+                        onEachFeature: function (feature, layer) {
+                            if (feature.properties && feature.properties.name) {
+                                layer.bindTooltip(`<b>${feature.properties.name}</b><br><span style="font-size:10px">${feature.properties.description}</span>`, {
+                                    sticky: true,
+                                    className: 'custom-tooltip'
+                                });
+                            }
+                        }
+                    }).addTo(map);
+                }
+
+                updateMapMarkers(portfoyler);
+
+                // Harita Eventleri
+                map.on(L.Draw.Event.CREATED, function (event) {
+                    var layer = event.layer;
+                    drawnItems.clearLayers();
+                    drawnItems.addLayer(layer);
+
+                    filterListByPolygon(layer.toGeoJSON().geometry);
+
+                    document.getElementById('btn-clear-polygon').classList.remove('hidden');
+                    document.getElementById('btn-draw-polygon').classList.add('hidden');
+                });
+
+                document.getElementById('btn-draw-polygon').addEventListener('click', () => {
+                    new L.Draw.Polygon(map, drawControl.options.draw.polygon).enable();
+                });
+
+                document.getElementById('btn-clear-polygon').addEventListener('click', () => {
+                    drawnItems.clearLayers();
+                    document.getElementById('btn-clear-polygon').classList.add('hidden');
+                    document.getElementById('btn-draw-polygon').classList.remove('hidden');
+
+                    const cards = document.querySelectorAll('.list-item-card');
+                    cards.forEach(c => c.style.display = 'flex');
+
+                    const recordCountSpan = document.querySelector('.font-sans.text-xs.ml-2');
+                    if (recordCountSpan) recordCountSpan.textContent = `(${cards.length} Kayıt)`;
+                });
+            }
+
+            function filterListByPolygon(polygonGeometry) {
+                const coords = polygonGeometry.coordinates[0];
+                let matchCount = 0;
+                const cards = document.querySelectorAll('.list-item-card');
+
+                cards.forEach(card => {
+                    const id = card.getAttribute('onclick').match(/id=(\d+)/);
+                    if (!id) return;
+                    const marker = allPortfoliosMarkerMap.get(parseInt(id[1]));
+
+                    if (marker) {
+                        const pt = [marker.getLatLng().lng, marker.getLatLng().lat];
+                        if (isPointInPolygon(pt, coords)) {
+                            card.style.display = 'flex';
+                            matchCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+
+                const recordCountSpan = document.querySelector('.font-sans.text-xs.ml-2');
+                if (recordCountSpan) recordCountSpan.textContent = `(${matchCount} Çizilen Alan İçinde)`;
+            }
+
+            function isPointInPolygon(point, vs) {
+                var x = point[0], y = point[1];
+                var inside = false;
+                for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+                    var xi = vs[i][0], yi = vs[i][1];
+                    var xj = vs[j][0], yj = vs[j][1];
+                    var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            function updateMapMarkers(portfoyler) {
+                markersLayer.clearLayers();
+                allPortfoliosMarkerMap.clear();
+
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: "<div class='w-10 h-10 bg-navy rounded-t-full rounded-bl-full flex mx-auto items-center justify-center shadow-lg border-2 border-gold rotate-45 hover:scale-110 transition-transform cursor-pointer group'><i class='fa-solid fa-home text-white text-sm -rotate-45 group-hover:text-gold'></i></div>",
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40],
+                    popupAnchor: [0, -40]
+                });
+
+                portfoyler.forEach(p => {
+                    if (p.enlem && p.boylam) {
+                        const lat = parseFloat(p.enlem);
+                        const lng = parseFloat(p.boylam);
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            const m = L.marker([lat, lng], { icon: customIcon })
+                                .bindPopup(`<b style="color:#0a192f;font-family:'Playfair Display'">${p.baslik1}</b><br><span style="color:#c5a059;font-weight:bold;">${p.fiyat}</span>`);
+                            markersLayer.addLayer(m);
+                            allPortfoliosMarkerMap.set(p.id, m);
+                        }
+                    }
+                });
+
+                if (markersLayer.getLayers().length > 0) {
+                    map.fitBounds(markersLayer.getBounds(), { padding: [50, 50], maxZoom: 15 });
+                }
+            }
+
+            // Portföyleri API'den çek ve render et
+            const fetchPortfoyler = async () => {
+                try {
+                    const response = await fetch('/api/portfoyler');
+                    const portfoyler = await response.json();
+
+                    const listContainer = document.getElementById('portfoy-list');
+                    listContainer.innerHTML = ''; // Loading textini temizle
+
+                    portfoyler.forEach(item => {
+                        // Koleksiyon key'ini belirle
+                        const COL_STYLES = {
+                            konut: 'bg-navy/90 text-gold', arsa: 'bg-amber-800 text-white', tarla: 'bg-green-700 text-white',
+                            ciftlik: 'bg-amber-900 text-white', isyeri: 'bg-red-700 text-white', sanayi: 'bg-gray-700 text-white',
+                            turizm: 'bg-cyan-700 text-white', donusum: 'bg-orange-700 text-white', bina: 'bg-indigo-700 text-white',
+                            devremulk: 'bg-purple-700 text-white'
+                        };
+                        const kolRaw = (item.koleksiyon || '').toLowerCase();
+                        let collectionKey = 'konut';
+                        for (const k of Object.keys(COL_STYLES)) {
+                            if (kolRaw.includes(k) || kolRaw === k) { collectionKey = k; break; }
+                        }
+                        const durumRenk = COL_STYLES[collectionKey] || 'bg-navy/90 text-gold';
+
+                        const fiyatKisa = item.fiyat.replace('0.000', 'M').replace('.000', 'K').replace('₺', '').trim(); // Çok basit bir format
+
+                        const html = `
+                        <div onclick="luxNavigate('detay.html?id=${item.id}')" data-collection="${collectionKey}"
+                            class="list-item-card group flex flex-col md:flex-row gap-8 bg-white hover:shadow-2xl hover:shadow-gold/5 rounded-[3rem] p-5 transition-all duration-700 border border-transparent hover:border-gold/10 cursor-pointer text-left">
+                            <div class="w-full md:w-72 h-56 rounded-[2.5rem] overflow-hidden relative shrink-0 text-left">
+                                <img src="${item.resim_hero}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                                <div class="absolute top-5 left-5 ${durumRenk} text-[8px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest backdrop-blur-md">Satılık</div>
+                            </div>
+                            <div class="flex flex-col justify-between py-3 flex-1 text-left">
+                                <div class="text-left">
+                                    <h3 class="font-serif font-bold text-navy text-xl group-hover:text-gold transition-colors uppercase leading-tight mb-2 text-left">${item.baslik1} ${item.baslik2}</h3>
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-6 text-left">
+                                        <i class="fa-solid fa-location-dot text-gold/60 mr-1"></i> ${item.lokasyon}
+                                    </p>
+                                    <div class="flex gap-8 text-[11px] font-black uppercase tracking-widest text-gray-500 text-left">
+                                        <span><i class="fa-solid fa-bed text-gold mr-1"></i> ${item.oda}</span>
+                                        <span><i class="fa-solid fa-vector-square text-gold mr-1"></i> ${item.alan}</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center mt-8 text-left">
+                                    <span class="text-2xl font-serif font-bold text-navy">${item.fiyat}</span>
+                                    <span class="text-gold font-bold text-[10px] uppercase tracking-widest border-b-2 border-gold/20 pb-1 group-hover:border-gold transition-all text-left">Detay &rarr;</span>
+                                </div>
+                            </div>
+                        </div>`;
+                        listContainer.innerHTML += html;
+                    });
+
+                    // Koleksiyon Filtresi URL Parametresi Dinleme (Render sonrasi baslat)
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const koleksiyonParam = urlParams.get('koleksiyon');
+                    if (koleksiyonParam && koleksiyonParam !== 'tumu') {
+                        const cards = document.querySelectorAll('.list-item-card');
+                        let matchCount = 0;
+                        cards.forEach(card => {
+                            if (card.dataset.collection === koleksiyonParam) {
+                                card.style.display = 'flex';
+                                matchCount++;
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+
+                        // Kayıt sayısını güncelle
+                        const recordCountSpan = document.querySelector('.font-sans.text-xs.ml-2');
+                        if (recordCountSpan) {
+                            recordCountSpan.textContent = `(${matchCount} Kayıt)`;
+                        }
+
+                        // Aşağı yavaşça in (mobil ve ufak ekran harici)
+                        if (window.innerWidth >= 768) {
+                            setTimeout(() => {
+                                goToSection(1);
+                            }, 400);
+                        }
+                    } else {
+                        // Tümü ise toplam kayıt sayısı
+                        const recordCountSpan = document.querySelector('.font-sans.text-xs.ml-2');
+                        if (recordCountSpan) {
+                            recordCountSpan.textContent = `(${portfoyler.length} Kayıt)`;
+                        }
+                    }
+
+                    // HARİTAYI ÇİZ MANTIĞI:
+                    initSearchMap(portfoyler);
+
+                } catch (error) {
+                    console.error('Listeleme hatası:', error);
+                    document.getElementById('portfoy-list').innerHTML = '<div class="text-center py-10 text-red-500">Veriler yüklenirken bir hata oluştu.</div>';
+                }
+            };
+
+            fetchPortfoyler();
+        });
+    </script>
+</body>
+
+</html>
