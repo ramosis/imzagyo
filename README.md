@@ -52,3 +52,4 @@ python scripts/fill_module_data.py
 
 ---
 *İmza Gayrimenkul Yazılım Ekibi tarafından geliştirilmiştir.*
+
