@@ -4,9 +4,9 @@ FROM python:3.10-slim
 # Çalışma dizinini ayarla
 WORKDIR /app
 
-# Sistem bağımlılıklarını yükle (SQLite ve diğer araçlar için gerekirse)
+# Sistem bağımlılıklarını yükle (Gerekli temel paketler)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Bağımlılıkları kopyala ve yükle
