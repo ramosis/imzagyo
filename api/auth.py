@@ -163,3 +163,76 @@ def mobile_login():
         'username': user['username'],
         'app_route': authorized_apps
     }), 200
+import secrets
+
+@auth_bp.route('/api/auth/request-reset', methods=['POST'])
+def request_reset():
+    """Şifre sıfırlama talebi oluşturur ve e-posta gönderir."""
+    data = request.json
+    email = data.get('email')
+    if not email:
+        return jsonify({'error': 'E-posta adresi gerekli'}), 400
+        
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    
+    if user:
+        # Token oluştur (32 karakterlik güvenli bir dize)
+        token = secrets.token_urlsafe(32)
+        expiry = (datetime.datetime.utcnow() + datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Mevcut kullanılmamış token'ları geçersiz kıl
+        conn.execute('UPDATE password_resets SET used = 1 WHERE user_id = ?', (user['id'],))
+        
+        # Yeni token'ı kaydet
+        conn.execute('INSERT INTO password_resets (user_id, token, expiry) VALUES (?, ?, ?)',
+                     (user['id'], token, expiry))
+        conn.commit()
+        
+        # E-posta gönder (Arka planda gönderilmesi daha iyidir ama şimdilik senkron)
+        from api.mail_service import send_password_reset_email
+        success, msg = send_password_reset_email(email, token, user['username'])
+        
+        if not success:
+            conn.close()
+            # Gerçekte güvenlik için hata mesajı detaylı verilmemeli ama geliştirme için veriyoruz
+            return jsonify({'error': 'E-posta gönderilemedi', 'details': msg}), 500
+            
+    conn.close()
+    
+    # Güvenlik için kullanıcı olsa da olmasa da "Eğer kayıtlıysanız e-posta gönderildi" mesajı verilir
+    return jsonify({'message': 'Şifre sıfırlama talimatları e-posta adresinize gönderildi.'}), 200
+
+@auth_bp.route('/api/auth/reset-password', methods=['POST'])
+def reset_password():
+    """Token ile şifreyi sıfırlar."""
+    data = request.json
+    token = data.get('token')
+    new_password = data.get('password')
+    
+    if not token or not new_password:
+        return jsonify({'error': 'Token ve yeni şifre gereklidir'}), 400
+        
+    conn = get_db_connection()
+    now = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    
+    reset_req = conn.execute('''
+        SELECT * FROM password_resets 
+        WHERE token = ? AND used = 0 AND expiry > ?
+    ''', (token, now)).fetchone()
+    
+    if not reset_req:
+        conn.close()
+        return jsonify({'error': 'Geçersiz veya süresi dolmuş token'}), 400
+        
+    # Şifreyi güncelle
+    new_hash = hash_password(new_password)
+    conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (new_hash, reset_req['user_id']))
+    
+    # Token'ı kullanıldı olarak işaretle
+    conn.execute('UPDATE password_resets SET used = 1 WHERE id = ?', (reset_req['id'],))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Şifreniz başarıyla güncellendi.'}), 200

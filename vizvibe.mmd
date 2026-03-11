@@ -26,6 +26,12 @@ flowchart TD
     %% @task_consolidation [ai-task, closed, 2026-03-10, nam]
     task_consolidation("Script Consolidation<br/><sub>Unified portal logic into a<br/>single organized script block,<br/>removing 3,300+ redundant lines<br/>and fixing syntax errors</sub>")
 
+    %% @feature_docker_deployment [ai-task, closed, 2026-03-11, nam]
+    feature_docker_deployment("Docker Deployment<br/><sub>Containerized the application<br/>and successfully deployed it<br/>to Google Cloud VPS using<br/>Docker Compose</sub>")
+
+    %% @feature_mobile_app [ai-task, closed, 2026-03-11, nam]
+    feature_mobile_app("Mobile App Success<br/><sub>Expo/React Native SDK 54 ile<br/>mobil uygulama başarıyla başlatıldı,<br/>tünel üzerinden cihazda test edildi<br/>ve premium UI arayüzleri hazırlandı</sub>")
+
     %% === FUTURE WORK ===
     %% @future_integrations [ai-task, opened, 2026-03-11, nam]
     future_integrations("Platform Integrations<br/><sub>Implement automated property<br/>publishing to Sahibinden,<br/>Hepsiemlak, and Emlakjet<br/>via API hooks</sub>")
@@ -39,14 +45,17 @@ flowchart TD
     feature_appointments_v2 --> feature_contract_builder
     feature_contract_builder --> feature_ai_integration
     feature_ai_integration --> task_consolidation
-    task_consolidation --> future_integrations
-    task_consolidation --> future_payroll_api
+    task_consolidation --> feature_docker_deployment
+    feature_docker_deployment --> feature_mobile_app
+    feature_mobile_app --> feature_multi_domain
+    feature_multi_domain --> future_integrations
+    feature_multi_domain --> future_payroll_api
     future_integrations -.-> ultimate_goal
     future_payroll_api -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        task_consolidation
+        feature_multi_domain
     end
 
     %% === STYLES ===
@@ -57,8 +66,9 @@ flowchart TD
     style feature_contract_builder fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_ai_integration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
-    %% Recent node (highlighted purple)
-    style task_consolidation fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style task_consolidation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+
+    style feature_mobile_app fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph (dashed border)
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
