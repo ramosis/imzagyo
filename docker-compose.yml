@@ -11,9 +11,9 @@ services:
       - ./.env:/app/.env
       - data_volume:/app/data
     restart: always
-
-volumes:
-  data_volume:
     environment:
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
+
+volumes:
+  data_volume:
