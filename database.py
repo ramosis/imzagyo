@@ -687,7 +687,7 @@ def doldur_ornek_veriler():
     
     for p in portfoyler:
         cursor.execute('''
-            INSERT INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, danisman_isim, danisman_unvan, danisman_resim)
+            INSERT OR IGNORE INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, danisman_isim, danisman_unvan, danisman_resim)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (p['id'], p['koleksiyon'], p['baslik1'], p['baslik2'], p['lokasyon'], p['refNo'], p['fiyat'], p['oda'], p['alan'], p['kat'], p['ozellik_renk'], p['bg_renk'], p['btn_renk'], p['icon_renk'], p['resim_hero'], p['resim_hikaye'], p['hikaye'], p['ozellikler'], p['danisman_isim'], p['danisman_unvan'], p['danisman_resim']))
         
@@ -781,7 +781,7 @@ def doldur_ornek_veriler():
     
     for e in ekip_uyeleri:
         cursor.execute('''
-            INSERT INTO ekip (id, isim, unvan, detaylar, uzmanlikAlanlari, telefon, email, resim, sosyal_linkedin, sosyal_instagram, sosyal_twitter, tip)
+            INSERT OR IGNORE INTO ekip (id, isim, unvan, detaylar, uzmanlikAlanlari, telefon, email, resim, sosyal_linkedin, sosyal_instagram, sosyal_twitter, tip)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (e['id'], e['isim'], e['unvan'], e['detaylar'], e['uzmanlikAlanlari'], e['telefon'], e['email'], e['resim'], e['sosyal_linkedin'], e['sosyal_instagram'], e['sosyal_twitter'], e['tip']))
 
@@ -789,11 +789,11 @@ def doldur_ornek_veriler():
     print("Örnek sözleşme şablonları ekleniyor...")
     cursor.execute('SELECT COUNT(*) FROM contract_templates')
     if cursor.fetchone()[0] == 0:
-        cursor.execute('INSERT INTO contract_templates (name, description) VALUES (?, ?)', 
+        cursor.execute('INSERT OR IGNORE INTO contract_templates (name, description) VALUES (?, ?)', 
                        ("Konut Kira Sözleşmesi", "Standart konut kiralama işlemleri için kullanılır."))
         template_kira_id = cursor.lastrowid
 
-        cursor.execute('INSERT INTO contract_templates (name, description) VALUES (?, ?)', 
+        cursor.execute('INSERT OR IGNORE INTO contract_templates (name, description) VALUES (?, ?)', 
                        ("Gayrimenkul Satış Vaadi Sözleşmesi", "Satış vaadi ön protokolu gerektiren durumlarda kullanılır."))
         template_satis_id = cursor.lastrowid
         
