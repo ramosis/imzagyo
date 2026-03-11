@@ -71,6 +71,33 @@
             }
         }
 
+        /* Mobil Düzenlemeler */
+        @media (max-width: 767px) {
+            html, body {
+                overflow-x: hidden;
+                overflow-y: auto; /* Doğal kaydırmaya izin ver */
+                height: auto;
+            }
+            .main-wrapper {
+                transform: none !important; /* JS transformunu mobilde iptal et */
+                height: auto;
+            }
+            .intro-screen {
+                height: auto;
+                display: block;
+            }
+            #heroSlider {
+                height: 70vh !important; /* Mobilde hero yüksekliği */
+                min-height: 500px;
+            }
+            section.snap-section {
+                height: auto;
+                min-height: 100vh;
+                padding-top: 5rem;
+                padding-bottom: 3rem;
+            }
+        }
+
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -209,6 +236,7 @@
 
         .lux-curtain.hidden {
             opacity: 0;
+            visibility: hidden; /* Butonlara tıklamayı engellememesi için */
         }
     </style>
     <script>
@@ -1183,6 +1211,7 @@
         const sections = document.querySelectorAll('.intro-screen, section.snap-section, footer.snap-section');
 
         function goToSection(index) {
+            if (window.innerWidth < 768) return; // Mobilde JS kaydırmayı tamamen iptal et
             if (index < 0 || index >= sections.length || isScrolling) return;
 
             isScrolling = true;
