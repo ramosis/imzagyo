@@ -3,3 +3,5 @@ flask-cors
 python-dotenv
 google-generativeai
 PyJWT
+beautifulsoup4
+requests
