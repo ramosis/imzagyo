@@ -16,8 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Uygulama kodunu kopyala
 COPY . .
 
-# Uploads ve DB için yazma izinlerini kontrol et (Unix tabanlı sistemlerde gerekebilir)
-RUN mkdir -p uploads && chmod -R 777 uploads
+# Uploads ve DB için yazma izinlerini kontrol et
+RUN mkdir -p uploads data && chmod -R 777 uploads data
 
 # Uygulama portunu (8000) dışarı aç
 EXPOSE 8000

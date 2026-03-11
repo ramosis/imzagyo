@@ -7,7 +7,7 @@ import json
 import os
 import hashlib
 
-DB_NAME = "imza_database.db"
+DB_NAME = "data/imza_database.db"
 
 def get_db_connection():
     """Returns a sqlite3 connection object with row_factory set to Row."""
@@ -17,9 +17,11 @@ def get_db_connection():
 
 def init_db():
     """Initializes the database, creates tables, and inserts a default admin user."""
-    # Eski veritabanı varsa sil (Şemayı tazelemek için)
-    if os.path.exists(DB_NAME):
-        os.remove(DB_NAME)
+    # Eski veritabanını silmeyi durduruyoruz (Veri kaybını önlemek ve Docker hatalarını gidermek için)
+    # Eğer Dosya yerine yanlışlıkla Klasör oluşmuşsa uyarı ver
+    if os.path.exists(DB_NAME) and os.path.isdir(DB_NAME):
+        print(f"HATA: {DB_NAME} bir klasör olarak görünüyor! Lütfen sunucudaki bu klasörü silin.")
+        return
 
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()

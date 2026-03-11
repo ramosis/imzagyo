@@ -8,9 +8,12 @@ services:
       - "8000:8000"
     volumes:
       - ./uploads:/app/uploads
-      - ./imza_database.db:/app/imza_database.db
       - ./.env:/app/.env
+      - data_volume:/app/data
     restart: always
+
+volumes:
+  data_volume:
     environment:
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
