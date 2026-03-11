@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İmza Gayrimenkul | Proje Detayı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .text-gold { color: #b99860; }
+        .bg-gold { background-color: #b99860; }
+        .border-gold { border-color: #b99860; }
+        .hero-overlay { background: linear-gradient(to bottom, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 1)); }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-slate-900 font-bold text-xl">İ</div>
+                <span class="text-xl font-bold tracking-wider">İMZA <span class="text-gold">GAYRİMENKUL</span></span>
+            </div>
+            <a href="index.html" class="text-sm hover:text-gold transition-colors">Tüm Portföyler</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative h-screen flex items-center justify-center pt-20">
+        <div id="hero-bg" class="absolute inset-0 bg-cover bg-center transition-all duration-1000" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6199fbfd00?auto=format&fit=crop&w=2000&q=80')"></div>
+        <div class="absolute inset-0 hero-overlay"></div>
+        
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <h1 id="project-name" class="text-5xl md:text-7xl font-bold mb-6 opacity-0 translate-y-10 transition-all duration-1000">Yükleniyor...</h1>
+            <p id="project-location" class="text-gold text-xl md:text-2xl mb-8 tracking-widest uppercase opacity-0 translate-y-10 transition-all duration-1000 delay-200"></p>
+            <div class="w-24 h-1 bg-gold mx-auto mb-8 opacity-0 scale-x-0 transition-all duration-1000 delay-500"></div>
+            <p id="project-desc" class="text-slate-300 text-lg leading-relaxed mb-10 opacity-0 translate-y-10 transition-all duration-1000 delay-700"></p>
+            <a href="#leadsform" class="bg-gold text-slate-900 px-8 py-4 rounded-full font-bold hover:bg-yellow-600 transition-all transform hover:scale-105 opacity-0 translate-y-10 transition-all duration-1000 delay-1000">BİLGİ ALIN</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-24 bg-slate-900 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Ayrıcalıklar & Özellikler</h2>
+                <div class="w-16 h-1 bg-gold mx-auto"></div>
+            </div>
+            
+            <div id="features-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Features will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Leads Form -->
+    <section id="leadsform" class="py-24 bg-slate-950 px-6 border-t border-slate-800">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4 text-gold">Projeye Özel Teklif Alın</h2>
+                <p class="text-slate-400">Formu doldurun, uzman danışmanlarımız 15 dakika içinde sizi atasın.</p>
+            </div>
+            
+            <form id="lead-form" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-2">Ad Soyad</label>
+                        <input type="text" name="name" required class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 focus:border-gold outline-none transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-2">Telefon</label>
+                        <input type="tel" name="phone" required class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 focus:border-gold outline-none transition-colors">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">E-posta</label>
+                    <input type="email" name="email" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 focus:border-gold outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Notunuz (İsteğe Bağlı)</label>
+                    <textarea name="message" rows="4" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 focus:border-gold outline-none transition-colors"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-gold text-slate-900 py-4 rounded-lg font-bold hover:bg-yellow-600 transition-colors">TALEBİ GÖNDER</button>
+            </form>
+            <div id="form-msg" class="mt-6 text-center hidden"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-slate-950 border-t border-slate-900 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 İmza Gayrimenkul. Tüm Hakları Saklıdır.</p>
+    </footer>
+
+    <script>
+        // Load Project Data
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug') || 'vadi-evleri';
+
+        async function loadProject() {
+            try {
+                const response = await fetch(`/api/projects/public/${slug}`);
+                if (!response.ok) throw new Error('Proje bulunamadı');
+                
+                const project = await response.json();
+                
+                document.title = project.name + " | İmza Gayrimenkul";
+                document.getElementById('project-name').innerText = project.name;
+                document.getElementById('project-location').innerText = project.location || '';
+                document.getElementById('project-desc').innerText = project.description;
+                document.getElementById('hero-bg').style.backgroundImage = `url('${project.hero_image_url}')`;
+
+                // Theme color apply
+                if (project.theme_color) {
+                    const golds = document.querySelectorAll('.text-gold');
+                    golds.forEach(el => el.style.color = project.theme_color);
+                    const bgGolds = document.querySelectorAll('.bg-gold');
+                    bgGolds.forEach(el => el.style.backgroundColor = project.theme_color);
+                }
+
+                // Load features
+                const grid = document.getElementById('features-grid');
+                if (project.features && project.features.length > 0) {
+                    project.features.forEach(feat => {
+                        const div = document.createElement('div');
+                        div.className = "bg-slate-800/50 p-8 border border-slate-700 rounded-2xl text-center hover:border-gold transition-colors group";
+                        div.innerHTML = `
+                            <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6 text-gold group-hover:bg-gold group-hover:text-slate-900 transition-all">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h3 class="font-bold">${feat}</h3>
+                        `;
+                        grid.appendChild(div);
+                    });
+                }
+
+                // Final animations
+                setTimeout(() => {
+                    document.getElementById('project-name').classList.remove('opacity-0', 'translate-y-10');
+                    document.getElementById('project-location').classList.remove('opacity-0', 'translate-y-10');
+                    document.querySelector('.w-24').classList.remove('opacity-0', 'scale-x-0');
+                    document.getElementById('project-desc').classList.remove('opacity-0', 'translate-y-10');
+                    document.querySelector('a[href="#leadsform"]').classList.remove('opacity-0', 'translate-y-10');
+                }, 100);
+
+            } catch (err) {
+                document.getElementById('project-name').innerText = "Hata: Proje Bulunamadı";
+            }
+        }
+
+        // Handle Form
+        document.getElementById('lead-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const msg = document.getElementById('form-msg');
+
+            try {
+                const res = await fetch(`/api/projects/public/${slug}/leads`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: json.stringify(data)
+                });
+                const result = await res.json();
+                
+                msg.innerText = result.message || result.error;
+                msg.className = "mt-6 text-center font-bold " + (res.ok ? "text-green-500" : "text-red-500");
+                msg.classList.remove('hidden');
+                
+                if (res.ok) e.target.reset();
+
+            } catch (err) {
+                msg.innerText = "Bir hata oluştu. Lütfen tekrar deneyin.";
+                msg.className = "mt-6 text-center font-bold text-red-500";
+                msg.classList.remove('hidden');
+            }
+        });
+
+        loadProject();
+    </script>
+</body>
+</html>

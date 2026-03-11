@@ -1,89 +1,69 @@
-flowchart LR
+flowchart TD
     %% === PROJECT GOALS ===
-    %% Ultimate Goal: Develop a luxury real estate portfolio and PMS portal
-    %% Current Goal: Implement Contract Builder System and fix access issues
+    %% Ultimate Goal: Reconstruct the imzagyo property management portal with unified logic and modern UI/UX.
+    %% Current Goal: Finalize the consolidated portal script and verify all core feature integrations.
 
     %% === START ===
-    %% @project_start [start, closed, 2026-02-28, ant]
-    project_start("Project Base<br/><sub>Initial luxury real estate project<br/>with Flask backend, SQLite DB,<br/>and Tailwind CSS frontend</sub>")
+    %% @project_start [start, closed, 2026-03-01, nam]
+    project_start("Project Start<br/><sub>Initial development of the Imza<br/>Property Management Portal,<br/>focusing on listing and<br/>lead management</sub>")
+
+    %% @ultimate_goal [end, opened, 2026-03-15, nam]
+    ultimate_goal("Project Goal<br/><sub>Fully integrated and automated<br/>property portal with AI content<br/>generation and contract<br/>management functionality</sub>")
 
     %% === COMPLETED WORK ===
-    %% @reorganization [ai-task, closed, 2026-02-28, ant]
-    reorganization("Codebase Reorganization<br/><sub>Moved clutter utility scripts to<br/>/scripts, added README.md, and<br/>improved docstrings</sub>")
+    %% @feature_leads [ai-task, closed, 2026-03-05, nam]
+    feature_leads("Lead Management<br/><sub>Implemented lead scoring,<br/>WhatsApp template integration,<br/>and automated lead fetching<br/>from the web form</sub>")
 
-    %% @portal_login_issue [ai-task, closed, 2026-02-28, ant]
-    portal_login_issue("Portal Login Debugging<br/><sub>Investigated credentials and server<br/>access. Found that local server<br/>start is required for API access</sub>")
+    %% @feature_appointments_v2 [ai-task, closed, 2026-03-10, nam]
+    feature_appointments_v2("Appointments V2<br/><sub>Refined appointment management<br/>with date/time pickers, status<br/>tracking, and UI-optimized<br/>modal flows</sub>")
 
-    %% @contract_builder [ai-task, closed, 2026-02-28, ant]
-    contract_builder("Contract Builder System<br/><sub>Implemented a clause-based<br/>contract wizard with property<br/>auto-population for multiple types</sub>")
+    %% @feature_contract_builder [ai-task, closed, 2026-03-10, nam]
+    feature_contract_builder("Contract Builder<br/><sub>Implemented a multi-step<br/>contract wizard with party<br/>search, property selection,<br/>and draft generation</sub>")
 
-    %% @server_init [ai-task, closed, 2026-03-01, ant]
-    server_init("Flask Server & DB Init<br/><sub>Started background Flask server<br/>on port 8000 and initialised<br/>SQLite DB with sample data</sub>")
+    %% @feature_ai_integration [ai-task, closed, 2026-03-10, nam]
+    feature_ai_integration("AI Story Generation<br/><sub>Integrated Gemini AI to<br/>automatically generate property<br/>descriptions based on metadata<br/>and features</sub>")
 
-    %% @responsive_design [ai-task, closed, 2026-03-01, ant]
-    responsive_design("Responsive Portal UI<br/><sub>Implemented mobile full-screen<br/>sidebar toggle and ensured<br/>tablet layout matches desktop</sub>")
-
-    %% @ssl_deployment [ai-task, closed, 2026-03-06, ant]
-    ssl_deployment("SSL & Deployment Automation<br/><sub>Created Nginx reverse proxy config,<br/>Certbot auto-renewal via cron,<br/>systemd service, and one-command<br/>production setup script</sub>")
-
-    %% @similar_listings [ai-task, closed, 2026-03-06, ant]
-    similar_listings("Similar Listings Section<br/><sub>Added dynamic 'Buna Bakanlar<br/>Buna da Baktı' section to detay.html<br/>with API-driven card rendering<br/>and responsive grid layout</sub>")
-
-    %% @gemini_integration [ai-task, closed, 2026-03-10, ant]
-    gemini_integration("Gemini AI Integration<br/><sub>Implemented automated property<br/>description generation using<br/>Gemini 1.5 Flash API</sub>")
-
-    %% @dual_app_api [ai-task, closed, 2026-03-11, ant]
-    dual_app_api("Dual Mobile App API<br/><sub>Created JWT Auth for VIP Yatırım<br/>and Mahalle apps with role-based<br/>strict routing</sub>")
-
-    %% @neighborhood_noconflict [ai-task, closed, 2026-03-11, ant]
-    neighborhood_noconflict("Neighborhood No-Conflict API<br/><sub>Implemented Mahalle posts with<br/>ulasim, paylasim, yardim, duyuru<br/>categories and no-comments rule</sub>")
+    %% @task_consolidation [ai-task, closed, 2026-03-10, nam]
+    task_consolidation("Script Consolidation<br/><sub>Unified portal logic into a<br/>single organized script block,<br/>removing 3,300+ redundant lines<br/>and fixing syntax errors</sub>")
 
     %% === FUTURE WORK ===
-    %% @system_setup [human-task, opened, 2026-02-28, user]
-    system_setup("Environment Setup (WSL)<br/><sub>Installing WSL and Node.js to<br/>support Claude Code and other<br/>modern development tools</sub>")
+    %% @future_integrations [ai-task, opened, 2026-03-11, nam]
+    future_integrations("Platform Integrations<br/><sub>Implement automated property<br/>publishing to Sahibinden,<br/>Hepsiemlak, and Emlakjet<br/>via API hooks</sub>")
 
-    %% @ultimate_goal [end, opened, 2026-02-28, user]
-    ultimate_goal("Luxury Portal Live<br/><sub>Fully functional PMS with<br/>contracts, taxes, and portfolio<br/>management live for admins</sub>")
+    %% @future_payroll_api [ai-task, opened, 2026-03-12, nam]
+    future_payroll_api("Payroll (Hakediş) API<br/><sub>Develop the backend API to<br/>calculate commissions and<br/>expenses for the payroll<br/>management module</sub>")
 
     %% === CONNECTIONS ===
-    project_start --> reorganization
-    reorganization --> portal_login_issue
-    portal_login_issue --> contract_builder
-    contract_builder --> server_init
-    server_init --> responsive_design
-    responsive_design --> ssl_deployment
-    ssl_deployment --> similar_listings
-    similar_listings --> gemini_integration
-    gemini_integration --> dual_app_api
-    dual_app_api --> neighborhood_noconflict
-    neighborhood_noconflict --> system_setup
-    system_setup -.-> ultimate_goal
+    project_start --> feature_leads
+    feature_leads --> feature_appointments_v2
+    feature_appointments_v2 --> feature_contract_builder
+    feature_contract_builder --> feature_ai_integration
+    feature_ai_integration --> task_consolidation
+    task_consolidation --> future_integrations
+    task_consolidation --> future_payroll_api
+    future_integrations -.-> ultimate_goal
+    future_payroll_api -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        neighborhood_noconflict
+        task_consolidation
     end
 
     %% === STYLES ===
     %% Closed tasks (soft purple)
     style project_start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style reorganization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style portal_login_issue fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style contract_builder fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style server_init fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style responsive_design fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style ssl_deployment fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style similar_listings fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style gemini_integration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style dual_app_api fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style neighborhood_noconflict fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style feature_leads fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_appointments_v2 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_contract_builder fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_ai_integration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
-    %% Recent work (bright purple highlight)
-    %% Handled in closed style above for consistency if closed and recent
+    %% Recent node (highlighted purple)
+    style task_consolidation fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph (dashed border)
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Open tasks (soft green)
-    style system_setup fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style future_integrations fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style future_payroll_api fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

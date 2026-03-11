@@ -38,6 +38,7 @@ from api.contacts import contacts_bp
 from api.tracking import tracking_bp
 from api.ai import ai_bp
 from api.neighborhood import neighborhood_bp
+from api.projects import projects_bp
 app = Flask(__name__, static_folder='.', static_url_path='')
 
 UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
@@ -81,6 +82,7 @@ app.register_blueprint(hr_bp)
 app.register_blueprint(contacts_bp)
 app.register_blueprint(tracking_bp)
 app.register_blueprint(neighborhood_bp)
+app.register_blueprint(projects_bp)
 
 @app.after_request
 def add_header(r):
@@ -429,4 +431,5 @@ def get_whatsapp_template(id):
 
 if __name__ == '__main__':
     # Flask sunucusunu başlat
-    app.run(debug=True, port=8000)
+    # Flask sunucusunu başlat (Docker için 0.0.0.0'a bağlamak şart)
+    app.run(debug=True, host='0.0.0.0', port=8000)
