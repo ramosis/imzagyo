@@ -7,7 +7,7 @@
     <title>İmza Admin Portal | Premium Yönetim Paneli</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Leaflet Harita Kütüphanesi -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -171,6 +171,7 @@
             color: #c5a059 !important;
             /* text-gold */
             border-left: 3px solid #c5a059;
+            border-radius: 9999px;
             font-weight: 700;
         }
 
@@ -328,71 +329,67 @@
             <!-- Navigasyon -->
             <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1 relative z-10">
                 <button onclick="showSection('dashboard', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium active">
-                    <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard Özet
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium active">
+                    <i class="fa-solid fa-chart-pie w-6 text-center text-lg"></i> Dashboard Özet
                 </button>
 
                 <div class="pt-4 pb-2 px-4">
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Modüller</p>
-                </div>
-
-                <button onclick="showSection('portfolios', this)"
-                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <p class="text-[10p                <button onclick="showSection('portfolios', this)"
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-gem w-5 text-center"></i> Portföy Yönetimi
+                        <i class="fa-solid fa-gem w-6 text-center text-lg"></i> Portföy Yönetimi
                     </div>
                     <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">34</span>
                 </button>
 
                 <button onclick="showSection('contracts', this)"
-                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-file-signature w-5 text-center"></i> Sözleşmeler
+                        <i class="fa-solid fa-file-signature w-6 text-center text-lg"></i> Sözleşmeler
                     </div>
                 </button>
 
                 <button onclick="showSection('contract-builder', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-file-pen w-5 text-center"></i> Sözleşme Hazırlama
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-file-pen w-6 text-center text-lg"></i> Sözleşme Hazırlama
                     <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
                 </button>
 
                 <button onclick="showSection('leads', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-bullseye w-5 text-center"></i> Müşteri Adayları (CRM)
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-bullseye w-6 text-center text-lg"></i> Müşteri Adayları (CRM)
                 </button>
 
                 <button onclick="showSection('contacts', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-address-book w-5 text-center"></i> Telefon Rehberi
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-address-book w-6 text-center text-lg"></i> Telefon Rehberi
                 </button>
 
                 <button onclick="showSection('campaigns', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-envelopes-bulk w-5 text-center"></i> E-Posta Yönetimi
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-envelopes-bulk w-6 text-center text-lg"></i> E-Posta Yönetimi
                     <span class="bg-modern/20 text-modern text-[10px] py-0.5 px-2 rounded-full">Pro</span>
                 </button>
 
                 <button onclick="showSection('barter-wizard-section', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-calculator w-5 text-center"></i> Alım Gücü Sihirbazı
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-calculator w-6 text-center text-lg"></i> Alım Gücü Sihirbazı
                     <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
                 </button>
 
-
                 <button onclick="showSection('taxes', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-scale-balanced w-5 text-center"></i> Finans & Vergi
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-scale-balanced w-6 text-center text-lg"></i> Finans & Vergi
                 </button>
 
                 <button onclick="showSection('expenses', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-receipt w-5 text-center"></i> Harcama Yönetimi
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-receipt w-6 text-center text-lg"></i> Harcama Yönetimi
                 </button>
 
                 <button onclick="showSection('payroll', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-money-bill-trend-up w-5 text-center"></i> Hakediş & Komisyon
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-money-bill-trend-up w-6 text-center text-lg"></i> Hakediş & Komisyon
                 </button>
 
                 <div class="mt-4 mb-2 px-4">
@@ -400,19 +397,19 @@
                 </div>
 
                 <button onclick="showSection('integrations', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-share-nodes w-5 text-center"></i> Entegrasyon Merkezi
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-share-nodes w-6 text-center text-lg"></i> Entegrasyon Merkezi
                     <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
                 </button>
 
                 <button onclick="showSection('maintenance', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-screwdriver-wrench w-5 text-center"></i> Bakım Talepleri
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-screwdriver-wrench w-6 text-center text-lg"></i> Bakım Talepleri
                 </button>
 
                 <button onclick="showSection('appointments', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-regular fa-calendar-check w-5 text-center"></i> Randevular
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-regular fa-calendar-check w-6 text-center text-lg"></i> Randevular
                 </button>
 
                 <div class="pt-4 pb-2 px-4">
@@ -420,24 +417,26 @@
                 </div>
 
                 <button onclick="showSection('hero', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-images w-5 text-center"></i> Vitrin (Hero) Yönetimi
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-images w-6 text-center text-lg"></i> Vitrin (Hero) Yönetimi
                 </button>
 
                 <button onclick="showSection('projects', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-laptop-code w-5 text-center"></i> Projeler (Landing)
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-laptop-code w-6 text-center text-lg"></i> Projeler (Landing)
                     <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
                 </button>
 
                 <button onclick="showSection('users', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-users-gear w-5 text-center"></i> Kullanıcı Yönetimi
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-users-gear w-6 text-center text-lg"></i> Kullanıcı Yönetimi
+                </button>
+            <i class="fa-solid fa-users-gear w-5 text-center"></i> Kullanıcı Yönetimi
                 </button>
 
                 <button onclick="showSection('site-settings', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-gears w-5 text-center"></i> Site Ayarları
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-gears w-6 text-center text-lg"></i> Site Ayarları
                 </button>
             </nav>
 
