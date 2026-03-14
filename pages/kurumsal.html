@@ -160,10 +160,10 @@
             document.addEventListener('click', (e) => {
                 const link = e.target.closest('a');
                 if (link && link.href && link.href.includes('.html') && !link.target && !e.ctrlKey && !e.shiftKey) {
-                    const targetUrl = link.href;
-                    if (targetUrl.includes('#')) return;
+                    const targetUrl = link.getAttribute('href');
+                    if (!targetUrl || targetUrl.startsWith('#') || targetUrl.includes('#')) return;
 
-                    const isInternal = targetUrl.includes(window.location.origin) || !targetUrl.startsWith('http');
+                    const isInternal = targetUrl.includes(window.location.origin) || !targetUrl.startsWith('http') || targetUrl.startsWith('/');
 
                     if (isInternal) {
                         e.preventDefault();
