@@ -1,7 +1,7 @@
 flowchart TD
     %% === PROJE HEDEFLERİ ===
     %% Ultimate Goal: İmza Gayrimenkul portalını modern UI/UX ve birleşik mantıkla yeniden inşa etmek.
-    %% Current Goal: Mobil uyumluluğu tamamlamak ve İmza Mahalle Faz 2 hazırlıklarına başlamak.
+    %% Current Goal: Klasör yapısını modernize etmek ve yeni özellikler için hazır hale getirmek.
 
     %% === KULLANICI KATMANI ===
     subgraph Users [Kullanıcı Katmanı]
@@ -12,13 +12,13 @@ flowchart TD
 
     %% === UYGULAMA KATMANI ===
     subgraph Apps [Uygulama Katmanı]
-        frontend("Web Frontend<br/><sub>HTML/JS/Tailwind based<br/>Premium UI Arayüzü</sub>")
+        frontend("Web Frontend<br/><sub>pages/ klasöründe toplanmış<br/>Premium HTML/JS arayüzü</sub>")
         mobile("Mobil Uygulama<br/><sub>Expo / React Native<br/>iOS & Android</sub>")
     end
 
     %% === API & BACKEND KATMANI ===
     subgraph Backend [API & Backend Katmanı]
-        flask_api("Flask Python API<br/><sub>Tüm iş mantığı, yetkilendirme<br/>ve veri dağıtımı merkezi</sub>")
+        flask_api("Flask Python API<br/><sub>pages/ ve root servisleri<br/>merkezi iş mantığı</sub>")
         db[("Veritabanı<br/><sub>Mülkler, Müşteriler<br/>ve Sistem Ayarları</sub>")]
         gemini_ai("Gemini AI Servisi<br/><sub>Otomatik ilan hikayesi ve<br/>portföy analizi üretimi</sub>")
         mail_service("E-Posta Servisi<br/><sub>Google Workspace tabanlı<br/>bildirim ve şifre işlemleri</sub>")
@@ -26,7 +26,7 @@ flowchart TD
 
     %% === ALTYAPI & DAĞITIM ===
     subgraph Infra [Altyapı & Dağıtım]
-        docker("Docker & Compose<br/><sub>İzole edilmiş konteyner<br/>tabanlı çalışma ortamı</sub>")
+        docker("Docker & Compose<br/><sub>Root dizininde korunan<br/>dağıtım konfigürasyonu</sub>")
         nginx("Nginx Proxy<br/><sub>SSL yönetimi, Domain<br/>yönlendirme (imzaemlak.com)</sub>")
         gcp_vps("Google Cloud VPS<br/><sub>Esnek ve ölçeklenebilir<br/>bulut sunucu altyapısı</sub>")
     end
@@ -72,18 +72,21 @@ flowchart TD
         %% @feature_cloudinary [ai-task, closed, 2026-03-12, antigravity]
         cloudinary("Bulut Depolama")
 
-        %% @feature_gitlens [ai-task, closed, 2026-03-14, antigravity]
-        gitlens_config("GitLens Yapılandırma<br/><sub>Geliştirici deneyimini artırmak için<br/>Current Line Blame, Hovers ve<br/>Status Bar ayarları optimize edildi</sub>")
+        %% @feature_cleanup [ai-task, closed, 2026-03-14, antigravity]
+        cleanup("Yama & Temizlik")
+
+        %% @feature_refactor [ai-task, closed, 2026-03-14, antigravity]
+        refactor("Klasör Refaktörü<br/><sub>Dokümanlar docs/, sayfalar pages/<br/>altına alındı; app.py yeni<br/>yapıya göre optimize edildi</sub>")
 
         %% @ultimate_goal [end, opened, 2026-03-15, nam]
         goal("Büyük Hedef")
 
-        start --> leads --> contracts --> ai --> deploy --> mobile_fix --> perf_opt --> cloudinary --> gitlens_config -.-> goal
+        start --> leads --> contracts --> ai --> deploy --> mobile_fix --> perf_opt --> cloudinary --> cleanup --> refactor -.-> goal
     end
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [SON ÇALIŞMA]
-        gitlens_config
+        refactor
     end
 
     %% === STYLES ===
@@ -108,7 +111,8 @@ flowchart TD
     style gcp_vps fill:#1a1a2e,stroke:#94a3b8,color:#cbd5e1,stroke-width:1px
 
     %% Trajectory
-    style gitlens_config fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style cleanup fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style refactor fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style leads fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style contracts fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
@@ -116,7 +120,7 @@ flowchart TD
     style deploy fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     
     %% Recent highlight
-    style gitlens_config fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style refactor fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Target

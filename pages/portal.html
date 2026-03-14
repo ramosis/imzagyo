@@ -373,7 +373,7 @@
                     <span class="bg-modern/20 text-modern text-[10px] py-0.5 px-2 rounded-full">Pro</span>
                 </button>
 
-                <button onclick="showSection('barter-wizard', this)"
+                <button onclick="showSection('barter-wizard-section', this)"
                     class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
                     <i class="fa-solid fa-calculator w-5 text-center"></i> Alım Gücü Sihirbazı
                     <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
@@ -2235,7 +2235,7 @@
         // --- NAVIGATION & UI MANTIĞI ---
         function showSection(sectionId, btnElement) {
             // Section visibility
-            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
             const target = document.getElementById(sectionId);
             if (target) target.classList.remove('hidden');
 
@@ -2276,6 +2276,15 @@
         }
 
         function logout() {
+            // --- BARTER WIZARD LOGIC ---
+            window.barterNext = function(stepIndex) {
+                document.getElementById('step-' + (stepIndex - 1)).classList.add('hidden');
+                document.getElementById('step-' + stepIndex).classList.remove('hidden');
+            };
+            window.barterPrev = function(stepIndex) {
+                document.getElementById('step-' + (stepIndex + 1)).classList.add('hidden');
+                document.getElementById('step-' + stepIndex).classList.remove('hidden');
+            };
             localStorage.removeItem('imza_admin_token');
             localStorage.removeItem('imza_admin_role');
             window.location.reload();

@@ -108,10 +108,16 @@ doldur_ornek_veriler()
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'anasayfa.html')
+    return send_from_directory('pages', 'anasayfa.html')
 
 @app.route('/<path:path>')
 def serve_file(path):
+    # HTML dosyalarını pages/ klasöründen servis et
+    if path.endswith('.html'):
+        full_path = os.path.join('pages', path)
+        if os.path.exists(full_path):
+            return send_from_directory('pages', path)
+            
     if os.path.exists(path):
         return send_from_directory('.', path)
     return "File not found", 404

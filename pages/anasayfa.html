@@ -17,7 +17,9 @@
                     colors: {
                         navy: '#0a192f',
                         gold: '#c5a059',
+                        prestij: '#c5a059',
                         modern: '#e17055',
+                        doga: '#1b4d3e',
                         nature: '#1b4d3e',
                         natureLight: '#f3e5ab',
                         soft: '#f8fafc',
@@ -288,6 +290,11 @@
                     }
                 }
             });
+
+            // Initialize Dynamic Collections
+            if (typeof renderCollections === 'function') {
+                renderCollections();
+            }
         });
     </script>
 </head>
@@ -595,71 +602,8 @@
                         vizyon, binlerce farklı hikaye.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
-                    <div onclick="trackUserInterest('prestij', 35000000); luxNavigate('koleksiyon.html?tip=prestij')"
-                        class="relative h-56 md:h-[450px] lg:h-[500px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl">
-                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
-                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/20 to-transparent text-left">
-                        </div>
-                        <div
-                            class="absolute bottom-6 md:bottom-10 left-6 md:left-10 right-6 md:right-10 text-white text-left">
-                            <div
-                                class="w-10 h-10 md:w-12 md:h-12 bg-gold rounded-2xl flex items-center justify-center text-navy mb-4 shadow-xl transform group-hover:-translate-y-2 transition-transform">
-                                <i class="fas fa-crown text-xl"></i>
-                            </div>
-                            <h3
-                                class="text-2xl md:text-3xl font-serif font-bold text-gold mb-2 uppercase tracking-tight text-left">
-                                Prestij</h3>
-                            <p
-                                class="text-[10px] md:text-sm text-gray-300 leading-relaxed font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-left">
-                                Lüks konut ve seçkin yalı portföyü.</p>
-                        </div>
-                    </div>
-                    <div onclick="trackUserInterest('modern', 12000000); luxNavigate('koleksiyon.html?tip=modern')"
-                        class="relative h-56 md:h-[450px] lg:h-[500px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl">
-                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80"
-                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-t from-modern/90 via-navy/20 to-transparent opacity-80 text-left">
-                        </div>
-                        <div
-                            class="absolute bottom-6 md:bottom-10 left-6 md:left-10 right-6 md:right-10 text-white text-left">
-                            <div
-                                class="w-10 h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-white mb-4 shadow-xl transform group-hover:-translate-y-2 transition-transform">
-                                <i class="fas fa-city text-xl text-white"></i>
-                            </div>
-                            <h3
-                                class="text-2xl md:text-3xl font-serif font-bold text-white mb-2 uppercase tracking-tight text-left">
-                                Modern</h3>
-                            <p
-                                class="text-[10px] md:text-sm text-gray-200 leading-relaxed font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-left">
-                                Şehrin dinamizmini yansıtan projeler.</p>
-                        </div>
-                    </div>
-                    <div onclick="trackUserInterest('doga', 24000000); luxNavigate('koleksiyon.html?tip=doga')"
-                        class="relative h-56 md:h-[450px] lg:h-[500px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl text-left">
-                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80"
-                            loading="lazy"
-                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-t from-nature/90 via-navy/20 to-transparent opacity-80 text-left">
-                        </div>
-                        <div
-                            class="absolute bottom-6 md:bottom-10 left-6 md:left-10 right-6 md:right-10 text-white text-left">
-                            <div
-                                class="w-10 h-10 md:w-12 md:h-12 bg-natureLight/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-natureLight mb-4 shadow-xl transform group-hover:-translate-y-2 transition-transform">
-                                <i class="fas fa-leaf text-xl text-natureLight"></i>
-                            </div>
-                            <h3
-                                class="text-2xl md:text-3xl font-serif font-bold text-natureLight mb-2 uppercase tracking-tight text-left text-natureLight">
-                                Doğa</h3>
-                            <p
-                                class="text-[10px] md:text-sm text-gray-200 leading-relaxed font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-left">
-                                Doğayla iç içe lüks yaşam alanları.</p>
-                        </div>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10" id="collections-grid">
+                    <!-- Dinamik olarak JS ile doldurulacak -->
                 </div>
             </div>
         </section>
@@ -739,22 +683,6 @@
                                         class="text-navy font-bold">12 gün</span>
                                 </p>
                             </div>
-                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
-                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
-                                    <span
-                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
-                                        <i class="fa-solid fa-fire text-[8px]"></i> 145 kişi inceledi
-                                    </span>
-                                    <span
-                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
-                                        <i class="fa-solid fa-gavel text-[8px]"></i> 2 aktif teklif
-                                    </span>
-                                </div>
-                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
-                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
-                                        class="text-navy font-bold">12 gün</span>
-                                </p>
-                            </div>
                         </div>
                     </div>
                     <div onclick="location.href='detay.html'"
@@ -805,22 +733,6 @@
                                         class="text-navy font-bold">18 gün</span>
                                 </p>
                             </div>
-                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
-                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
-                                    <span
-                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
-                                        <i class="fa-solid fa-fire text-[8px]"></i> 89 kişi inceledi
-                                    </span>
-                                    <span
-                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
-                                        <i class="fa-solid fa-gavel text-[8px]"></i> 1 aktif teklif
-                                    </span>
-                                </div>
-                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
-                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
-                                        class="text-navy font-bold">18 gün</span>
-                                </p>
-                            </div>
                         </div>
                     </div>
                     <div onclick="luxNavigate('detay.html?id=ekolojik-ev')"
@@ -854,22 +766,6 @@
                                 <div class="flex flex-col"><span
                                         class="text-[8px] uppercase font-black text-gray-300 mb-1 text-navy">Tip</span><span
                                         class="text-xs font-bold text-natureLight uppercase">Villa</span></div>
-                            </div>
-                            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
-                                <div class="flex items-center gap-2 text-[10px] text-gray-500">
-                                    <span
-                                        class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-full font-bold">
-                                        <i class="fa-solid fa-fire text-[8px]"></i> 67 kişi inceledi
-                                    </span>
-                                    <span
-                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full font-bold">
-                                        <i class="fa-solid fa-gavel text-[8px]"></i> 3 aktif teklif
-                                    </span>
-                                </div>
-                                <p class="text-[9px] text-gray-400 font-medium flex items-center gap-1.5">
-                                    <i class="fa-regular fa-clock text-[8px]"></i> Bölgede ort. satış süresi: <span
-                                        class="text-navy font-bold">9 gün</span>
-                                </p>
                             </div>
                             <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
                                 <div class="flex items-center gap-2 text-[10px] text-gray-500">
@@ -1691,6 +1587,52 @@
             document.getElementById('lm-result').classList.add('hidden');
             document.querySelectorAll('.lm-question').forEach(q => q.classList.add('hidden'));
             document.getElementById('lm-q1').classList.remove('hidden');
+        }
+
+        // --- DINAMIK KOLEKSIYONLAR ---
+        const collectionData = {
+            'prestij': {
+                title: 'Prestij',
+                desc: 'Lüks konut ve seçkin yalı portföyü.',
+                img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+                icon: 'fas fa-crown',
+                color: 'gold'
+            },
+            'modern': {
+                title: 'Modern',
+                desc: 'Şehrin dinamizmini yansıtan projeler.',
+                img: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
+                icon: 'fas fa-city',
+                color: 'white'
+            },
+            'doga': {
+                title: 'Doğa',
+                desc: 'Doğayla iç içe lüks yaşam alanları.',
+                img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
+                icon: 'fas fa-leaf',
+                color: 'natureLight'
+            }
+        };
+
+        function renderCollections() {
+            const grid = document.getElementById('collections-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = Object.entries(collectionData).map(([key, data]) => `
+                <div onclick="trackUserInterest('${key}', 24000000); luxNavigate('koleksiyon.html?tip=${key}')"
+                    class="relative h-56 md:h-[450px] lg:h-[500px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl">
+                    <img src="${data.img}"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                    <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/20 to-transparent text-left"></div>
+                    <div class="absolute bottom-6 md:bottom-10 left-6 md:left-10 right-6 md:right-10 text-white text-left">
+                        <div class="w-10 h-10 md:w-12 md:h-12 bg-${data.color}${data.color === 'white' ? '/20 backdrop-blur-xl' : ''} rounded-2xl flex items-center justify-center text-${data.color === 'white' ? 'white' : 'navy'} mb-4 shadow-xl transform group-hover:-translate-y-2 transition-transform">
+                            <i class="${data.icon} text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-serif font-bold text-${data.color === 'white' ? 'white' : 'gold'} mb-2 uppercase tracking-tight text-left">${data.title}</h3>
+                        <p class="text-[10px] md:text-sm text-gray-300 leading-relaxed font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-left">${data.desc}</p>
+                    </div>
+                </div>
+            `).join('');
         }
 
     </script>
