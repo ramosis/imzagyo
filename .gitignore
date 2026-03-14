@@ -9,7 +9,13 @@ venv/
 instance/
 *.sqlite3
 *.db
-!imza_database_dummy.db # Şablon veritabanı har hariç tutulabilir (opsiyonel)
+imza_database.db
+!imza_database_dummy.db
+
+# Large Binaries
+*.exe
+DockerDesktopInstaller.exe
+docker-desktop-installer.exe
 
 # Mobile (React Native / Expo)
 mobile/node_modules/

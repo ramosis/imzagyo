@@ -1,79 +1,123 @@
 flowchart TD
-    %% === PROJECT GOALS ===
-    %% Ultimate Goal: Reconstruct the imzagyo property management portal with unified logic and modern UI/UX.
-    %% Current Goal: Finalize the consolidated portal script and verify all core feature integrations.
+    %% === PROJE HEDEFLERİ ===
+    %% Ultimate Goal: İmza Gayrimenkul portalını modern UI/UX ve birleşik mantıkla yeniden inşa etmek.
+    %% Current Goal: Mobil uyumluluğu tamamlamak ve İmza Mahalle Faz 2 hazırlıklarına başlamak.
 
-    %% === START ===
-    %% @project_start [start, closed, 2026-03-01, nam]
-    project_start("Project Start<br/><sub>Initial development of the Imza<br/>Property Management Portal,<br/>focusing on listing and<br/>lead management</sub>")
+    %% === KULLANICI KATMANI ===
+    subgraph Users [Kullanıcı Katmanı]
+        visitor("Ziyaretçi<br/><sub>İlanları gezer, arama yapar<br/>ve iletişim formu doldurur</sub>")
+        investor("Yatırımcı<br/><sub>Portföy analizlerini görür,<br/>AI fırsat rotasını kullanır</sub>")
+        admin("Danışman / Admin<br/><sub>Müşteri yönetimi, sözleşme<br/>oluşturma ve ilan girişi yapar</sub>")
+    end
 
-    %% @ultimate_goal [end, opened, 2026-03-15, nam]
-    ultimate_goal("Project Goal<br/><sub>Fully integrated and automated<br/>property portal with AI content<br/>generation and contract<br/>management functionality</sub>")
+    %% === UYGULAMA KATMANI ===
+    subgraph Apps [Uygulama Katmanı]
+        frontend("Web Frontend<br/><sub>HTML/JS/Tailwind based<br/>Premium UI Arayüzü</sub>")
+        mobile("Mobil Uygulama<br/><sub>Expo / React Native<br/>iOS & Android</sub>")
+    end
 
-    %% === COMPLETED WORK ===
-    %% @feature_leads [ai-task, closed, 2026-03-05, nam]
-    feature_leads("Lead Management<br/><sub>Implemented lead scoring,<br/>WhatsApp template integration,<br/>and automated lead fetching<br/>from the web form</sub>")
+    %% === API & BACKEND KATMANI ===
+    subgraph Backend [API & Backend Katmanı]
+        flask_api("Flask Python API<br/><sub>Tüm iş mantığı, yetkilendirme<br/>ve veri dağıtımı merkezi</sub>")
+        db[("Veritabanı<br/><sub>Mülkler, Müşteriler<br/>ve Sistem Ayarları</sub>")]
+        gemini_ai("Gemini AI Servisi<br/><sub>Otomatik ilan hikayesi ve<br/>portföy analizi üretimi</sub>")
+        mail_service("E-Posta Servisi<br/><sub>Google Workspace tabanlı<br/>bildirim ve şifre işlemleri</sub>")
+    end
 
-    %% @feature_appointments_v2 [ai-task, closed, 2026-03-10, nam]
-    feature_appointments_v2("Appointments V2<br/><sub>Refined appointment management<br/>with date/time pickers, status<br/>tracking, and UI-optimized<br/>modal flows</sub>")
+    %% === ALTYAPI & DAĞITIM ===
+    subgraph Infra [Altyapı & Dağıtım]
+        docker("Docker & Compose<br/><sub>İzole edilmiş konteyner<br/>tabanlı çalışma ortamı</sub>")
+        nginx("Nginx Proxy<br/><sub>SSL yönetimi, Domain<br/>yönlendirme (imzaemlak.com)</sub>")
+        gcp_vps("Google Cloud VPS<br/><sub>Esnek ve ölçeklenebilir<br/>bulut sunucu altyapısı</sub>")
+    end
 
-    %% @feature_contract_builder [ai-task, closed, 2026-03-10, nam]
-    feature_contract_builder("Contract Builder<br/><sub>Implemented a multi-step<br/>contract wizard with party<br/>search, property selection,<br/>and draft generation</sub>")
+    %% === İLİŞKİLER ===
+    visitor & investor --> frontend
+    visitor & investor --> mobile
+    admin --> frontend
 
-    %% @feature_ai_integration [ai-task, closed, 2026-03-10, nam]
-    feature_ai_integration("AI Story Generation<br/><sub>Integrated Gemini AI to<br/>automatically generate property<br/>descriptions based on metadata<br/>and features</sub>")
+    frontend & mobile <==> flask_api
+    flask_api <==> db
+    flask_api --> gemini_ai
+    flask_api --> mail_service
 
-    %% @task_consolidation [ai-task, closed, 2026-03-10, nam]
-    task_consolidation("Script Consolidation<br/><sub>Unified portal logic into a<br/>single organized script block,<br/>removing 3,300+ redundant lines<br/>and fixing syntax errors</sub>")
+    flask_api & db & nginx --> docker
+    docker --> gcp_vps
+    nginx <--> Apps
 
-    %% @feature_docker_deployment [ai-task, closed, 2026-03-11, nam]
-    feature_docker_deployment("Docker Deployment<br/><sub>Containerized the application<br/>and successfully deployed it<br/>to Google Cloud VPS using<br/>Docker Compose</sub>")
+    %% === GELİŞİM ÇİZGELGESİ (TRAJECTORY) ===
+    subgraph Trajectory [Gelişim Yolculuğu]
+        direction LR
+        %% @project_start [start, closed, 2026-03-01, nam]
+        start("Başlangıç")
+        
+        %% @feature_leads [ai-task, closed, 2026-03-05, nam]
+        leads("CRM Altyapı")
+        
+        %% @feature_contract_builder [ai-task, closed, 2026-03-10, nam]
+        contracts("Sözleşme Sihirbazı")
+        
+        %% @feature_ai_integration [ai-task, closed, 2026-03-10, nam]
+        ai("AI Entegrasyonu")
+        
+        %% @feature_docker_deployment [ai-task, closed, 2026-03-11, nam]
+        deploy("Canlı Dağıtım")
+        
+        %% @feature_mobile_ui_fixes [ai-task, closed, 2026-03-12, antigravity]
+        mobile_fix("Mobil & UI Fix")
+        
+        %% @feature_performance_opt [ai-task, closed, 2026-03-12, antigravity]
+        perf_opt("Performans Turbo")
 
-    %% @feature_mobile_app [ai-task, closed, 2026-03-11, nam]
-    feature_mobile_app("Mobile App Success<br/><sub>Expo/React Native SDK 54 ile<br/>mobil uygulama başarıyla başlatıldı,<br/>tünel üzerinden cihazda test edildi<br/>ve premium UI arayüzleri hazırlandı</sub>")
+        %% @feature_cloudinary [ai-task, closed, 2026-03-12, antigravity]
+        cloudinary("Bulut Depolama")
 
-    %% === FUTURE WORK ===
-    %% @future_integrations [ai-task, opened, 2026-03-11, nam]
-    future_integrations("Platform Integrations<br/><sub>Implement automated property<br/>publishing to Sahibinden,<br/>Hepsiemlak, and Emlakjet<br/>via API hooks</sub>")
+        %% @feature_gitlens [ai-task, closed, 2026-03-14, antigravity]
+        gitlens_config("GitLens Yapılandırma<br/><sub>Geliştirici deneyimini artırmak için<br/>Current Line Blame, Hovers ve<br/>Status Bar ayarları optimize edildi</sub>")
 
-    %% @future_payroll_api [ai-task, opened, 2026-03-12, nam]
-    future_payroll_api("Payroll (Hakediş) API<br/><sub>Develop the backend API to<br/>calculate commissions and<br/>expenses for the payroll<br/>management module</sub>")
+        %% @ultimate_goal [end, opened, 2026-03-15, nam]
+        goal("Büyük Hedef")
 
-    %% === CONNECTIONS ===
-    project_start --> feature_leads
-    feature_leads --> feature_appointments_v2
-    feature_appointments_v2 --> feature_contract_builder
-    feature_contract_builder --> feature_ai_integration
-    feature_ai_integration --> task_consolidation
-    task_consolidation --> feature_docker_deployment
-    feature_docker_deployment --> feature_mobile_app
-    feature_mobile_app --> feature_multi_domain
-    feature_multi_domain --> future_integrations
-    feature_multi_domain --> future_payroll_api
-    future_integrations -.-> ultimate_goal
-    future_payroll_api -.-> ultimate_goal
+        start --> leads --> contracts --> ai --> deploy --> mobile_fix --> perf_opt --> cloudinary --> gitlens_config -.-> goal
+    end
 
     %% === RECENT WORK HIGHLIGHT ===
-    subgraph recent [RECENT]
-        feature_multi_domain
+    subgraph recent [SON ÇALIŞMA]
+        gitlens_config
     end
 
     %% === STYLES ===
-    %% Closed tasks (soft purple)
-    style project_start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_leads fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_appointments_v2 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_contract_builder fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_ai_integration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    %% Kullanıcılar
+    style visitor fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style investor fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style admin fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
 
-    style task_consolidation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    %% Apps
+    style frontend fill:#1a1a2e,stroke:#c084fc,color:#e9d5ff,stroke-width:1px
+    style mobile fill:#1a1a2e,stroke:#c084fc,color:#e9d5ff,stroke-width:1px
 
-    style feature_mobile_app fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    %% Backend
+    style flask_api fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:2px
+    style db fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style gemini_ai fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style mail_service fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
-    %% Recent subgraph (dashed border)
+    %% Infra
+    style docker fill:#1a1a2e,stroke:#94a3b8,color:#cbd5e1,stroke-width:1px
+    style nginx fill:#1a1a2e,stroke:#94a3b8,color:#cbd5e1,stroke-width:1px
+    style gcp_vps fill:#1a1a2e,stroke:#94a3b8,color:#cbd5e1,stroke-width:1px
+
+    %% Trajectory
+    style gitlens_config fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style leads fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style contracts fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style ai fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style deploy fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    
+    %% Recent highlight
+    style gitlens_config fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
-    %% Open tasks (soft green)
-    style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style future_integrations fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style future_payroll_api fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    %% Target
+    style goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

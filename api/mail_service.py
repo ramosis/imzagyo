@@ -7,7 +7,7 @@ import os
 SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
 SMTP_USER = os.environ.get("SMTP_USER", "info@imzagayrimenkul.com")
-SMTP_PASS = os.environ.get("SMTP_PASS", "your-app-password-here")
+SMTP_PASS = os.environ.get("SMTP_PASS", "oyqb jcoa exbc bizc")
 MAIL_FROM = os.environ.get("MAIL_FROM", "İmza Gayrimenkul <info@imzagayrimenkul.com>")
 
 def send_email(subject, recipient, body_html):

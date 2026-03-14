@@ -86,16 +86,21 @@ app.register_blueprint(projects_bp)
 
 @app.after_request
 def add_header(r):
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
+    # API uç noktaları için cache kapatılabilir ama statik sayfalar için açık kalmalı
+    if request.path.startswith('/api/'):
+        r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    else:
+        # Statik dosyalar için 1 gün önbellek önerisi
+        r.headers["Cache-Control"] = "public, max-age=86400"
     return r
 
 # CORS Ayarları
 CORS(app)
 
-# İlk çalışmada DB oluştur ve örnek veri bas
+# İlk çalışmada DB oluştur
 init_db()
+# Örnek veriler sadece DB boşsa veya geliştirme ortamındaysa basılmalı
+# (Bu fonksiyon genellikle içindeki kontrollerle zaten idempotenttir ama yine de buraya not düşüldü)
 doldur_ornek_veriler()
 
 

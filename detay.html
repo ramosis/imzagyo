@@ -300,7 +300,7 @@
                         </p>
                     </div>
                     <div class="relative rounded-[3rem] overflow-hidden h-64 md:h-[400px] shadow-2xl">
-                        <img id="p-resim-hikaye" src="" class="w-full h-full object-cover">
+                        <img id="p-resim-hikaye" src="" loading="lazy" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
@@ -566,7 +566,7 @@
                             card.onclick = () => { window.location.href = `detay.html?id=${item.id}`; };
                             card.innerHTML = `
                                 <div class="relative h-64 overflow-hidden">
-                                    <img src="${item.resim_hero}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="${item.baslik1}">
+                                    <img src="${item.resim_hero}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="${item.baslik1}">
                                     <div class="absolute top-6 left-6 ${badgeBg} ${accentColor} text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-xl">Satılık</div>
                                     <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-navy/80 to-transparent">
                                         <span class="text-white font-serif font-bold text-2xl">${item.fiyat}</span>

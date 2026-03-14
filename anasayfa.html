@@ -443,13 +443,55 @@
                         <div class="md:hidden flex items-center gap-4 text-navy">
                             <button onclick="toggleSearch()" class="hover:text-gold text-xl"><i
                                     class="fa-solid fa-magnifying-glass"></i></button>
-                            <button class="hover:text-gold text-2xl"><i class="fa-solid fa-bars"></i></button>
+                            <button onclick="toggleMobileMenu()" class="hover:text-gold text-2xl"><i class="fa-solid fa-bars"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
         </nav>
     </header>
+
+    <div id="mobileMenu"
+        class="fixed inset-y-0 right-0 z-[200] w-full sm:w-80 bg-navy shadow-2xl transform translate-x-full transition-transform duration-500 ease-in-out md:hidden flex flex-col">
+        <div class="absolute inset-0 brand-pattern opacity-10 pointer-events-none"></div>
+        <div class="flex items-center justify-between p-6 border-b border-white/10 relative z-10">
+            <span class="font-serif font-bold text-xl text-white tracking-widest">MENÜ</span>
+            <button onclick="toggleMobileMenu()" class="text-gray-400 hover:text-gold text-3xl focus:outline-none">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto py-8 px-6 space-y-6 relative z-10">
+            <a href="arama.html" class="flex items-center gap-4 text-gray-300 hover:text-gold transition-colors py-2 group">
+                <i class="fa-solid fa-house-chimney text-gold text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold uppercase tracking-widest text-sm">İlanları Keşfet</span>
+            </a>
+            <a href="kurumsal.html" class="flex items-center gap-4 text-gray-300 hover:text-gold transition-colors py-2 group">
+                <i class="fa-solid fa-concierge-bell text-gold text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold uppercase tracking-widest text-sm">Kurumsal</span>
+            </a>
+            <a href="ekip.html" class="flex items-center gap-4 text-gray-300 hover:text-gold transition-colors py-2 group">
+                <i class="fa-solid fa-user-tie text-gold text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold uppercase tracking-widest text-sm">Ekibimiz</span>
+            </a>
+            <a href="kariyer.html" class="flex items-center gap-4 text-gray-300 hover:text-gold transition-colors py-2 group">
+                <i class="fa-solid fa-users text-gold text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold uppercase tracking-widest text-sm">Kariyer</span>
+            </a>
+            <a href="portal.html" class="flex items-center gap-4 text-gray-300 hover:text-gold transition-colors py-2 group border-t border-white/5 pt-6">
+                <i class="fa-solid fa-key text-gold text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold uppercase tracking-widest text-sm">İmza Portal</span>
+            </a>
+        </div>
+        <div class="p-8 border-t border-white/10 bg-black/20 relative z-10">
+            <p class="text-gray-500 text-[10px] uppercase font-bold tracking-[0.3em] mb-4">İletişim</p>
+            <a href="tel:4440000" class="text-white font-bold text-lg block mb-2">444 0 000</a>
+            <a href="mailto:info@imzaemlak.com.tr" class="text-gold text-xs italic">info@imzaemlak.com.tr</a>
+        </div>
+    </div>
+
+    <!-- Mobil Menü Overlay -->
+    <div id="menuOverlay" onclick="toggleMobileMenu()"
+        class="fixed inset-0 z-[110] bg-navy/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
 
     <!-- Ana Kaydırma Sarmalayıcı -->
     <div class="main-wrapper" id="mainWrapper">
@@ -480,9 +522,10 @@
                     </div>
                 </div>
             </section>
+        </div>
 
-            <!-- Partners -->
-            <section class="py-4 md:py-6 bg-white border-b border-gray-50 flex-shrink-0 overflow-hidden">
+        <!-- Partners -->
+        <section class="py-4 md:py-6 bg-white border-b border-gray-50 flex-shrink-0 overflow-hidden relative z-10">
                 <div class="relative flex overflow-x-hidden group max-w-7xl mx-auto">
                     <div class="animate-marquee flex w-max items-center">
                         <div class="flex items-center gap-12 md:gap-24 px-8 md:px-12 text-gray-400">
@@ -540,9 +583,8 @@
                     </div>
                 </div>
             </section>
-        </div>
-
-        <!-- Section 2: Koleksiyonlar -->
+ 
+         <!-- Section 2: Koleksiyonlar -->
         <section id="seriler" class="snap-section bg-white border-b border-gray-100 text-navy">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
                 <div class="mb-10 md:mb-12 text-center">
@@ -598,7 +640,8 @@
                     </div>
                     <div onclick="trackUserInterest('doga', 24000000); luxNavigate('koleksiyon.html?tip=doga')"
                         class="relative h-56 md:h-[450px] lg:h-[500px] rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl text-left">
-                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80"
+                            loading="lazy"
                             class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-nature/90 via-navy/20 to-transparent opacity-80 text-left">
@@ -653,6 +696,7 @@
                         class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 flex flex-col border border-gray-50 text-left cursor-pointer">
                         <div class="relative h-56 md:h-64 overflow-hidden">
                             <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80"
+                                loading="lazy"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                             <div
                                 class="absolute top-6 left-6 bg-navy text-gold text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
@@ -717,6 +761,7 @@
                         class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 flex flex-col border border-gray-50 text-left cursor-pointer">
                         <div class="relative h-56 md:h-64 overflow-hidden text-left">
                             <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+                                loading="lazy"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                             <div
                                 class="absolute top-6 left-6 bg-modern text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
@@ -782,6 +827,7 @@
                         class="group cursor-pointer bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-2 border border-gray-100 flex flex-col h-full text-left">
                         <div class="relative h-56 md:h-64 overflow-hidden text-left">
                             <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80"
+                                loading="lazy"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                             <div
                                 class="absolute top-6 left-6 bg-natureLight text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
@@ -1261,6 +1307,25 @@
                 modal.classList.remove('opacity-100', 'open');
                 modal.classList.add('opacity-0');
                 setTimeout(() => { modal.classList.add('invisible'); }, 400);
+            }
+        }
+        // Mobil Menü Mantığı
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('menuOverlay');
+            
+            if (menu.classList.contains('translate-x-full')) {
+                menu.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+                document.body.style.overflow = 'hidden'; // Kaydırmayı engelle
+            } else {
+                menu.classList.add('translate-x-full');
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    if (window.innerWidth < 768) document.body.style.overflow = 'auto';
+                }, 300);
             }
         }
 
