@@ -261,17 +261,17 @@
                                     <input type="password" id="password"
                                         class="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold focus:bg-white transition-all text-sm font-medium text-navy placeholder-gray-400"
                                         placeholder="••••••••">
-                                    <button
+                                    <button type="button" id="toggle-password" onclick="togglePasswordVisibility()"
                                         class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-navy transition-colors">
-                                        <i class="fa-regular fa-eye-slash text-sm"></i>
+                                        <i id="toggle-icon" class="fa-regular fa-eye-slash text-sm"></i>
                                     </button>
                                 </div>
                             </div>
 
                             <div class="pt-2">
-                                <button onclick="login()"
+                                <button type="button" onclick="login()" id="login-btn"
                                     class="w-full bg-navy hover:bg-slate-800 text-gold font-bold py-4 rounded-lg transition-all gold-glow uppercase tracking-[0.15em] text-xs flex items-center justify-center gap-3">
-                                    Güvenli Giriş <i class="fa-solid fa-arrow-right"></i>
+                                    <span id="login-btn-text">Güvenli Giriş</span> <i class="fa-solid fa-arrow-right"></i>
                                 </button>
                             </div>
 
@@ -443,8 +443,7 @@
 
             <!-- Çıkış Butonu -->
             <div class="p-4 border-t border-white/10 relative z-10">
-                <button onclick="document.getElementById('logout-confirm-modal').classList.remove('hidden')" <button
-                    onclick="logout()"
+                <button onclick="logout()"
                     class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-modern hover:bg-modern/10 transition-all text-sm font-bold">
                     <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Güvenli Çıkış
                 </button>
@@ -2276,18 +2275,111 @@
         }
 
         function logout() {
-            // --- BARTER WIZARD LOGIC ---
-            window.barterNext = function(stepIndex) {
-                document.getElementById('step-' + (stepIndex - 1)).classList.add('hidden');
-                document.getElementById('step-' + stepIndex).classList.remove('hidden');
-            };
-            window.barterPrev = function(stepIndex) {
-                document.getElementById('step-' + (stepIndex + 1)).classList.add('hidden');
-                document.getElementById('step-' + stepIndex).classList.remove('hidden');
-            };
+            document.getElementById('logout-confirm-modal').classList.remove('hidden');
+        }
+
+        function executeLogout() {
             localStorage.removeItem('imza_admin_token');
             localStorage.removeItem('imza_admin_role');
             window.location.reload();
+        }
+
+        // --- BARTER WIZARD LOGIC ---
+        window.barterNext = function(stepIndex) {
+            document.getElementById('step-' + (stepIndex - 1)).classList.add('hidden');
+            document.getElementById('step-' + stepIndex).classList.remove('hidden');
+        };
+        window.barterPrev = function(stepIndex) {
+            document.getElementById('step-' + (stepIndex + 1)).classList.add('hidden');
+            document.getElementById('step-' + stepIndex).classList.remove('hidden');
+        };
+
+        // --- LOGIN MANTIĞI ---
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+            const loginBtn = document.getElementById('login-btn');
+            const loginBtnText = document.getElementById('login-btn-text');
+
+            if (!username || !password) {
+                errorDiv.classList.remove('hidden');
+                errorDiv.querySelector('span').textContent = 'Lütfen tüm alanları doldurun.';
+                return;
+            }
+
+            // Loading state
+            loginBtn.disabled = true;
+            loginBtn.classList.add('opacity-70', 'cursor-not-allowed');
+            loginBtnText.textContent = 'Giriş Yapılıyor...';
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('imza_admin_token', data.token);
+                    localStorage.setItem('imza_admin_role', data.role);
+                    window.location.reload();
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    errorDiv.classList.remove('hidden');
+                    errorDiv.querySelector('span').textContent = errorData.error || 'Giriş bilgileri hatalı.';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.classList.remove('hidden');
+                errorDiv.querySelector('span').textContent = 'Bir hata oluştu. Sunucuya erişilemiyor.';
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                loginBtnText.textContent = 'Güvenli Giriş';
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggle-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            }
+        }
+
+        // Enter tuşu desteği
+        document.getElementById('password')?.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') login();
+        });
+        document.getElementById('username')?.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // Sayfa yüklendiğinde oturum kontrolü
+        function checkAuth() {
+            const token = localStorage.getItem('imza_admin_token');
+            const loginSection = document.getElementById('login-section');
+            const portalApp = document.getElementById('portal-app');
+            
+            if (token) {
+                loginSection.classList.add('hidden');
+                portalApp.classList.remove('hidden');
+                portalApp.classList.add('show-app');
+                // Dashboard verilerini çek
+                fetchDashboardStats();
+            } else {
+                loginSection.classList.remove('hidden');
+                portalApp.classList.add('hidden');
+            }
         }
 
         // --- DASHBOARD ---
@@ -2661,7 +2753,7 @@
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
-            fetchDashboardStats();
+            checkAuth();
             // Category population helper
             const catSelect = document.getElementById('p-kategori');
             if (catSelect) {

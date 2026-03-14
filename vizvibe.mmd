@@ -78,15 +78,21 @@ flowchart TD
         %% @feature_refactor [ai-task, closed, 2026-03-14, antigravity]
         refactor("Klasör Refaktörü<br/><sub>Dokümanlar docs/, sayfalar pages/<br/>altına alındı; app.py yeni<br/>yapıya göre optimize edildi</sub>")
 
+        %% @feature_portal_fix [ai-task, closed, 2026-03-14, antigravity]
+        portal_fix("Portal & Login Onarımı<br/><sub>Kayıp login fonksiyonu geri<br/>getirildi, 404 sayfası eklendi<br/>ve UI/UX iyileştirmeleri yapıldı</sub>")
+
+        %% @feature_server_up [ai-task, closed, 2026-03-14, antigravity]
+        server_up("Yerel Sunucu Aktif<br/><sub>Sunucu başlatma hataları giderildi<br/>ve sistem yerelde çalışır<br/>duruma getirildi</sub>")
+
         %% @ultimate_goal [end, opened, 2026-03-15, nam]
         goal("Büyük Hedef")
 
-        start --> leads --> contracts --> ai --> deploy --> mobile_fix --> perf_opt --> cloudinary --> cleanup --> refactor -.-> goal
+        start --> leads --> contracts --> ai --> deploy --> mobile_fix --> perf_opt --> cloudinary --> cleanup --> refactor --> portal_fix --> server_up -.-> goal
     end
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [SON ÇALIŞMA]
-        refactor
+        server_up
     end
 
     %% === STYLES ===
@@ -118,9 +124,11 @@ flowchart TD
     style contracts fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style ai fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style deploy fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style portal_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style server_up fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     
     %% Recent highlight
-    style refactor fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style server_up fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Target

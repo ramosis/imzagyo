@@ -112,15 +112,28 @@ def index():
 
 @app.route('/<path:path>')
 def serve_file(path):
-    # HTML dosyalarını pages/ klasöründen servis et
-    if path.endswith('.html'):
-        full_path = os.path.join('pages', path)
+    # 1. API isteklerini atla (Flask otomatik yönlendirir ama güvenlik için)
+    if path.startswith('api/'):
+        return "Not Found", 404
+    
+    # 2. HTML dosyalarını pages/ klasöründen servis et
+    if path.endswith('.html') or '.' not in path:
+        # Eğer uzantı yoksa .html ekle (örn: /portal -> /portal.html)
+        file_name = path if path.endswith('.html') else f"{path}.html"
+        full_path = os.path.join('pages', file_name)
         if os.path.exists(full_path):
-            return send_from_directory('pages', path)
-            
-    if os.path.exists(path):
+            return send_from_directory('pages', file_name)
+
+    # 3. Diğer statik dosyaları (js, css, img) root'tan servis et
+    if os.path.exists(path) and os.path.isfile(path):
         return send_from_directory('.', path)
-    return "File not found", 404
+
+    # 4. Hiçbir şey bulunamazsa 404 sayfasına gönder
+    return send_from_directory('pages', '404.html'), 404
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return send_from_directory('pages', '404.html'), 404
 
 # === API UÇ NOKTALARI (ENDPOINTS) ===
 
