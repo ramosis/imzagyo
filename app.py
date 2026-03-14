@@ -39,7 +39,7 @@ from api.tracking import tracking_bp
 from api.ai import ai_bp
 from api.neighborhood import neighborhood_bp
 from api.projects import projects_bp
-app = Flask(__name__, static_folder='.', static_url_path='')
+app = Flask(__name__, static_folder=None)
 
 UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -112,24 +112,30 @@ def index():
 
 @app.route('/<path:path>')
 def serve_file(path):
-    # 1. API isteklerini atla (Flask otomatik yönlendirir ama güvenlik için)
+    # Ana dizini belirle (app.py'nin olduğu yer)
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    pages_dir = os.path.join(base_dir, 'pages')
+    
+    # 1. API isteklerini atla
     if path.startswith('api/'):
         return "Not Found", 404
     
     # 2. HTML dosyalarını pages/ klasöründen servis et
-    if path.endswith('.html') or '.' not in path:
-        # Eğer uzantı yoksa .html ekle (örn: /portal -> /portal.html)
-        file_name = path if path.endswith('.html') else f"{path}.html"
-        full_path = os.path.join('pages', file_name)
-        if os.path.exists(full_path):
-            return send_from_directory('pages', file_name)
+    # Hem .html eklenmiş hem eklenmemiş halini kontrol et
+    clean_path = path.lower()
+    file_name = clean_path if clean_path.endswith('.html') else f"{clean_path}.html"
+    full_html_path = os.path.join(pages_dir, file_name)
+    
+    if os.path.exists(full_html_path) and os.path.isfile(full_html_path):
+        return send_from_directory(pages_dir, file_name)
 
     # 3. Diğer statik dosyaları (js, css, img) root'tan servis et
-    if os.path.exists(path) and os.path.isfile(path):
-        return send_from_directory('.', path)
+    full_static_path = os.path.join(base_dir, path)
+    if os.path.exists(full_static_path) and os.path.isfile(full_static_path):
+        return send_from_directory(base_dir, path)
 
     # 4. Hiçbir şey bulunamazsa 404 sayfasına gönder
-    return send_from_directory('pages', '404.html'), 404
+    return send_from_directory(pages_dir, '404.html'), 404
 
 @app.errorhandler(404)
 def page_not_found(e):
