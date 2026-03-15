@@ -91,16 +91,16 @@
         // Lux Curtain Bridge Logic
         function luxNavigate(url) {
             const curtain = document.querySelector('.lux-curtain');
-            curtain.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
             curtain.classList.remove('hidden');
             setTimeout(() => {
                 window.location.href = url;
-            }, 450);
+            }, 1100);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const curtain = document.querySelector('.lux-curtain');
-            curtain.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
             setTimeout(() => {
                 curtain.classList.add('hidden');
             }, 100);

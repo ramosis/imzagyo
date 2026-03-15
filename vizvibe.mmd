@@ -81,15 +81,18 @@ flowchart TD
         %% @feature_design_standard [ai-task, closed, 2026-03-14, antigravity]
         design_standard("Tasarım Standardizasyonu<br/><sub>Tüm sayfalarda 1.1s Maybach hızı,<br/>12px Montserrat nav fontu ve<br/>premium marka uyumu sağlandı</sub>")
 
+        %% @feature_mobile_web [ai-task, closed, 2026-03-15, antigravity]
+        mobile_web("Mobil Web Geliştirme<br/><sub>1.1s Maybach senkronizasyonu,<br/>responsive görsel optimizasyonu (srcset)<br/>ve PWA (manifest/sw) entegrasyonu</sub>")
+
         %% @ultimate_goal [end, opened, 2026-03-15, nam]
         goal("Büyük Hedef")
 
-        start --> leads --> contracts --> ai --> deploy --> mobile_fix --> perf_opt --> cloudinary --> cleanup --> refactor --> portal_fix --> server_up --> design_standard -.-> goal
+        start --> leads --> contracts --> ai --> deploy --> mobile_fix --> perf_opt --> cloudinary --> cleanup --> refactor --> portal_fix --> server_up --> design_standard --> mobile_test --> mobile_web -.-> goal
     end
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [SON ÇALIŞMA]
-        design_standard
+        mobile_web
     end
 
     %% === STYLES ===

@@ -10,6 +10,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#0a192f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script>
         tailwind.config = {
             theme: {
@@ -230,7 +234,7 @@
             background-color: #0a192f;
             z-index: 99999;
             pointer-events: none;
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -242,14 +246,30 @@
         }
     </style>
     <script>
+        // Lux Image Optimizer (Unsplash API Bridge)
+        function optimizeLuxuryImage(url, width = null) {
+            if (!url || !url.includes('unsplash.com')) return url;
+            const targetWidth = width || (window.innerWidth < 768 ? 800 : 1920);
+            
+            // Mevcut w parametresini temizle ve yenisini ekle
+            let baseUrl = url.split('?')[0];
+            let params = new URLSearchParams(url.split('?')[1] || '');
+            params.set('w', targetWidth);
+            params.set('q', window.innerWidth < 768 ? 70 : 85); // Mobil için kalite düşür
+            params.set('auto', 'format');
+            params.set('fit', 'crop');
+            
+            return `${baseUrl}?${params.toString()}`;
+        }
+
         // Lux Curtain Bridge Logic (Fluid Outro, Luxury Intro)
         function luxNavigate(url) {
             const curtain = document.querySelector('.lux-curtain');
-            curtain.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)'; // Yumuşak ama akıcı (Sweet Spot)
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)'; // Maybach 1.1s Standard
             curtain.classList.remove('hidden');
             setTimeout(() => {
                 window.location.href = url;
-            }, 450); // Perde kapanmaya yakınken geçiş yap
+            }, 1100); // Tam senkronizasyon
         }
 
         window.addEventListener('scroll', function () {
@@ -264,7 +284,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Açılış (Intro) - Lüks ve Ağır
             const curtain = document.querySelector('.lux-curtain');
-            curtain.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
             setTimeout(() => {
                 curtain.classList.add('hidden');
             }, 100);
@@ -577,7 +597,7 @@
                 <div
                     class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row justify-between items-center gap-2">
                     <div
-                        class="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 font-semibold uppercase tracking-widest text-gray-400">
+                        class="hidden sm:flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 font-semibold uppercase tracking-widest text-gray-400">
                         <a href="kurumsal.html" class="hover:text-gold transition-colors">Kurumsal</a>
                         <a href="kariyer.html" class="hover:text-gold transition-colors">Kariyer</a>
                         <a href="javascript:void(0)" onclick="goToSection(4)"
@@ -1249,9 +1269,10 @@
 
                 heroData.forEach((item, index) => {
                     // Slayt Ekleme
+                    const optimizedImg = optimizeLuxuryImage(item.resim_url);
                     const slideHTML = `
                     <div class="slide absolute inset-0 transition-opacity duration-1000 ${index === 0 ? 'opacity-100 z-10 active' : 'opacity-0 z-0'}">
-                        <div class="absolute inset-0 bg-cover bg-center text-left" style="background-image: url('${item.resim_url}');"></div>
+                        <div class="absolute inset-0 bg-cover bg-center text-left" style="background-image: url('${optimizedImg}');"></div>
                         <div class="absolute inset-0 bg-navy/80"></div>
                         <div class="absolute inset-0 brand-pattern opacity-20"></div>
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative h-full flex items-center w-full">
@@ -1389,11 +1410,12 @@
                 // Çok basit bir format
                 const fiyatKisa = item.fiyat.replace('0.000', 'M').replace('.000', 'K').replace('₺', '').trim();
 
+                const optimizedPortfolioImg = optimizeLuxuryImage(item.resim_hero, 600);
                 const html = `
                 <div onclick="luxNavigate('detay.html?id=${item.id}')"
                     class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 flex flex-col border border-gray-50 text-left cursor-pointer h-full">
                     <div class="relative h-56 md:h-64 overflow-hidden shrink-0">
-                        <img src="${item.resim_hero}"
+                        <img src="${optimizedPortfolioImg}" loading="lazy"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute top-6 left-6 ${tagColor} text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
                             Satılık</div>
@@ -1637,6 +1659,16 @@
             `).join('');
         }
 
+    </script>
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('../sw.js')
+                    .then(reg => console.log('Service Worker kayıtlı', reg))
+                    .catch(err => console.log('SW hatası', err));
+            });
+        }
     </script>
 </body>
 

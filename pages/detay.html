@@ -134,7 +134,7 @@
             background-color: #0a192f;
             z-index: 99999;
             pointer-events: none;
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -146,19 +146,32 @@
     </style>
     <script>
         // Lux Curtain Bridge Logic (Fluid Outro, Luxury Intro)
+        // Lux Image Optimizer
+        function optimizeLuxuryImage(url, width = null) {
+            if (!url || !url.includes('unsplash.com')) return url;
+            const targetWidth = width || (window.innerWidth < 768 ? 800 : 1920);
+            let baseUrl = url.split('?')[0];
+            let params = new URLSearchParams(url.split('?')[1] || '');
+            params.set('w', targetWidth);
+            params.set('auto', 'format');
+            params.set('fit', 'crop');
+            params.set('q', window.innerWidth < 768 ? 70 : 85);
+            return `${baseUrl}?${params.toString()}`;
+        }
+
         function luxNavigate(url) {
             const curtain = document.querySelector('.lux-curtain');
-            curtain.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
             curtain.classList.remove('hidden');
             setTimeout(() => {
                 window.location.href = url;
-            }, 450);
+            }, 1100);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             // Açılış (Intro) - Lüks ve Ağır
             const curtain = document.querySelector('.lux-curtain');
-            curtain.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
             setTimeout(() => {
                 curtain.classList.add('hidden');
             }, 100);
@@ -558,7 +571,7 @@
                 document.title = `${veri.baslik1} ${veri.baslik2} | İmza Gayrimenkul`;
 
                 // Hero
-                document.getElementById('p-hero-bg').style.backgroundImage = `url('${veri.resim_hero}')`;
+                document.getElementById('p-hero-bg').style.backgroundImage = `url('${optimizeLuxuryImage(veri.resim_hero)}')`;
                 document.getElementById('p-koleksiyon').innerText = veri.koleksiyon;
                 document.getElementById('p-koleksiyon').className = `uppercase tracking-[0.4em] text-[10px] font-bold mb-2 italic ${veri.ozellik_renk}`;
                 document.getElementById('p-baslik1').innerText = veri.baslik1;
@@ -582,7 +595,7 @@
                 // Story
                 document.getElementById('p-line-story').className = `w-16 h-1 mb-10 text-left bg-${veri.ozellik_renk.split('-')[1]}`;
                 document.getElementById('p-hikaye').innerText = veri.hikaye;
-                document.getElementById('p-resim-hikaye').src = veri.resim_hikaye;
+                document.getElementById('p-resim-hikaye').src = optimizeLuxuryImage(veri.resim_hikaye, 800);
 
                 // Features
                 const ozList = document.getElementById('p-ozellikler-list');

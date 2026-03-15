@@ -83,7 +83,7 @@
             background-color: #0a192f;
             z-index: 99999;
             pointer-events: none;
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -104,7 +104,7 @@
 
             .main-wrapper {
                 height: 100%;
-                transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+                transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1);
                 will-change: transform;
             }
 
@@ -131,22 +131,45 @@
     </style>
     <script>
         // Lux Curtain Bridge Logic (Fluid Outro, Luxury Intro)
+        // Lux Image Optimizer
+        function optimizeLuxuryImage(url, width = null) {
+            if (!url || !url.includes('unsplash.com')) return url;
+            const targetWidth = width || (window.innerWidth < 768 ? 800 : 1920);
+            let baseUrl = url.split('?')[0];
+            let params = new URLSearchParams(url.split('?')[1] || '');
+            params.set('w', targetWidth);
+            params.set('auto', 'format');
+            params.set('fit', 'crop');
+            params.set('q', window.innerWidth < 768 ? 70 : 85);
+            return `${baseUrl}?${params.toString()}`;
+        }
+
         function luxNavigate(url) {
             const curtain = document.querySelector('.lux-curtain');
-            curtain.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
             curtain.classList.remove('hidden');
             setTimeout(() => {
                 window.location.href = url;
-            }, 450);
+            }, 1100);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             // Açılış (Intro) - Lüks ve Ağır
             const curtain = document.querySelector('.lux-curtain');
-            curtain.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
             setTimeout(() => {
                 curtain.classList.add('hidden');
             }, 100);
+
+            // Hero Image Optimization
+            const heroBg = document.querySelector('.snap-section div[style*="unsplash.com"]');
+            if (heroBg) {
+                const currentStyle = heroBg.getAttribute('style');
+                const urlMatch = currentStyle.match(/url\(['"]?([^'"]+)['"]?\)/);
+                if (urlMatch && urlMatch[1]) {
+                    heroBg.style.backgroundImage = `url('${optimizeLuxuryImage(urlMatch[1])}')`;
+                }
+            }
 
             // Geri butonu için düzeltme (Bfcache)
             window.addEventListener('pageshow', (event) => {
