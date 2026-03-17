@@ -81,8 +81,8 @@ flowchart TD
         %% @feature_extension_sync [ai-task, closed, 2026-03-18, antigravity]
         extension_sync("Eklenti Senkronizasyonu<br/><sub>Shadow Mode verilerinin Flask<br/>backend ile anlık senkronizasyonu<br/>altyapısı (API+DB) kuruldu</sub>")
 
-        %% @feature_imza_lens_merkezi [ai-task, closed, 2026-03-18, antigravity]
-        imza_lens_merkezi("İmza Lens Merkezi Panel (Faz 24)<br/><sub>Şahibinden/HE verileri ile<br/>site trafik analizleri (L-Metrics)<br/>tek bir sekmeli panelde birleştirildi</sub>")
+    %% @feature_imza_lens_merkezi [ai-task, closed, 2026-03-18, antigravity]
+    imza_lens_merkezi("İmza Lens Merkezi Panel (Faz 24)<br/><sub>Şahibinden/HE verileri ile<br/>site trafik analizleri (L-Metrics)<br/>tek bir sekmeli panelde birleştirildi.<br/>Eklenti portu 8000 olarak güncellendi.</sub>")
 
         start --> refactor --> mobile_web --> l_metrics --> geo_seo --> shadow_bridge --> campaign --> admin_fix --> mobile_ops --> extensions
         extensions --> extension_mvp --> extension_sync --> imza_lens_merkezi
