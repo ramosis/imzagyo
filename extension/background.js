@@ -4,9 +4,9 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // --- YAPILANDIRMA (CONFIG) ---
 const CONFIG = {
-    // Yerel test için: http://127.0.0.1:8000
-    // Sunucu test için: http://SUNUCU_IP:8000
-    API_BASE_URL: 'http://127.0.0.1:8000' 
+    // Canlı Sunucu (Google Cloud): https://imzaemlak.com
+    // Yerel Test: http://127.0.0.1:8000
+    API_BASE_URL: 'https://imzaemlak.com' 
 };
 
 // Arka plan işlemleri (Shadow Mode Sync)
