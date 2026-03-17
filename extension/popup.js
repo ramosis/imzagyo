@@ -74,6 +74,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         data.district = parts[1] || "";
                         data.neighborhood = parts[2] || "";
                     }
+                    try {
+                        const mapEl = document.querySelector('#map');
+                        if (mapEl) {
+                            data.latitude = parseFloat(mapEl.getAttribute('data-lat'));
+                            data.longitude = parseFloat(mapEl.getAttribute('data-lng'));
+                        }
+                        if (!data.latitude) {
+                            const scriptText = Array.from(document.querySelectorAll('script')).find(s => s.textContent.includes('centerLat'))?.textContent || "";
+                            const latMatch = scriptText.match(/centerLat\s*:\s*([\d.]+)/);
+                            const lngMatch = scriptText.match(/centerLng\s*:\s*([\d.]+)/);
+                            if (latMatch) data.latitude = parseFloat(latMatch[1]);
+                            if (lngMatch) data.longitude = parseFloat(lngMatch[1]);
+                        }
+                    } catch (e) {}
                 }
                 return data;
             }
