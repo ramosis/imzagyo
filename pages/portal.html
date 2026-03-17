@@ -529,6 +529,7 @@
                                         <tr>
                                             <th class="p-6">Kaynak</th>
                                             <th class="p-6">İlan Başlığı</th>
+                                            <th class="p-6">Konum (İl/İlçe)</th>
                                             <th class="p-6">Fiyat</th>
                                             <th class="p-6">Son Görülme</th>
                                             <th class="p-6 text-right">İşlemler</th>
@@ -2978,14 +2979,21 @@
         async function fetchShadowListings() {
             const tbody = document.getElementById('shadow-listings-table-body');
             if (!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Veriler yükleniyor...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Veriler yükleniyor...</td></tr>';
             try {
                 const res = await apiFetch(`${API_BASE}/extension/listings`);
                 if (!res.ok) throw new Error('Yükleme hatası');
                 const data = await res.json();
-                tbody.innerHTML = data.length === 0 ? '<tr><td colspan="5" class="py-12 text-center text-gray-400">Henüz senkronize edilmiş veri bulunamadı.</td></tr>' : '';
+                tbody.innerHTML = data.length === 0 ? '<tr><td colspan="6" class="py-12 text-center text-gray-400">Henüz senkronize edilmiş veri bulunamadı.</td></tr>' : '';
                 data.forEach(item => {
-                    const dateStr = new Date(item.last_sync).toLocaleString('tr-TR');
+                    const dateStr = new Date(item.last_seen_at || item.last_sync).toLocaleString('tr-TR');
+                    const location = (item.city || item.district) ? `${item.city} / ${item.district}` : '<span class="text-gray-300">Belirtilmedi</span>';
+                    const neighborhood = item.neighborhood ? `<div class="text-[10px] text-gray-400">${item.neighborhood}</div>` : '';
+                    
+                    const mapBtn = (item.latitude && item.longitude) 
+                        ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-100 transition-colors" title="Haritada Gör"><i class="fa-solid fa-map-location-dot"></i></a>`
+                        : '';
+
                     tbody.innerHTML += `
                         <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors group">
                             <td class="py-4 px-6 text-center">
@@ -2996,6 +3004,10 @@
                                 <div class="text-[9px] text-gray-400 font-mono mt-1 opacity-60 truncate max-w-xs">${item.url}</div>
                             </td>
                             <td class="py-4 px-6">
+                                <div class="text-sm font-medium text-navy/80">${location}</div>
+                                ${neighborhood}
+                            </td>
+                            <td class="py-4 px-6">
                                 <div class="font-bold text-green-700 text-sm whitespace-nowrap">${item.price}</div>
                             </td>
                             <td class="py-4 px-6">
@@ -3003,6 +3015,7 @@
                             </td>
                             <td class="py-4 px-6 text-right">
                                 <div class="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                                    ${mapBtn}
                                     <a href="${item.url}" target="_blank" class="w-8 h-8 rounded-lg bg-navy/5 text-navy hover:bg-navy hover:text-white transition-all flex items-center justify-center shadow-sm" title="Kaynağa Git">
                                         <i class="fa-solid fa-external-link text-xs"></i>
                                     </a>

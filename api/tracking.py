@@ -151,6 +151,13 @@ def sync_extension_data():
         price = data.get('price')
         url = data.get('url')
         
+        # Yeni Alanlar
+        city = data.get('city')
+        district = data.get('district')
+        neighborhood = data.get('neighborhood')
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        
         if not url:
             return jsonify({'error': 'URL bilgisi gerekli'}), 400
 
@@ -160,14 +167,22 @@ def sync_extension_data():
         try:
             # İlanı kaydet veya güncelle
             conn.execute('''
-                INSERT INTO listings_shadow (title, price, url, source, data_json)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO listings_shadow (
+                    title, price, city, district, neighborhood, 
+                    latitude, longitude, url, source, data_json
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(url) DO UPDATE SET
                     title=excluded.title,
                     price=excluded.price,
+                    city=excluded.city,
+                    district=excluded.district,
+                    neighborhood=excluded.neighborhood,
+                    latitude=excluded.latitude,
+                    longitude=excluded.longitude,
                     data_json=excluded.data_json,
                     last_seen_at=CURRENT_TIMESTAMP
-            ''', (title, price, url, source, json.dumps(data)))
+            ''', (title, price, city, district, neighborhood, latitude, longitude, url, source, json.dumps(data)))
             conn.commit()
             return jsonify({'status': 'Success', 'message': 'İlan verisi senkronize edildi'}), 201
         except Exception as e:

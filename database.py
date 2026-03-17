@@ -344,12 +344,32 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
             price TEXT,
+            city TEXT,
+            district TEXT,
+            neighborhood TEXT,
+            latitude REAL,
+            longitude REAL,
             url TEXT UNIQUE,
             source TEXT, -- 'sahibinden', 'hepsiemlak'
             data_json TEXT, -- Tüm ham veri
-            last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # Mevcut tabloya yeni kolonları ekle (Migration desteği)
+    columns_to_add = [
+        ('city', 'TEXT'),
+        ('district', 'TEXT'),
+        ('neighborhood', 'TEXT'),
+        ('latitude', 'REAL'),
+        ('longitude', 'REAL')
+    ]
+    for col_name, col_type in columns_to_add:
+        try:
+            cursor.execute(f'ALTER TABLE listings_shadow ADD COLUMN {col_name} {col_type}')
+        except sqlite3.OperationalError:
+            pass # Kolon zaten varsa hata verir, görmezden gel
 
     # -----------------------------------------------------------------------
 
