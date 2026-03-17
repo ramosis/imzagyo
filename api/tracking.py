@@ -3,6 +3,7 @@ from database import get_db_connection
 import json
 import re
 from functools import wraps
+from urllib.parse import urlparse
 
 tracking_bp = Blueprint('tracking', __name__)
 
@@ -207,7 +208,10 @@ def sync_extension_data():
             elif listing_type == 'Kiralık':
                 estimated_rent = price_numeric # Kiralık ilan için fiyatın kendisi tahmini kiradır
 
-            source = 'sahibinden' if 'sahibinden.com' in url else 'hepsiemlak' if 'hepsiemlak.com' in url else 'zingat' if 'zingat.com' in url else 'other'
+            # URL'den site adını (source) dinamik ayıkla
+            parsed_url = urlparse(url)
+            domain = parsed_url.netloc.replace('www.', '').split('.')[0]
+            source = domain if domain else 'other'
             # İlanı kaydet veya güncelle
             conn.execute('''
                 INSERT INTO listings_shadow (

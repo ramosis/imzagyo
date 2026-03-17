@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeTab.url.includes('sahibinden.com') || activeTab.url.includes('hepsiemlak.com') || activeTab.url.includes('zingat.com')) {
             pageStatus.innerText = "Emlak Sayfası Algılandı ✅";
             pageStatus.style.color = "#4ade80";
+        } else if (activeTab.url.startsWith('http')) {
+            pageStatus.innerText = "Yeni Site Algılandı (Jenerik) 🕵️‍♂️";
+            pageStatus.style.color = "#fbbf24";
+            analyzeBtn.disabled = false;
+            analyzeBtn.style.opacity = "1";
         } else {
             pageStatus.innerText = "Desteklenmeyen Sayfa ❌";
             pageStatus.style.color = "#f87171";
@@ -161,6 +166,38 @@ document.addEventListener('DOMContentLoaded', () => {
                             data.longitude = parseFloat(mapContainer.getAttribute('data-lng'));
                         }
                     } catch (e) {}
+                } else {
+                    // --- JENERİK KAZIMA (Bilinmeyen Siteler) ---
+                    const generic = (() => {
+                        const res = { title: "", price: "Bilinmiyor", owner_name: "" };
+                        try {
+                            const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+                            scripts.forEach(s => {
+                                try {
+                                    const json = JSON.parse(s.textContent);
+                                    const items = Array.isArray(json) ? json : (json['@graph'] || [json]);
+                                    items.forEach(item => {
+                                        if (item['@type'] === 'Product' || item['@type'] === 'RealEstateListing') {
+                                            res.title = res.title || item.name || item.headline;
+                                            if (item.offers) {
+                                                const offer = Array.isArray(item.offers) ? item.offers[0] : item.offers;
+                                                if (offer.price) res.price = `${offer.price} ${offer.priceCurrency || ''}`.trim();
+                                            }
+                                        }
+                                    });
+                                } catch (e) {}
+                            });
+                        } catch (e) {}
+                        res.title = res.title || document.querySelector('meta[property="og:title"]')?.content || document.title;
+                        if (res.price === "Bilinmiyor") {
+                            const pm = document.body.innerText.match(/(\d{1,3}(\.\d{3})*|(\d+))(\s*)(TL|₺|USD|€)/i);
+                            if (pm) res.price = pm[0];
+                        }
+                        return res;
+                    })();
+                    data.price = generic.price;
+                    data.title = generic.title || data.title;
+                    data.owner_name = generic.owner_name;
                 }
                 return data;
             }

@@ -149,9 +149,74 @@ function scrapeListingData() {
                 data.longitude = parseFloat(mapContainer.getAttribute('data-lng'));
             }
         } catch (e) {}
+    } else {
+        // --- JENERİK KAZIMA (Bilinmeyen Siteler İçin) ---
+        const generic = scrapeGenericData();
+        data.price = generic.price;
+        data.title = generic.title || data.title;
+        data.owner_name = generic.owner_name;
+        data.owner_phone = generic.owner_phone;
+        data.listing_date = generic.listing_date;
+        data.city = generic.city;
+        data.district = generic.district;
+        data.neighborhood = generic.neighborhood;
     }
 
     return data;
+}
+
+/**
+ * Bilinmeyen siteler için JSON-LD, OG ve Meta etiketlerinden veri çekmeye çalışır.
+ */
+function scrapeGenericData() {
+    const res = {
+        title: "",
+        price: "Bilinmiyor",
+        city: "",
+        district: "",
+        neighborhood: "",
+        owner_name: "",
+        owner_phone: "",
+        listing_date: ""
+    };
+
+    // 1. JSON-LD (Schema.org) Analizi
+    try {
+        const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+        scripts.forEach(s => {
+            try {
+                const json = JSON.parse(s.textContent);
+                const items = Array.isArray(json) ? json : (json['@graph'] || [json]);
+                
+                items.forEach(item => {
+                    // Ürün veya İlan tipi kontrolü
+                    if (item['@type'] === 'Product' || item['@type'] === 'RealEstateListing' || item['@id']?.includes('listing')) {
+                        res.title = res.title || item.name || item.headline;
+                        if (item.offers) {
+                            const offer = Array.isArray(item.offers) ? item.offers[0] : item.offers;
+                            if (offer.price) res.price = `${offer.price} ${offer.priceCurrency || ''}`.trim();
+                        }
+                    }
+                });
+            } catch (e) {}
+        });
+    } catch (e) {}
+
+    // 2. OpenGraph & Meta Etiketleri
+    res.title = res.title || document.querySelector('meta[property="og:title"]')?.content || document.title;
+    
+    // 3. Fiyat Regex Fallback (Sayfa metninde TL/₺ arama)
+    if (res.price === "Bilinmiyor") {
+        const priceMatch = document.body.innerText.match(/(\d{1,3}(\.\d{3})*|(\d+))(\s*)(TL|₺|USD|€)/i);
+        if (priceMatch) res.price = priceMatch[0];
+    }
+
+    // 4. İlan Sahibi Tagleri
+    res.owner_name = document.querySelector('[itemprop="author"]')?.innerText || 
+                     document.querySelector('.agent-name')?.innerText || 
+                     document.querySelector('.seller-name')?.innerText || "";
+
+    return res;
 }
 
 // Popup'tan gelen talepleri dinle
