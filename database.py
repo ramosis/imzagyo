@@ -344,6 +344,10 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
             price TEXT,
+            price_numeric REAL,
+            estimated_rent REAL,
+            roi_score REAL,
+            amortization_years REAL,
             city TEXT,
             district TEXT,
             neighborhood TEXT,
@@ -359,6 +363,10 @@ def init_db():
 
     # Mevcut tabloya yeni kolonları ekle (Migration desteği)
     columns_to_add = [
+        ('price_numeric', 'REAL'),
+        ('estimated_rent', 'REAL'),
+        ('roi_score', 'REAL'),
+        ('amortization_years', 'REAL'),
         ('city', 'TEXT'),
         ('district', 'TEXT'),
         ('neighborhood', 'TEXT'),

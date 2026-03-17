@@ -46,6 +46,15 @@ function scrapeListingData() {
             }
         } catch (e) { console.warn("Koordinat çekilemedi:", e); }
 
+        // Sahibinden ROI / Kira Tahmini (Emlak Endeksi widget'ı varsa)
+        try {
+            const rentText = document.querySelector('.re-valuation-info-value')?.innerText || "";
+            if (rentText) {
+                const rentMatch = rentText.match(/([\d.]+)/);
+                if (rentMatch) data.estimated_rent = parseFloat(rentMatch[1].replace(/\./g, ''));
+            }
+        } catch (e) {}
+
     } else if (isHepsiemlak) {
         // Hepsiemlak Fiyat
         data.price = document.querySelector('.new-fiyat')?.innerText?.trim() || 

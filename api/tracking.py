@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from database import get_db_connection
 import json
+import re
 from functools import wraps
 
 tracking_bp = Blueprint('tracking', __name__)
@@ -161,6 +162,26 @@ def sync_extension_data():
         if not url:
             return jsonify({'error': 'URL bilgisi gerekli'}), 400
 
+        # --- ROI & Amortisman Hesaplama ---
+        price_numeric = 0
+        if price:
+            # Sadece sayıları al (Örn: "1.500.000 TL" -> 1500000)
+            price_numeric = float(re.sub(r'[^\d]', '', str(price)) or 0)
+
+        # Eklentiden gelen tahmini kira yoksa, basit bir modelle hesapla
+        # Genelde gayrimenkulde 240 ay (20 yıl) amortisman standarttır.
+        if not estimated_rent or float(estimated_rent) <= 0:
+            estimated_rent = price_numeric / 240
+        else:
+            estimated_rent = float(estimated_rent)
+
+        roi_score = 0
+        amortization_years = 0
+        if price_numeric > 0 and estimated_rent > 0:
+            annual_rent = estimated_rent * 12
+            roi_score = (annual_rent / price_numeric) * 100
+            amortization_years = price_numeric / annual_rent
+
         source = 'sahibinden' if 'sahibinden.com' in url else 'hepsiemlak' if 'hepsiemlak.com' in url else 'other'
         
         conn = get_db_connection()
@@ -168,13 +189,19 @@ def sync_extension_data():
             # İlanı kaydet veya güncelle
             conn.execute('''
                 INSERT INTO listings_shadow (
-                    title, price, city, district, neighborhood, 
+                    title, price, price_numeric, estimated_rent, 
+                    roi_score, amortization_years,
+                    city, district, neighborhood, 
                     latitude, longitude, url, source, data_json
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(url) DO UPDATE SET
                     title=excluded.title,
                     price=excluded.price,
+                    price_numeric=excluded.price_numeric,
+                    estimated_rent=excluded.estimated_rent,
+                    roi_score=excluded.roi_score,
+                    amortization_years=excluded.amortization_years,
                     city=excluded.city,
                     district=excluded.district,
                     neighborhood=excluded.neighborhood,
@@ -182,7 +209,12 @@ def sync_extension_data():
                     longitude=excluded.longitude,
                     data_json=excluded.data_json,
                     last_seen_at=CURRENT_TIMESTAMP
-            ''', (title, price, city, district, neighborhood, latitude, longitude, url, source, json.dumps(data)))
+            ''', (
+                title, price, price_numeric, estimated_rent, 
+                roi_score, amortization_years,
+                city, district, neighborhood, 
+                latitude, longitude, url, source, json.dumps(data)
+            ))
             conn.commit()
             return jsonify({'status': 'Success', 'message': 'İlan verisi senkronize edildi'}), 201
         except Exception as e:

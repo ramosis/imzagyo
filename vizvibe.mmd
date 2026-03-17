@@ -87,9 +87,12 @@ flowchart TD
     %% @feature_deep_scraping [ai-task, closed, 2026-03-18, antigravity]
     deep_scraping("Derin Veri Kazıma (Faz 25)<br/><sub>İl, İlçe, Mahalle ve Koordinat<br/>bazlı scraping mantığı kuruldu.<br/>Portalda harita entegrasyonu aktif.</sub>")
 
+    %% @feature_roi_analysis [ai-task, closed, 2026-03-18, antigravity]
+    roi_analysis("ROI & Amortisman (Faz 26)<br/><sub>Sayısal fiyat analizi, tahmini<br/>kira projeksiyonu ve yatırım<br/>verimlilik göstergeleri eklendi.</sub>")
+
         start --> refactor --> mobile_web --> l_metrics --> geo_seo --> shadow_bridge --> campaign --> admin_fix --> mobile_ops --> extensions
-        extensions --> extension_mvp --> extension_sync --> imza_lens_merkezi --> deep_scraping
-        deep_scraping --> env_setup
+        extensions --> extension_mvp --> extension_sync --> imza_lens_merkezi --> deep_scraping --> roi_analysis
+        roi_analysis --> env_setup
         env_setup -.-> goal
     end
 

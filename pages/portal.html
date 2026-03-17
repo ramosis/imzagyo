@@ -529,9 +529,9 @@
                                         <tr>
                                             <th class="p-6">Kaynak</th>
                                             <th class="p-6">İlan Başlığı</th>
-                                            <th class="p-6">Konum (İl/İlçe)</th>
+                                            <th class="p-6">Konum</th>
                                             <th class="p-6">Fiyat</th>
-                                            <th class="p-6">Son Görülme</th>
+                                            <th class="p-6">ROI / Geri Dönüş</th>
                                             <th class="p-6 text-right">İşlemler</th>
                                         </tr>
                                     </thead>
@@ -2994,6 +2994,18 @@
                         ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-100 transition-colors" title="Haritada Gör"><i class="fa-solid fa-map-location-dot"></i></a>`
                         : '';
 
+                    // ROI & Amortisman UI
+                    let roiUI = '<span class="text-gray-300">-</span>';
+                    if (item.roi_score > 0) {
+                        const roiColor = item.roi_score >= 6 ? 'text-green-600 bg-green-50' : item.roi_score >= 4 ? 'text-blue-600 bg-blue-50' : 'text-orange-600 bg-orange-50';
+                        roiUI = `
+                            <div class="flex flex-col">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${roiColor} w-fit">%${item.roi_score.toFixed(2)} ROI</span>
+                                <span class="text-[10px] text-gray-500 font-medium mt-0.5">${item.amortization_years.toFixed(1)} Yıl Amortisman</span>
+                            </div>
+                        `;
+                    }
+
                     tbody.innerHTML += `
                         <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors group">
                             <td class="py-4 px-6 text-center">
@@ -3002,6 +3014,7 @@
                             <td class="py-4 px-6">
                                 <div class="font-bold text-navy text-sm leading-tight">${item.title}</div>
                                 <div class="text-[9px] text-gray-400 font-mono mt-1 opacity-60 truncate max-w-xs">${item.url}</div>
+                                <div class="text-[9px] text-gray-400 mt-1 italic">Senk: ${dateStr}</div>
                             </td>
                             <td class="py-4 px-6">
                                 <div class="text-sm font-medium text-navy/80">${location}</div>
@@ -3011,7 +3024,7 @@
                                 <div class="font-bold text-green-700 text-sm whitespace-nowrap">${item.price}</div>
                             </td>
                             <td class="py-4 px-6">
-                                <div class="text-[10px] text-gray-500 font-medium whitespace-nowrap">${dateStr}</div>
+                                ${roiUI}
                             </td>
                             <td class="py-4 px-6 text-right">
                                 <div class="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">

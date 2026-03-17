@@ -62,6 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (lngMatch) data.longitude = parseFloat(lngMatch[1]);
                         }
                     } catch (e) {}
+                    try {
+                        const rentText = document.querySelector('.re-valuation-info-value')?.innerText || "";
+                        if (rentText) {
+                            const rentMatch = rentText.match(/([\d.]+)/);
+                            if (rentMatch) data.estimated_rent = parseFloat(rentMatch[1].replace(/\./g, ''));
+                        }
+                    } catch (e) {}
                 } else if (isHepsiemlak) {
                     data.price = document.querySelector('.new-fiyat')?.innerText?.trim() || 
                                  document.querySelector('.price')?.innerText?.trim() || "Bilinmiyor";
