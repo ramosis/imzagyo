@@ -177,3 +177,36 @@ def sync_extension_data():
             
     except Exception as e:
         return jsonify({'error': f'İstek işlenirken hata oluştu: {str(e)}'}), 500
+
+@tracking_bp.route('/api/extension/listings', methods=['GET'])
+def get_extension_listings():
+    """
+    Eklentiden gelen tüm shadow ilanları listeler.
+    """
+    conn = get_db_connection()
+    try:
+        listings = conn.execute('SELECT * FROM listings_shadow ORDER BY last_seen_at DESC').fetchall()
+        return jsonify([dict(row) for row in listings]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@tracking_bp.route('/api/tracking/interactions', methods=['GET'])
+def get_interactions():
+    """
+    Kendi sitemizdeki kullanıcı etkileşimlerini (L-Metrics) listeler.
+    """
+    conn = get_db_connection()
+    try:
+        # En son etkileşimleri getir
+        interactions = conn.execute('''
+            SELECT * FROM lead_interactions 
+            ORDER BY created_at DESC 
+            LIMIT 200
+        ''').fetchall()
+        return jsonify([dict(row) for row in interactions]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()

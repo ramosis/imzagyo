@@ -181,6 +181,13 @@
         .nav-item.active i {
             color: #c5a059;
         }
+
+        /* Lens Tab Aktif Durumu */
+        .lens-tab-btn.active {
+            background-color: white !important;
+            color: #0a192f !important;
+            box-shadow: 0 4px 6.0px -1.0px rgb(0 0 0 / 0.1), 0 2.0px 4.0px -2.0px rgb(0 0 0 / 0.1) !important;
+        }
     </style>
 
 </head>
@@ -407,6 +414,12 @@
                     <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
                 </button>
 
+                <button onclick="showSection('imza-lens', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-eye w-6 text-center text-lg"></i> İmza Lens (Merkezi)
+                    <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Pro</span>
+                </button>
+
                 <button onclick="showSection('maintenance', this)"
                     class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
                     <i class="fa-solid fa-screwdriver-wrench w-6 text-center text-lg"></i> Bakım Talepleri
@@ -479,6 +492,94 @@
 
             <!-- İçerik Alanı (Scrollable) -->
             <div class="flex-1 overflow-y-auto p-8 relative">
+
+                <!-- İMZA LENS MERKEZİ PANEL -->
+                <div id="imza-lens-section" class="content-section hidden animate-fade-in">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <h2 class="text-4xl font-black text-navy tracking-tight mb-2 uppercase italic">İmza <span class="text-gold">Lens</span></h2>
+                            <p class="text-gray-500 text-sm font-medium">Harici piyasa verileri ve dahili ziyaretçi analizlerinin buluştuğu nokta.</p>
+                        </div>
+                    </div>
+
+                    <!-- Tab Navigation -->
+                    <div class="flex gap-2 mb-8 bg-gray-200/50 p-1.5 rounded-2xl w-fit">
+                        <button onclick="switchLensTab('shadow')" id="tab-btn-shadow" class="lens-tab-btn active px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-ghost"></i> Gölge İlanlar (Shadow)
+                        </button>
+                        <button onclick="switchLensTab('traffic')" id="tab-btn-traffic" class="lens-tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-navy">
+                            <i class="fa-solid fa-chart-line"></i> Site Trafiği (L-Metrics)
+                        </button>
+                    </div>
+
+                    <!-- Tab Content: Shadow Listings -->
+                    <div id="lens-tab-content-shadow" class="lens-tab-content">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-navy flex items-center gap-2 uppercase tracking-tight">
+                                <span class="w-2 h-2 bg-modern rounded-full animate-pulse"></span> Canlı Piyasa Takibi
+                            </h3>
+                            <button onclick="fetchShadowListings()" class="text-sm font-bold text-navy/60 hover:text-navy transition-colors">
+                                <i class="fa-solid fa-rotate mr-1"></i> Yenile
+                            </button>
+                        </div>
+                        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse premium-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="p-6">Kaynak</th>
+                                            <th class="p-6">İlan Başlığı</th>
+                                            <th class="p-6">Fiyat</th>
+                                            <th class="p-6">Son Görülme</th>
+                                            <th class="p-6 text-right">İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="shadow-listings-table-body" class="text-sm divide-y divide-gray-50">
+                                        <tr><td colspan="5" class="p-8 text-center text-gray-400">Yükleniyor...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content: Traffic Analytics -->
+                    <div id="lens-tab-content-traffic" class="lens-tab-content hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-b-4 border-b-gold">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Toplam İzleme</p>
+                                <h3 class="text-3xl font-black text-navy" id="traffic-total-count">0</h3>
+                            </div>
+                            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-b-4 border-b-modern">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Aktif Oturumlar</p>
+                                <h3 class="text-3xl font-black text-navy" id="traffic-session-count">0</h3>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-navy uppercase tracking-tight">Davranışsal Analitik</h3>
+                            <button onclick="fetchTrafficData()" class="text-sm font-bold text-navy/60 hover:text-navy transition-colors">
+                                <i class="fa-solid fa-rotate mr-1"></i> Verileri Güncelle
+                            </button>
+                        </div>
+                        <div class="bg-white rounded-[2.5rem] shadow-xl shadow-navy/5 border border-gray-100 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="premium-table w-full text-left">
+                                    <thead>
+                                        <tr class="bg-gray-50/50 border-b border-gray-100">
+                                            <th class="py-5 px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Tür</th>
+                                            <th class="py-5 px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Ziyaretçi (ID)</th>
+                                            <th class="py-5 px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Detay & Metrics</th>
+                                            <th class="py-5 px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Konum</th>
+                                            <th class="py-5 px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Tarih</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="traffic-table-body">
+                                        <tr><td colspan="5" class="py-12 text-center text-gray-400">Yükleniyor...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- KAMPANYALAR & E-POSTA SECTION -->
                 <div id="campaigns-section" class="content-section hidden">
@@ -2287,10 +2388,22 @@
                 'integrations': typeof fetchIntegrations !== 'undefined' ? fetchIntegrations : null,
                 'users': typeof fetchUsers !== 'undefined' ? fetchUsers : null,
                 'payroll': typeof fetchPayroll !== 'undefined' ? fetchPayroll : null,
-                'projects': typeof fetchProjects !== 'undefined' ? fetchProjects : null // Added projects loader
+                'projects': typeof fetchProjects !== 'undefined' ? fetchProjects : null,
+                'imza-lens': () => {
+                   const trafficTab = document.getElementById('lens-tab-content-traffic');
+                   const isTrafficActive = trafficTab && !trafficTab.classList.contains('hidden');
+                   if (isTrafficActive) fetchTrafficData();
+                   else fetchShadowListings();
+                }
             };
-
-            const loaderKey = targetId.endsWith('-section') ? targetId.replace('-section', '') : targetId;
+            
+            // Normalize ID: ensure the loader key is clean
+            let loaderKey = targetId.endsWith('-section') ? targetId.replace('-section', '') : targetId;
+            
+            // Special case for merged sections
+            if (loaderKey === 'shadow-listings' || loaderKey === 'traffic') {
+                loaderKey = 'imza-lens';
+            }
             if (loaders[loaderKey]) {
                 console.log("[İmza Portal] Veri yükleniyor:", loaderKey);
                 loaders[loaderKey]();
@@ -2859,6 +2972,138 @@
         async function fetchSettings() { console.log('[İmza Portal] Ayarlar yükleniyor...'); }
         async function fetchUsers() { console.log('[İmza Portal] Kullanıcı yönetimi yükleniyor...'); }
         async function fetchPayroll() { console.log('[İmza Portal] Bordro ve komisyonlar yükleniyor...'); }
+        async function fetchProjects() { console.log('[İmza Portal] Projeler yükleniyor...'); }
+
+        // --- İMZA LENS (SHADOW LISTINGS) ---
+        async function fetchShadowListings() {
+            const tbody = document.getElementById('shadow-listings-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Veriler yükleniyor...</td></tr>';
+            try {
+                const res = await apiFetch(`${API_BASE}/extension/listings`);
+                if (!res.ok) throw new Error('Yükleme hatası');
+                const data = await res.json();
+                tbody.innerHTML = data.length === 0 ? '<tr><td colspan="5" class="py-12 text-center text-gray-400">Henüz senkronize edilmiş veri bulunamadı.</td></tr>' : '';
+                data.forEach(item => {
+                    const dateStr = new Date(item.last_sync).toLocaleString('tr-TR');
+                    tbody.innerHTML += `
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                            <td class="py-4 px-6 text-center">
+                                <span class="px-3 py-1 bg-gold/10 text-gold rounded-full text-[10px] font-black uppercase tracking-widest border border-gold/20 shadow-sm">${item.source}</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-navy text-sm leading-tight">${item.title}</div>
+                                <div class="text-[9px] text-gray-400 font-mono mt-1 opacity-60 truncate max-w-xs">${item.url}</div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-green-700 text-sm whitespace-nowrap">${item.price}</div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="text-[10px] text-gray-500 font-medium whitespace-nowrap">${dateStr}</div>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <div class="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <a href="${item.url}" target="_blank" class="w-8 h-8 rounded-lg bg-navy/5 text-navy hover:bg-navy hover:text-white transition-all flex items-center justify-center shadow-sm" title="Kaynağa Git">
+                                        <i class="fa-solid fa-external-link text-xs"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>`;
+                });
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Veri yüklenirken hata oluştu.</td></tr>';
+            }
+        }
+
+        // --- İÇ TRAFİK & L-METRICS ---
+        async function fetchTrafficData() {
+            const tbody = document.getElementById('traffic-table-body');
+            const totalCountEl = document.getElementById('traffic-total-count');
+            const sessionCountEl = document.getElementById('traffic-session-count');
+            
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Veriler yükleniyor...</td></tr>';
+            
+            try {
+                const res = await apiFetch(`${API_BASE}/tracking/interactions`);
+                if (!res.ok) throw new Error('Yükleme hatası');
+                const data = await res.json();
+                
+                totalCountEl.innerText = data.length;
+                const uniqueSessions = new Set(data.map(item => item.session_id)).size;
+                sessionCountEl.innerText = uniqueSessions;
+
+                tbody.innerHTML = data.length === 0 ? '<tr><td colspan="5" class="py-12 text-center text-gray-400">Henüz takip verisi bulunamadı.</td></tr>' : '';
+                
+                data.forEach(item => {
+                    const dateStr = new Date(item.created_at).toLocaleString('tr-TR');
+                    let detailHtml = '';
+                    let typeBadge = '';
+                    
+                    try {
+                        const payload = JSON.parse(item.data_json);
+                        if (item.tool_name === 'L-Metrics Sync') {
+                            typeBadge = '<span class="px-2 py-0.5 bg-modern/10 text-modern rounded text-[9px] font-bold">L-METRICS</span>';
+                            const metrics = payload.metrics || {};
+                            detailHtml = `
+                                <div class="text-[10px] text-gray-600">
+                                    <span class="mr-2">🖱️ Scroll: %${metrics.maxScroll || 0}</span>
+                                    <span class="mr-2">👁️ Odak: ${Math.round(metrics.focusTime || 0)}s</span>
+                                    <div class="text-[9px] text-gray-400 truncate mt-0.5">🔗 ${payload.url || '-'}</div>
+                                </div>`;
+                        } else {
+                            typeBadge = `<span class="px-2 py-0.5 bg-gold/10 text-gold rounded text-[9px] font-bold">${item.tool_name.toUpperCase()}</span>`;
+                            detailHtml = `<div class="text-[10px] text-gray-600">${payload.url || 'Aktivite'}</div>`;
+                        }
+                        
+                        const geo = payload.geo || {};
+                        const geoStr = geo.city ? `${geo.city}, ${geo.country}` : 'Belirlenemedi';
+
+                        tbody.innerHTML += `
+                            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                                <td class="py-4 px-6 text-center">${typeBadge}</td>
+                                <td class="py-4 px-6 font-mono text-[9px] text-navy/60">${item.session_id}</td>
+                                <td class="py-4 px-6">${detailHtml}</td>
+                                <td class="py-4 px-6 text-[10px] text-gray-500 font-medium">${geoStr}</td>
+                                <td class="py-4 px-6 text-[10px] text-gray-400 whitespace-nowrap">${dateStr}</td>
+                            </tr>`;
+                    } catch (e) {
+                         // Hatalı JSON durumunda atla
+                    }
+                });
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-red-400">Hata: ' + err.message + '</td></tr>';
+            }
+        }
+
+        // --- İMZA LENS TAB SİSTEMİ ---
+        function switchLensTab(tabName) {
+            // Tab Buttons
+            document.querySelectorAll('.lens-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-gray-500', 'hover:text-navy');
+            });
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('text-gray-500', 'hover:text-navy');
+            }
+
+            // Tab Contents
+            document.querySelectorAll('.lens-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            const targetContent = document.getElementById(`lens-tab-content-${tabName}`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
+
+            // Fetch data for the selected tab
+            if (tabName === 'shadow') fetchShadowListings();
+            if (tabName === 'traffic') fetchTrafficData();
+        }
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {

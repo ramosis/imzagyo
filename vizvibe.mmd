@@ -81,15 +81,18 @@ flowchart TD
         %% @feature_extension_sync [ai-task, closed, 2026-03-18, antigravity]
         extension_sync("Eklenti Senkronizasyonu<br/><sub>Shadow Mode verilerinin Flask<br/>backend ile anlık senkronizasyonu<br/>altyapısı (API+DB) kuruldu</sub>")
 
+        %% @feature_imza_lens_merkezi [ai-task, closed, 2026-03-18, antigravity]
+        imza_lens_merkezi("İmza Lens Merkezi Panel (Faz 24)<br/><sub>Şahibinden/HE verileri ile<br/>site trafik analizleri (L-Metrics)<br/>tek bir sekmeli panelde birleştirildi</sub>")
+
         start --> refactor --> mobile_web --> l_metrics --> geo_seo --> shadow_bridge --> campaign --> admin_fix --> mobile_ops --> extensions
-        extensions --> extension_mvp --> extension_sync
-        extension_sync --> env_setup
+        extensions --> extension_mvp --> extension_sync --> imza_lens_merkezi
+        imza_lens_merkezi --> env_setup
         env_setup -.-> goal
     end
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [SON ÇALIŞMA]
-        extension_sync
+        imza_lens_merkezi
     end
 
     %% === STYLES ===
@@ -108,7 +111,8 @@ flowchart TD
     style env_setup fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
     style extensions fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style extension_mvp fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style extension_sync fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style extension_sync fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style imza_lens_merkezi fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Open tasks
