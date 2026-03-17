@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     latitude: null,
                     longitude: null,
                     url: url,
+                    listing_type: url.includes('kiralik') ? 'Kiralık' : 'Satılık',
                     timestamp: new Date().toISOString()
                 };
 
@@ -60,13 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             const lngMatch = mapScript.textContent.match(/lon\s*:\s*([\d.]+)/);
                             if (latMatch) data.latitude = parseFloat(latMatch[1]);
                             if (lngMatch) data.longitude = parseFloat(lngMatch[1]);
-                        }
-                    } catch (e) {}
-                    try {
-                        const rentText = document.querySelector('.re-valuation-info-value')?.innerText || "";
-                        if (rentText) {
-                            const rentMatch = rentText.match(/([\d.]+)/);
-                            if (rentMatch) data.estimated_rent = parseFloat(rentMatch[1].replace(/\./g, ''));
                         }
                     } catch (e) {}
                 } else if (isHepsiemlak) {

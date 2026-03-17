@@ -355,6 +355,7 @@ def init_db():
             longitude REAL,
             url TEXT UNIQUE,
             source TEXT, -- 'sahibinden', 'hepsiemlak'
+            listing_type TEXT, -- 'Satılık', 'Kiralık'
             data_json TEXT, -- Tüm ham veri
             last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -371,7 +372,8 @@ def init_db():
         ('district', 'TEXT'),
         ('neighborhood', 'TEXT'),
         ('latitude', 'REAL'),
-        ('longitude', 'REAL')
+        ('longitude', 'REAL'),
+        ('listing_type', 'TEXT')
     ]
     for col_name, col_type in columns_to_add:
         try:

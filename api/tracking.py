@@ -168,33 +168,50 @@ def sync_extension_data():
             # Sadece sayıları al (Örn: "1.500.000 TL" -> 1500000)
             price_numeric = float(re.sub(r'[^\d]', '', str(price)) or 0)
 
-        # Eklentiden gelen tahmini kira yoksa, basit bir modelle hesapla
-        # Genelde gayrimenkulde 240 ay (20 yıl) amortisman standarttır.
-        if not estimated_rent or float(estimated_rent) <= 0:
-            estimated_rent = price_numeric / 240
-        else:
-            estimated_rent = float(estimated_rent)
-
+        listing_type = data.get('listing_type', 'Satılık')
+        estimated_rent = 0
         roi_score = 0
         amortization_years = 0
-        if price_numeric > 0 and estimated_rent > 0:
-            annual_rent = estimated_rent * 12
-            roi_score = (annual_rent / price_numeric) * 100
-            amortization_years = price_numeric / annual_rent
 
-        source = 'sahibinden' if 'sahibinden.com' in url else 'hepsiemlak' if 'hepsiemlak.com' in url else 'other'
-        
         conn = get_db_connection()
         try:
+            if listing_type == 'Satılık' and price_numeric > 0:
+                # Bölgesel kira ortalamasını bul (Aggregated Data)
+                # 1. Kendi mahallesindeki kira ilanlarının ortalaması
+                avg_rent = conn.execute('''
+                    SELECT AVG(price_numeric) FROM listings_shadow 
+                    WHERE listing_type = 'Kiralık' AND district = ? AND neighborhood = ? AND price_numeric > 0
+                ''', (district, neighborhood)).fetchone()[0]
+                
+                # 2. Mahallede veri yoksa ilçe ortalaması
+                if not avg_rent:
+                    avg_rent = conn.execute('''
+                        SELECT AVG(price_numeric) FROM listings_shadow 
+                        WHERE listing_type = 'Kiralık' AND district = ? AND price_numeric > 0
+                    ''', (district,)).fetchone()[0]
+                
+                # 3. Hala veri yoksa 1/240 çarpanı (Muhafazakar model)
+                if not avg_rent:
+                    estimated_rent = price_numeric / 240
+                else:
+                    estimated_rent = float(avg_rent)
+                
+                annual_rent = estimated_rent * 12
+                roi_score = (annual_rent / price_numeric) * 100
+                amortization_years = price_numeric / annual_rent
+            elif listing_type == 'Kiralık':
+                estimated_rent = price_numeric # Kiralık ilan için fiyatın kendisi tahmini kiradır
+
+            source = 'sahibinden' if 'sahibinden.com' in url else 'hepsiemlak' if 'hepsiemlak.com' in url else 'other'
             # İlanı kaydet veya güncelle
             conn.execute('''
                 INSERT INTO listings_shadow (
                     title, price, price_numeric, estimated_rent, 
                     roi_score, amortization_years,
                     city, district, neighborhood, 
-                    latitude, longitude, url, source, data_json
+                    latitude, longitude, url, source, listing_type, data_json
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(url) DO UPDATE SET
                     title=excluded.title,
                     price=excluded.price,
@@ -207,13 +224,14 @@ def sync_extension_data():
                     neighborhood=excluded.neighborhood,
                     latitude=excluded.latitude,
                     longitude=excluded.longitude,
+                    listing_type=excluded.listing_type,
                     data_json=excluded.data_json,
                     last_seen_at=CURRENT_TIMESTAMP
             ''', (
                 title, price, price_numeric, estimated_rent, 
                 roi_score, amortization_years,
                 city, district, neighborhood, 
-                latitude, longitude, url, source, json.dumps(data)
+                latitude, longitude, url, source, listing_type, json.dumps(data)
             ))
             conn.commit()
             return jsonify({'status': 'Success', 'message': 'İlan verisi senkronize edildi'}), 201

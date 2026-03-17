@@ -528,6 +528,7 @@
                                     <thead>
                                         <tr>
                                             <th class="p-6">Kaynak</th>
+                                            <th class="p-6">Tip</th>
                                             <th class="p-6">İlan Başlığı</th>
                                             <th class="p-6">Konum</th>
                                             <th class="p-6">Fiyat</th>
@@ -2996,20 +2997,27 @@
 
                     // ROI & Amortisman UI
                     let roiUI = '<span class="text-gray-300">-</span>';
-                    if (item.roi_score > 0) {
+                    const isSale = item.listing_type === 'Satılık';
+                    
+                    if (isSale && item.roi_score > 0) {
                         const roiColor = item.roi_score >= 6 ? 'text-green-600 bg-green-50' : item.roi_score >= 4 ? 'text-blue-600 bg-blue-50' : 'text-orange-600 bg-orange-50';
                         roiUI = `
-                            <div class="flex flex-col">
+                            <div class="flex flex-col" title="Bölge kira ortalamasına dayalı tahmini ROI">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${roiColor} w-fit">%${item.roi_score.toFixed(2)} ROI</span>
-                                <span class="text-[10px] text-gray-500 font-medium mt-0.5">${item.amortization_years.toFixed(1)} Yıl Amortisman</span>
+                                <span class="text-[10px] text-gray-500 font-medium mt-0.5">${item.amortization_years.toFixed(1)} Yıl Geri Dönüş</span>
                             </div>
                         `;
+                    } else if (!isSale) {
+                        roiUI = '<span class="px-2 py-0.5 rounded text-[10px] bg-gray-100 text-gray-500 font-bold w-fit">REFERANS VERİ</span>';
                     }
 
                     tbody.innerHTML += `
                         <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors group">
                             <td class="py-4 px-6 text-center">
                                 <span class="px-3 py-1 bg-gold/10 text-gold rounded-full text-[10px] font-black uppercase tracking-widest border border-gold/20 shadow-sm">${item.source}</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="px-2 py-1 ${isSale ? 'bg-navy/5 text-navy' : 'bg-green-50 text-green-700'} rounded text-[10px] font-bold">${item.listing_type || 'Satılık'}</span>
                             </td>
                             <td class="py-4 px-6">
                                 <div class="font-bold text-navy text-sm leading-tight">${item.title}</div>
