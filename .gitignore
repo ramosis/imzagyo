@@ -17,18 +17,24 @@ imza_database.db
 DockerDesktopInstaller.exe
 docker-desktop-installer.exe
 
-# Mobile (React Native / Expo)
+# Mobile (React Native / Native Build)
 mobile/node_modules/
 mobile/.expo/
-mobile/dist/
-mobile/web-build/
-mobile/ios/
-mobile/android/
+mobile/android/app/build/
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/local.properties
+mobile/ios/build/
+mobile/ios/Pods/
 mobile/*.jks
 mobile/*.p8
 mobile/*.p12
 mobile/*.key
 mobile/*.mobileprovision
+
+# APK Distribution
+*.apk
+!static/downloads/imza-gayrimenkul.apk
 
 # IDEs
 .vscode/
@@ -42,3 +48,4 @@ Thumbs.db
 desktop.ini
 sunucu_rehberi.md
 Ollama-mcp/
+node_modules

@@ -319,6 +319,38 @@ def init_db():
             UNIQUE(source_table, source_id)
         )
     ''')
+    
+    # 6. Yeni Tablo: staff_locations (Personel Konum Takibi)
+    #    - Amaç: Saha ekibinin konum bilgilerini ve check-in/out sürelerini takip etmek.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS staff_locations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            latitude REAL NOT NULL,
+            longitude REAL NOT NULL,
+            accuracy REAL, -- Metre cinsinden doğruluk
+            location_type TEXT DEFAULT 'checkin', -- 'checkin', 'checkout', 'periodic'
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+    # -----------------------------------------------------------------------
+
+    # 7. Yeni Tablo: listings_shadow (Eklenti Veri Havuzu)
+    #    - Amaç: Tarayıcı eklentisinden gelen ilan verilerini (Shadow Mode) saklamak.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS listings_shadow (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            price TEXT,
+            url TEXT UNIQUE,
+            source TEXT, -- 'sahibinden', 'hepsiemlak'
+            data_json TEXT, -- Tüm ham veri
+            last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     # -----------------------------------------------------------------------
 
     # Personel Harcamaları (Expenses)

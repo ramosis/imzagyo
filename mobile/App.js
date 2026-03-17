@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Geolocation from '@react-native-community/geolocation';
 import Colors from './src/constants/Colors';
 
 const { width } = Dimensions.get('window');
@@ -36,12 +37,143 @@ export default function App() {
   
   // Dashboard Data
   const [stats, setStats] = useState({
-    activePortfolio: 0,
-    monthlyLeads: 0,
-    roi: '0%',
     revenue: '₺0'
   });
   const [recentPortfolios, setRecentPortfolios] = useState([]);
+  const [leads, setLeads] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [userRole, setUserRole] = useState('staff'); // 'admin' or 'staff'
+  const [currentTab, setCurrentTab] = useState('Dashboard'); // 'Dashboard', 'Leads', 'Appointments', 'Team'
+  const [locationStatus, setLocationStatus] = useState(''); // Manuel konum durumu
+  const [autoLocationStatus, setAutoLocationStatus] = useState(''); // Otomatik konum durumu
+  const [isAutoLocationActive, setIsAutoLocationActive] = useState(false); // Otomatik konum aktif mi?
+  const [batteryLevel, setBatteryLevel] = useState(null); // Pil seviyesi
+  const [isBatterySaving, setIsBatterySaving] = useState(false); // Pil tasarrufu modu
+  let autoLocationInterval = null; // Interval referansı
+
+  // Component unmount olduğunda interval'i temizle
+  useEffect(() => {
+    return () => {
+      if (autoLocationInterval) {
+        clearInterval(autoLocationInterval);
+      }
+    };
+  }, []);
+
+  // Pil seviyesi değişikliklerini dinleme
+  useEffect(() => {
+    // Sadece tarayıcı ortamında çalış
+    if (typeof navigator !== 'undefined' && navigator.getBattery) {
+      navigator.getBattery().then(battery => {
+        setBatteryLevel(battery.level * 100);
+        
+        battery.addEventListener('levelchange', () => {
+          setBatteryLevel(battery.level * 100);
+        });
+      }).catch(err => {
+        console.log('Pil bilgisi alınamadı:', err);
+      });
+    }
+  }, []);
+
+  // Mesai saatlerini kontrol eden fonksiyon (09:00 - 18:00)
+  const isWorkHours = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const day = now.getDay(); // 0 = Pazar, 1 = Pazartesi, ..., 6 = Cumartesi
+    
+    // Hafta sonu değilse ve mesai saatlerindeyse
+    return day >= 1 && day <= 5 && hours >= 9 && hours < 18;
+  };
+
+  // Otomatik konum gönderimi için fonksiyon
+  const sendAutoLocation = async () => {
+    // Pil tasarrufu modu aktifse ve pil seviyesi düşükse gönderimi azalt
+    if (isBatterySaving && batteryLevel !== null && batteryLevel < 20) {
+      console.log('Düşük pil ve tasarruf modu aktif, konum gönderimi atlandı');
+      setAutoLocationStatus('Pil tasarrufu: Konum gönderimi atlandı');
+      return;
+    }
+
+    if (!isWorkHours()) {
+      console.log('Mesai saatleri dışında, konum gönderimi yapılmıyor');
+      return;
+    }
+
+    setAutoLocationStatus('Otomatik konum gönderiliyor...');
+    
+    try {
+      // Konum izni kontrolü ve konum alma
+      Geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          // Kullanıcı token'ını alma
+          const token = await AsyncStorage.getItem('userToken');
+          
+          // Konum verisini sunucuya gönderme
+          const response = await fetch(`${API_URL}/api/tracking/location`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              latitude,
+              longitude,
+              timestamp: new Date().toISOString(),
+              auto: true // Otomatik gönderim olduğunu belirtmek için
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            setAutoLocationStatus('Otomatik konum başarıyla gönderildi');
+          } else {
+            setAutoLocationStatus('Otomatik konum gönderimi başarısız: ' + (data.error || 'Bilinmeyen hata'));
+          }
+        },
+        (error) => {
+          console.log('Otomatik konum hatası:', error);
+          setAutoLocationStatus('Otomatik konum alınamadı: ' + error.message);
+        },
+        { 
+          enableHighAccuracy: !isBatterySaving, // Pil tasarrufunda hassasiyeti düşür
+          timeout: 15000, 
+          maximumAge: isBatterySaving ? 300000 : 10000 // Pil tasarrufunda eski konumu daha uzun süre kabul et
+        }
+      );
+    } catch (error) {
+      console.log('Otomatik konum gönderimi hatası:', error);
+      setAutoLocationStatus('Otomatik konum gönderimi başarısız: ' + error.message);
+    }
+  };
+
+  // Otomatik konum gönderimini başlatan fonksiyon
+  const startAutoLocationTracking = () => {
+    if (autoLocationInterval) return; // Zaten çalışıyor
+    
+    // İlk gönderimi hemen yap
+    sendAutoLocation();
+    
+    // Pil tasarrufu modu aktifse gönderim sıklığını azalt
+    const intervalTime = isBatterySaving ? 30 * 60 * 1000 : 10 * 60 * 1000; // 30 dakika veya 10 dakika
+    
+    // Sonrasında belirlenen sıklıkta gönderim
+    autoLocationInterval = setInterval(sendAutoLocation, intervalTime);
+    setIsAutoLocationActive(true);
+  };
+
+  // Otomatik konum gönderimini durduran fonksiyon
+  const stopAutoLocationTracking = () => {
+    if (autoLocationInterval) {
+      clearInterval(autoLocationInterval);
+      autoLocationInterval = null;
+      setIsAutoLocationActive(false);
+      setAutoLocationStatus('Otomatik konum takibi durduruldu');
+    }
+  };
 
   useEffect(() => {
     checkLoginStatus();
@@ -52,7 +184,14 @@ export default function App() {
       const token = await AsyncStorage.getItem('userToken');
       if (token) {
         setIsLoggedIn(true);
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          setUserRole(userData.role || 'staff');
+        }
         fetchDashboardData(token);
+        fetchLeads(token);
+        fetchAppointments(token);
       }
     } catch (e) {
       console.error(e);
@@ -85,7 +224,10 @@ export default function App() {
         await AsyncStorage.setItem('userToken', data.token);
         await AsyncStorage.setItem('userData', JSON.stringify(data));
         setIsLoggedIn(true);
+        setUserRole(data.role || 'staff');
         fetchDashboardData(data.token);
+        fetchLeads(data.token);
+        fetchAppointments(data.token);
       } else {
         Alert.alert('Giriş Başarısız', data.error || 'Kontrol edip tekrar deneyin.');
       }
@@ -149,6 +291,78 @@ export default function App() {
       }
     } catch (error) {
       console.log('Veri çekme hatası:', error);
+    }
+  };
+
+  const fetchLeads = async (token) => {
+    try {
+      const response = await fetch(`${API_URL}/api/leads`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (Array.isArray(data)) setLeads(data);
+    } catch (error) {
+      console.log('Leads çekme hatası:', error);
+    }
+  };
+
+  const fetchAppointments = async (token) => {
+    try {
+      const response = await fetch(`${API_URL}/api/appointments`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (Array.isArray(data)) setAppointments(data);
+    } catch (error) {
+      console.log('Randevu çekme hatası:', error);
+    }
+  };
+
+  // Konum gönderimi için fonksiyon
+  const sendLocation = async () => {
+    setLocationStatus('Konum alınıyor...');
+    
+    try {
+      // Konum izni kontrolü ve konum alma
+      Geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          // Kullanıcı token'ını alma
+          const token = await AsyncStorage.getItem('userToken');
+          
+          // Konum verisini sunucuya gönderme
+          const response = await fetch(`${API_URL}/api/tracking/location`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              latitude,
+              longitude,
+              timestamp: new Date().toISOString()
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            setLocationStatus('Konum başarıyla gönderildi');
+            setTimeout(() => setLocationStatus(''), 3000); // 3 saniye sonra mesajı sil
+          } else {
+            setLocationStatus('Konum gönderimi başarısız: ' + (data.error || 'Bilinmeyen hata'));
+          }
+        },
+        (error) => {
+          console.log('Konum hatası:', error);
+          setLocationStatus('Konum alınamadı: ' + error.message);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    } catch (error) {
+      console.log('Konum gönderimi hatası:', error);
+      setLocationStatus('Konum gönderimi başarısız: ' + error.message);
     }
   };
 
@@ -269,9 +483,205 @@ export default function App() {
             Henüz gösterilecek veri bulunamadı.
           </Text>
         )}
+        
+          {/* Pil Seviyesi ve Tasarruf Modu */}
+        <View style={styles.batterySection}>
+          <Text style={styles.sectionTitle}>Pil Yönetimi</Text>
+          <View style={styles.batteryInfo}>
+            <MaterialCommunityIcons name="battery" size={24} color={Colors.gold} />
+            <Text style={styles.batteryText}>
+              Pil Seviyesi: {batteryLevel !== null ? `${Math.round(batteryLevel)}%` : 'Okunuyor...'}
+            </Text>
+          </View>
+          
+          <TouchableOpacity 
+            style={[
+              styles.toggleButton, 
+              { backgroundColor: isBatterySaving ? Colors.gold : 'transparent' }
+            ]} 
+            onPress={() => setIsBatterySaving(!isBatterySaving)}
+          >
+            <Text style={[
+              styles.toggleButtonText,
+              { color: isBatterySaving ? Colors.bgDark : Colors.gold }
+            ]}>
+              {isBatterySaving ? 'Pil Tasarrufu Aktif' : 'Pil Tasarrufu'}
+            </Text>
+          </TouchableOpacity>
+          
+          {/* Pil Tasarrufu Aktifse Konum Sıklığını Azalt */}
+          {isBatterySaving && (
+            <View style={{ marginTop: 15, padding: 10, backgroundColor: 'rgba(212, 175, 55, 0.1)', borderRadius: 8 }}>
+              <Text style={{ color: Colors.gold, fontSize: 12, textAlign: 'center' }}>
+                ⚡ Pil tasarrufu modu aktif: Konum güncellemeleri azaltıldı
+              </Text>
+            </View>
+          )}
+        </View>
+        
+        {/* Manuel Konum Gönderimi Butonu */}
+        <TouchableOpacity style={styles.locationBtn} onPress={sendLocation}>
+          <MaterialCommunityIcons name="map-marker" size={24} color={Colors.white} />
+          <Text style={styles.locationBtnText}>Konumumu Gönder</Text>
+        </TouchableOpacity>
+        
+        {locationStatus ? (
+          <Text style={{ 
+            color: locationStatus.includes('başarıyla') ? Colors.gold : '#ff6b6b', 
+            textAlign: 'center', 
+            marginTop: 10,
+            fontSize: 14
+          }}>
+            {locationStatus}
+          </Text>
+        ) : null}
+
+        {/* Otomatik Konum Takibi Butonları */}
+        <TouchableOpacity 
+          style={[
+            styles.locationBtn, 
+            { backgroundColor: isAutoLocationActive ? '#ff6b6b' : Colors.gold }
+          ]} 
+          onPress={isAutoLocationActive ? stopAutoLocationTracking : startAutoLocationTracking}
+        >
+          <MaterialCommunityIcons 
+            name={isAutoLocationActive ? "stop-circle" : "play-circle"} 
+            size={24} 
+            color={Colors.white} 
+          />
+          <Text style={styles.locationBtnText}>
+            {isAutoLocationActive ? 'Otomatik Takibi Durdur' : 'Otomatik Takibi Başlat'}
+          </Text>
+        </TouchableOpacity>
+        
+        {autoLocationStatus ? (
+          <Text style={{ 
+            color: autoLocationStatus.includes('başarıyla') ? Colors.gold : '#ff6b6b', 
+            textAlign: 'center', 
+            marginTop: 10,
+            fontSize: 14
+          }}>
+            {autoLocationStatus}
+          </Text>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
+
+  const LeadsTab = () => (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.userName}>MÜŞTERİ ADAYLARI</Text>
+        <TouchableOpacity style={styles.logoutBtn} onPress={() => fetchLeads(AsyncStorage.getItem('userToken'))}>
+          <MaterialCommunityIcons name="refresh" size={20} color={Colors.gold} />
+        </TouchableOpacity>
+      </View>
+      <ScrollView style={styles.content}>
+        <Text style={styles.sectionTitle}>Akıllı Takip Listesi</Text>
+        {leads.map((item, index) => (
+          <View key={item.id || index} style={styles.listCard}>
+            <View style={[styles.listIcon, { backgroundColor: item.ai_score > 70 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(212, 175, 55, 0.1)' }]}>
+              <Text style={{ color: item.ai_score > 70 ? '#10B981' : Colors.gold, fontWeight: 'bold' }}>{item.ai_score || 0}</Text>
+            </View>
+            <View style={styles.listContent}>
+              <Text style={styles.listTitle}>{item.name}</Text>
+              <Text style={styles.listSub}>{item.property_title || 'Genel İlgili'}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity onPress={() => Alert.alert('Arama', `${item.phone} aranıyor...`)}>
+                <MaterialCommunityIcons name="phone" size={24} color="#10B981" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Alert.alert('WhatsApp', 'WhatsApp şablonu hazırlanıyor...')}>
+                <MaterialCommunityIcons name="whatsapp" size={24} color="#25D366" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+        {leads.length === 0 && <Text style={styles.emptyText}>Henüz aday bulunmuyor.</Text>}
+      </ScrollView>
+    </SafeAreaView>
+  );
+
+  const AppointmentsTab = () => (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.userName}>RANDEVULARIM</Text>
+      </View>
+      <ScrollView style={styles.content}>
+        <Text style={styles.sectionTitle}>Günün Ajandası</Text>
+        {appointments.map((item, index) => (
+          <View key={item.id || index} style={styles.listCard}>
+            <View style={styles.dateInfo}>
+              <Text style={styles.dateText}>{item.datetime ? item.datetime.split(' ')[1] : '--:--'}</Text>
+              <Text style={styles.subDate}>{item.datetime ? item.datetime.split(' ')[0].split('-').slice(1).reverse().join('/') : ''}</Text>
+            </View>
+            <View style={styles.listContent}>
+              <Text style={styles.listTitle}>{item.client_name}</Text>
+              <Text style={styles.listSub}>{item.baslik1 || 'Görüşme'}</Text>
+            </View>
+            <TouchableOpacity onPress={() => Alert.alert('Konum', 'Haritalara yönlendiriliyorsunuz...')}>
+              <MaterialCommunityIcons name="navigation-variant" size={24} color={Colors.gold} />
+            </TouchableOpacity>
+          </View>
+        ))}
+        {appointments.length === 0 && <Text style={styles.emptyText}>Bugün için randevunuz bulunmuyor.</Text>}
+      </ScrollView>
+    </SafeAreaView>
+  );
+
+  const TeamTab = () => (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.userName}>EKİP PANORAMASI</Text>
+      </View>
+      <ScrollView style={styles.content}>
+        <Text style={styles.sectionTitle}>Saha Takibi</Text>
+        <View style={styles.listCard}>
+          <MaterialCommunityIcons name="account-circle" size={40} color={Colors.gold} style={{ marginRight: 15 }} />
+          <View style={styles.listContent}>
+            <Text style={styles.listTitle}>Ahmet Yılmaz</Text>
+            <Text style={styles.listSub}>Son Check-in: Çatalca (10 dk önce)</Text>
+          </View>
+          <View style={styles.statusBadge}><Text style={styles.statusText}>AKTİF</Text></View>
+        </View>
+        <View style={styles.listCard}>
+          <MaterialCommunityIcons name="account-circle" size={40} color={Colors.textMuted} style={{ marginRight: 15 }} />
+          <View style={styles.listContent}>
+            <Text style={styles.listTitle}>Ayşe Demir</Text>
+            <Text style={styles.listSub}>Çevrimdışı (Mesai bitti)</Text>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: '#444' }]}><Text style={styles.statusText}>PASİF</Text></View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+
+  const BottomTabBar = () => (
+    <View style={styles.tabBar}>
+      <TabItem icon="view-dashboard" label="Özet" active={currentTab === 'Dashboard'} onClick={() => setCurrentTab('Dashboard')} />
+      <TabItem icon="account-group" label="Adaylar" active={currentTab === 'Leads'} onClick={() => setCurrentTab('Leads')} />
+      <TabItem icon="calendar-clock" label="Randevu" active={currentTab === 'Appointments'} onClick={() => setCurrentTab('Appointments')} />
+      {userRole === 'admin' && (
+        <TabItem icon="security" label="Yönetim" active={currentTab === 'Team'} onClick={() => setCurrentTab('Team')} />
+      )}
+    </View>
+  );
+
+  const TabItem = ({ icon, label, active, onClick }) => (
+    <TouchableOpacity style={styles.tabItem} onPress={onClick}>
+      <MaterialCommunityIcons name={icon} size={24} color={active ? Colors.gold : Colors.textMuted} />
+      <Text style={[styles.tabLabel, { color: active ? Colors.gold : Colors.textMuted }]}>{label}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderContent = () => {
+    switch (currentTab) {
+      case 'Leads': return <LeadsTab />;
+      case 'Appointments': return <AppointmentsTab />;
+      case 'Team': return <TeamTab />;
+      default: return <DashboardScreen />;
+    }
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -279,7 +689,10 @@ export default function App() {
       {!isLoggedIn ? (
         currentScreen === 'Login' ? <LoginScreen /> : <ForgotScreen />
       ) : (
-        <DashboardScreen />
+        <>
+          {renderContent()}
+          <BottomTabBar />
+        </>
       )}
     </View>
   );
@@ -479,4 +892,103 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  locationBtn: {
+    backgroundColor: Colors.gold,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginTop: 20,
+    shadowColor: Colors.gold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  locationBtnText: {
+    color: Colors.bgDark,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    letterSpacing: 1,
+  },
+  batterySection: {
+    backgroundColor: Colors.bgCard,
+    padding: 20,
+    borderRadius: 15,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.1)',
+  },
+  batteryInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  batteryText: {
+    color: Colors.white,
+    fontSize: 16,
+    marginLeft: 10,
+  },
+  toggleButton: {
+    borderWidth: 1,
+    borderColor: Colors.gold,
+    borderRadius: 12,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  toggleButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  tabBar: {
+    flexDirection: 'row',
+    height: 70,
+    backgroundColor: '#1A1A22',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(212, 175, 55, 0.1)',
+    paddingBottom: 10,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabLabel: {
+    fontSize: 10,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  emptyText: {
+    color: Colors.textMuted,
+    textAlign: 'center',
+    marginTop: 40,
+  },
+  dateInfo: {
+    alignItems: 'center',
+    marginRight: 15,
+    minWidth: 50,
+  },
+  dateText: {
+    color: Colors.gold,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  subDate: {
+    color: Colors.textMuted,
+    fontSize: 10,
+  },
+  statusBadge: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  statusText: {
+    color: Colors.bgDark,
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
 });
+

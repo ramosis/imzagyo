@@ -27,6 +27,7 @@ flowchart TD
     subgraph Infra [Altyapı & Dağıtım]
         docker("Docker & Compose<br/><sub>Root dizininde korunan<br/>dağıtım konfigürasyonu</sub>")
         pwa("PWA & Service Worker<br/><sub>Offline destek ve v2<br/>önbellek yönetimi (sw.js)</sub>")
+        data_logs("Data & Logs<br/><sub>data/ klasöründe toplanmış<br/>veritabanı, log ve yedekler</sub>")
     end
 
     %% === İLİŞKİLER ===
@@ -65,19 +66,30 @@ flowchart TD
         %% @feature_campaign_module [ai-task, closed, 2026-03-17, antigravity]
         campaign("Kampanya Modülü (Faz 14)<br/><sub>Hero slider kampanya enjeksiyonu,<br/>merkezi talep formu ve L-Metrics<br/>backend entegrasyonu tamamlandı</sub>")
 
-        %% @feature_admin_fix [ai-task, closed, 2026-03-17, antigravity]
-        admin_fix("Portal Onarımı (Faz 17)<br/><sub>Sidebar z-index, HTML hataları<br/>ve CRM kampanya veri akışı<br/>sorunları tamamen giderildi</sub>")
+        %% @feature_mobile_ops [ai-task, closed, 2026-03-17, antigravity]
+        mobile_ops("Mobil Operasyon (Faz 18)<br/><sub>Personel/Yönetici için CRM,<br/>AJANDA ve ekip takibi<br/>entegrasyonu tamamlandı</sub>")
 
         %% @ultimate_goal [end, opened, 2026-03-17, nam]
         goal("Büyük Hedef")
 
-        start --> refactor --> mobile_web --> l_metrics --> geo_seo --> shadow_bridge --> campaign --> admin_fix
-        admin_fix -.-> goal
+        %% @env_setup [ai-task, opened, 2026-03-18, antigravity]
+        env_setup("Android Ortamı<br/><sub>Android Studio (3GB+) ve<br/>JDK 17 kurulumu devam ediyor.<br/>APK derlemesi için ön koşul</sub>")
+
+        %% @feature_extension_mvp [ai-task, closed, 2026-03-18, antigravity]
+        extension_mvp("Eklenti MVP (Faz 23)<br/><sub>Manifest V3, Popup UI ve<br/>temel scraping mantığı kuruldu.<br/>Geliştirme süreci tamamlandı</sub>")
+
+        %% @feature_extension_sync [ai-task, closed, 2026-03-18, antigravity]
+        extension_sync("Eklenti Senkronizasyonu<br/><sub>Shadow Mode verilerinin Flask<br/>backend ile anlık senkronizasyonu<br/>altyapısı (API+DB) kuruldu</sub>")
+
+        start --> refactor --> mobile_web --> l_metrics --> geo_seo --> shadow_bridge --> campaign --> admin_fix --> mobile_ops --> extensions
+        extensions --> extension_mvp --> extension_sync
+        extension_sync --> env_setup
+        env_setup -.-> goal
     end
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [SON ÇALIŞMA]
-        admin_fix
+        extension_sync
     end
 
     %% === STYLES ===
@@ -88,9 +100,15 @@ flowchart TD
     style l_metrics fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
     %% Recent nodes
-    style geo_seo fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style geo_seo fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style shadow_bridge fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style admin_fix fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style campaign fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style admin_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style mobile_ops fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style env_setup fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style extensions fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style extension_mvp fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style extension_sync fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Open tasks

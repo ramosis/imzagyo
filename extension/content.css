@@ -1,0 +1,11 @@
+/* İmza Emlak Asistanı - Sayfa Enjeksiyon Stilleri */
+.imza-analiz-box {
+    border: 2px solid #D4AF37 !important;
+    background: #0F0F13 !important;
+    color: white !important;
+    padding: 15px !important;
+    border-radius: 12px !important;
+    margin: 10px 0 !important;
+    font-family: 'Montserrat', sans-serif !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+}

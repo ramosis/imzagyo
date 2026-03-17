@@ -527,8 +527,9 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- DASHBOARD SECTION -->
+                <!-- DASHBOARD SECTION -->
                     <div id="dashboard-section" class="content-section">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                             <!-- Stat Card 1 -->
@@ -1091,8 +1092,9 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- BARTER/BUDGET WIZARD SECTION (Correctly Placed) -->
+                    <!-- BARTER/BUDGET WIZARD SECTION (Correctly Placed) -->
                         <div id="barter-wizard-section" class="content-section hidden">
                             <div
                                 class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
@@ -1308,6 +1310,7 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
                         <!-- SITE SETTINGS SECTION -->
                         <section id="site-settings-section"
@@ -1583,8 +1586,6 @@
                                                         <p
                                                             class="text-[10px] text-gold uppercase font-bold tracking-wider mb-1 mt-1">
                                                             Gerçekçi</p>
-                                                        <p class="text-xs text-gray-500 mb-2">Aylık: %<span
-                                                                id="res-real-rate"></span></p>
                                                         <p id="res-real-monthly"
                                                             class="text-xl font-serif font-bold text-gold mb-1 leading-none">
                                                             0 ₺</p>
@@ -1980,10 +1981,11 @@
                                                     <tbody id="payroll-commissions-body" class="text-sm"></tbody>
                                                 </table>
                                             </div>
-                                        </div>
-                                </section>
+                                </div>
+                            </div>
+                        </div>
 
-                        </section>
+                    </section>
 
                         <!-- ========================================== -->
                         <!-- LEADS (CRM) SECTION -->
@@ -2008,11 +2010,11 @@
                                         <table class="w-full text-left premium-table">
                                             <thead>
                                                 <tr>
-                                                    <th class="px-6 py-4 font-bold text-xs">Puan</th>
-                                                    <th class="px-6 py-4 font-bold text-xs">Aday İsmi</th>
-                                                    <th class="px-6 py-4 font-bold text-xs">İletişim</th>
-                                                    <th class="px-6 py-4 font-bold text-xs">İlgilendiği Mülk</th>
-                                                    <th class="px-6 py-4 font-bold text-xs">Durum</th>
+                                                    <th class="px-6 py-4">Müşteri</th>
+                                                    <th class="px-6 py-4">İletişim</th>
+                                                    <th class="px-6 py-4">Kaynak</th>
+                                                    <th class="px-6 py-4">İlgi Alanı / Not</th>
+                                                    <th class="px-6 py-4">Tarih</th>
                                                     <th class="px-6 py-4 text-right">İşlem</th>
                                                 </tr>
                                             </thead>
@@ -2235,10 +2237,28 @@
 
         // --- NAVIGATION & UI MANTIĞI ---
         function showSection(sectionId, btnElement) {
+            console.log("[İmza Portal] showSection çağrıldı:", sectionId);
+
+            // Normalize ID: Ensure the section ID ends with '-section' for DOM lookup
+            let targetId = sectionId;
+            if (!sectionId.endsWith('-section')) {
+                const potentialTargetId = sectionId + '-section';
+                if (document.getElementById(potentialTargetId)) {
+                    targetId = potentialTargetId;
+                }
+            }
+
             // Section visibility
-            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-            const target = document.getElementById(sectionId);
-            if (target) target.classList.remove('hidden');
+            const allSections = document.querySelectorAll('.content-section');
+            allSections.forEach(s => s.classList.add('hidden'));
+
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.classList.remove('hidden');
+                console.log("[İmza Portal] Bölüm gösteriliyor:", targetId);
+            } else {
+                console.error("[İmza Portal] HATA: Hedef bölüm bulunamadı ->", targetId);
+            }
 
             // Sidebar highlight
             document.querySelectorAll('#sidebar nav .nav-item').forEach(a => {
@@ -2248,26 +2268,35 @@
                 btnElement.classList.add('bg-gold/10', 'text-gold', 'border-r-4', 'border-gold');
             }
 
-            // Data loading switch
+            // Data loading switch (Standardized Keys)
             const loaders = {
-                'dashboard': fetchDashboardStats,
-                'leads': fetchLeads,
-                'expenses': fetchExpenses,
-                'portfolios': fetchAllPortfolios,
-                'campaigns': fetchCampaigns,
-                'hero-management': fetchHeroSlides,
-                'appointments': fetchAppointments,
-                'taxes': fetchTaxes,
-                'maintenance': fetchMaintenance,
-                'contracts': fetchContracts,
-                'contract-builder': initContractBuilder,
-                'site-settings': fetchSettings,
-                'contacts': fetchContacts,
-                'integrations': fetchIntegrations,
-                'users-management': fetchUsers,
-                'payroll': fetchPayroll
+                'dashboard': typeof fetchDashboardStats !== 'undefined' ? fetchDashboardStats : null,
+                'leads': typeof fetchLeads !== 'undefined' ? fetchLeads : null,
+                'expenses': typeof fetchExpenses !== 'undefined' ? fetchExpenses : null,
+                'portfolios': typeof fetchAllPortfolios !== 'undefined' ? fetchAllPortfolios : null,
+                'campaigns': typeof fetchCampaigns !== 'undefined' ? fetchCampaigns : null,
+                'barter-wizard': typeof fetchBarterWizard !== 'undefined' ? fetchBarterWizard : null,
+                'hero': typeof fetchHeroSlides !== 'undefined' ? fetchHeroSlides : null,
+                'appointments': typeof fetchAppointments !== 'undefined' ? fetchAppointments : null,
+                'taxes': typeof fetchTaxes !== 'undefined' ? fetchTaxes : null,
+                'maintenance': typeof fetchMaintenance !== 'undefined' ? fetchMaintenance : null,
+                'contracts': typeof fetchContracts !== 'undefined' ? fetchContracts : null,
+                'contract-builder': typeof initContractBuilder !== 'undefined' ? initContractBuilder : null,
+                'site-settings': typeof fetchSettings !== 'undefined' ? fetchSettings : null,
+                'contacts': typeof fetchContacts !== 'undefined' ? fetchContacts : null,
+                'integrations': typeof fetchIntegrations !== 'undefined' ? fetchIntegrations : null,
+                'users': typeof fetchUsers !== 'undefined' ? fetchUsers : null,
+                'payroll': typeof fetchPayroll !== 'undefined' ? fetchPayroll : null,
+                'projects': typeof fetchProjects !== 'undefined' ? fetchProjects : null // Added projects loader
             };
-            if (loaders[sectionId]) loaders[sectionId]();
+
+            const loaderKey = targetId.endsWith('-section') ? targetId.replace('-section', '') : targetId;
+            if (loaders[loaderKey]) {
+                console.log("[İmza Portal] Veri yükleniyor:", loaderKey);
+                loaders[loaderKey]();
+            } else {
+                console.warn("[İmza Portal] Loader bulunamadı veya tanım yok:", loaderKey);
+            }
         }
 
         const sidebar = document.getElementById('sidebar');
@@ -2425,7 +2454,7 @@
             if (pass.length < 6) return alert('Şifre en az 6 karakter olmalıdır.');
 
             try {
-                const res = await fetch(`${API_BASE}/auth/reset-password`, {
+                const res = await apiFetch(`${API_BASE}/auth/reset-password`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token: token, password: pass })
@@ -2448,10 +2477,8 @@
                 const res = await apiFetch(`${API_BASE}/dashboard/stats`);
                 if (res.ok) {
                     const stats = await res.json();
-                    document.getElementById('stat-leads').textContent = stats.leads_count || 0;
-                    document.getElementById('stat-portfolios').textContent = stats.portfolios_count || 0;
-                    document.getElementById('stat-active-ads').textContent = stats.active_ads_count || 0;
-                    document.getElementById('stat-monthly-revenue').textContent = (stats.monthly_revenue || 0).toLocaleString() + ' ₺';
+                    document.getElementById('dash-stat-leads').textContent = stats.leads_count || 0;
+                    document.getElementById('dash-stat-expenses').textContent = stats.pending_expenses_count || 0;
                     fetchPortfoliosForDashboard();
                     fetchUpcomingBirthdays();
                 }
@@ -2582,19 +2609,29 @@
                 if (!tbody) return;
                 tbody.innerHTML = data.length === 0 ? '<tr><td colspan="6" class="p-8 text-center text-gray-400">Yeni aday bulunmuyor.</td></tr>' : '';
                 data.forEach(l => {
-                    let scoreColor = l.ai_score > 80 ? 'text-green-600' : (l.ai_score > 50 ? 'text-gold' : 'text-gray-400');
+                    const dateStr = l.created_at ? new Date(l.created_at).toLocaleString('tr-TR') : '-';
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-50 hover:bg-gray-50';
-                    tr.innerHTML = `<td class="px-6 py-4 font-bold ${scoreColor}">${l.ai_score || 0}</td>
-                        <td class="px-6 py-4 font-medium text-navy">${l.name}</td>
-                        <td class="px-6 py-4 text-gray-500 text-xs">${l.phone || '-'}</td>
-                        <td class="px-6 py-4 text-navy font-bold text-xs">
-                            ${l.property_title || (l.campaign_id ? `<span class="text-gold">Kampanya: ${l.campaign_id}</span>` : 'Genel')}
+                    tr.innerHTML = `
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-navy">${l.name || 'İsimsiz'}</div>
                         </td>
-                        <td class="px-6 py-4"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-bold uppercase">${l.status}</span></td>
-                        <td class="px-6 py-4 text-right flex gap-2 justify-end">
-                            <button onclick="openQuickWhatsApp(${l.id})" class="text-green-600"><i class="fa-brands fa-whatsapp"></i></button>
-                            <button class="text-gray-400"><i class="fa-solid fa-ellipsis"></i></button>
+                        <td class="px-6 py-4 text-xs">
+                            <div>${l.phone || '-'}</div>
+                            <div class="text-gray-400">${l.email || '-'}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${l.source === 'campaign' ? 'bg-gold/10 text-gold' : 'bg-gray-100 text-gray-500'}">
+                                ${l.source || 'Genel'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-xs font-medium text-gray-500">
+                            ${l.message || l.project_slug || '-'}
+                        </td>
+                        <td class="px-6 py-4 text-xs text-gray-400">${dateStr}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="openQuickWhatsApp(${l.id})" class="text-green-600 p-2"><i class="fa-brands fa-whatsapp"></i></button>
+                            <button class="text-gray-400 p-2"><i class="fa-solid fa-ellipsis"></i></button>
                         </td>`;
                     tbody.appendChild(tr);
                 });
@@ -2812,6 +2849,16 @@
             const tbody = document.getElementById('publications-table-body');
             if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-400 font-serif italic text-sm">Entegrasyonlar yakında aktif edilecek.</td></tr>';
         }
+
+        // --- STUBS & FALLBACKS ---
+        async function fetchCampaigns() { console.log('[İmza Portal] Kampanyalar yükleniyor...'); }
+        async function fetchHeroSlides() { console.log('[İmza Portal] Vitrin yönetimi yükleniyor...'); }
+        async function fetchTaxes() { console.log('[İmza Portal] Vergiler yükleniyor...'); }
+        async function fetchMaintenance() { console.log('[İmza Portal] Bakım yönetimi yükleniyor...'); }
+        async function fetchContracts() { console.log('[İmza Portal] Sözleşmeler yükleniyor...'); }
+        async function fetchSettings() { console.log('[İmza Portal] Ayarlar yükleniyor...'); }
+        async function fetchUsers() { console.log('[İmza Portal] Kullanıcı yönetimi yükleniyor...'); }
+        async function fetchPayroll() { console.log('[İmza Portal] Bordro ve komisyonlar yükleniyor...'); }
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
