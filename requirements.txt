@@ -5,3 +5,5 @@ google-generativeai
 PyJWT
 beautifulsoup4
 requests
+flask-limiter
+marshmallow

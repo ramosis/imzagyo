@@ -1,4 +1,4 @@
-const CACHE_NAME = 'imza-luxury-v1';
+const CACHE_NAME = 'imza-luxury-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/pages/anasayfa.html',

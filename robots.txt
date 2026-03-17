@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /pages/
+Disallow: /api/
+Disallow: /uploads/
+
+Sitemap: https://imzaemlak.com/sitemap.xml

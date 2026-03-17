@@ -41,6 +41,105 @@ Lütfen sadece oluşturduğun metni (başka bir açıklama eklemeden) markdown f
         response = model.generate_content(prompt)
         # response.text produces the generated output
         return jsonify({"story": response.text.strip()}), 200
-
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+def translate_content(text, target_lang):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return text # Anahtar yoksa orijinali dön
+
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        prompt = f"""
+Sen profesyonel bir gayrimenkul çevirmenisin. Aşağıdaki Türkçe metni, emlak terminolojisine uygun, lüks ve çekici bir dille {target_lang} diline çevir.
+Lütfen sadece çeviriyi döndür, başka hiçbir açıklama ekleme.
+
+Metin:
+{text}
+"""
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        print(f"AI Çeviri Hatası ({target_lang}): {e}")
+        return text
+
+@ai_bp.route('/api/ai/auto-translate-portfolio', methods=['POST'])
+@require_inner_circle
+def auto_translate_portfolio():
+    data = request.json
+    fields_to_translate = ['baslik1', 'baslik2', 'lokasyon', 'hikaye']
+    results = {}
+    
+    for field in fields_to_translate:
+        val = data.get(field)
+        if val:
+            results[f"{field}_en"] = translate_content(val, "İngilizce")
+            results[f"{field}_ar"] = translate_content(val, "Arapça")
+            
+    return jsonify(results), 200
+
+# --- STRATEJİK YATIRIMCI ANALİZİ (DUNNING-KRUGER SHADOW) ---
+
+@ai_bp.route('/api/ai/analyze-investor', methods=['POST'])
+def analyze_investor():
+    """
+    Frontend'den gelen ham cevapları (A, B, C, D) analiz eder.
+    Stratejik teşhis ve taktikler sadece burada (backend) bulunur.
+    """
+    data = request.json
+    choices = data.get('choices', {}) # Örn: {"2": "A", "3": "C", ...}
+    
+    scores = {"A": 0, "B": 0, "C": 0, "D": 0}
+    for q, choice in choices.items():
+        if choice in scores:
+            scores[choice] += 1
+            
+    # Kazanan profili bul
+    winning_profile = max(scores, key=scores.get)
+    
+    # Stratejik Veri Sözlüğü (SADECE BACKEND)
+    profiles = {
+        "A": {
+            "public_title": "Vizyoner ve Lider Yatırımcı",
+            "public_desc": "Kendi fırsatınızı yaratmayı ve vizyonunuzla gayrimenkule değer katmayı seviyorsunuz. Sizin hızınıza ayak uydurabilecek özel yetkili uzmanımızla portföyleri inceleyeceğiz.",
+            "crm_diagnosis": "Dunning-Kruger eğiliminde. Piyasayı bildiğini sanıyor ama asıl amacı kontrolü elinde tutmak.",
+            "crm_tactic": "Asla zıtlaşma. İtirazları pazar rakamlarıyla çürüt ama kararı o veriyormuş gibi hissettir.",
+            "assigned_agent_type": "Tip 3 (Analist) / Tip 4 (PR Ustası)"
+        },
+        "B": {
+            "public_title": "Stratejik ve Güven Odaklı",
+            "public_desc": "Yatırım yaparken uzun vadeli huzuru ön planda tutuyorsunuz. Sürecin tüm operasyonel yükünü sizden alarak pürüzsüz bir deneyim yaşatacak A Sınıfı Rehber Danışmanımızla eşleştirildiniz.",
+            "crm_diagnosis": "Kayıptan kaçınma güdüsü çok yüksek. Karar almaktan ve zarar etmekten korkuyor.",
+            "crm_tactic": "Maksimum 2 seçenek sun. Başkalarının (sürünün) da oradan alıp karlı çıktığını söyle. Güven ver.",
+            "assigned_agent_type": "Tip 2 (Empat / Rehber)"
+        },
+        "C": {
+            "public_title": "Analitik ve Rasyonel",
+            "public_desc": "Duygusal tahminler yerine size net amortisman süreleri, bölgesel ROI raporları ve excel tabloları sunacak finansal gayrimenkul uzmanımızla eşleştirildiniz.",
+            "crm_diagnosis": "Duygusu yok, yatırım getirisi ve fırsat maliyetine odaklı.",
+            "crm_tactic": "Manzara veya estetik övme. Excel ver, kira çarpanı ver, net teklif yap ve satışı kapat.",
+            "assigned_agent_type": "Tip 1 (Kapanışçı) / Tip 3 (Analist)"
+        },
+        "D": {
+            "public_title": "Detaycı ve Mükemmeliyetçi",
+            "public_desc": "Kusursuz planlamaya inanıyor ve her şeyi güvence altına alıyorsunuz. Sizin için zemin etüdünden hukuki duruma kadar her detayı hazırlayacak Risk Analiz Ekibimizle eşleştirildiniz.",
+            "crm_diagnosis": "Bilgili ama analiz felcine uğramış. Çok fazla detaya takıldığı için eyleme geçemiyor.",
+            "crm_tactic": "Talep ettiği raporları önüne yığ, bilgisini onore et. Sonra inisiyatif alıp 'Hadi imzalıyoruz' diyerek itekle.",
+            "assigned_agent_type": "Tip 3 (Analist) + Tip 1 (Broker)"
+        }
+    }
+    
+    result = profiles.get(winning_profile, profiles["B"])
+    return jsonify({
+        "winning_profile": winning_profile,
+        "public_title": result["public_title"],
+        "public_desc": result["public_desc"],
+        "internal_data": { # Bu kısım normalde lead kaydedilirken kullanılacak
+            "diagnosis": result["crm_diagnosis"],
+            "tactic": result["crm_tactic"],
+            "agent": result["assigned_agent_type"]
+        }
+    }), 200

@@ -26,6 +26,12 @@ def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
+    # --- Şema Güncelleme (Migration Simülasyonu) ---
+    try:
+        cursor.execute("ALTER TABLE leads ADD COLUMN campaign_id TEXT")
+    except:
+        pass # Zaten varsa hata verme
+
     # Portföyler Tablosu (Tam olarak portfoy-data.js'deki alanlarla eşleşecek)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS portfoyler (
@@ -235,6 +241,7 @@ def init_db():
             email TEXT,
             source TEXT, -- 'website', 'sahibinden', 'referans', 'instagram'
             interest_property_id TEXT, -- İlgilendiği portföy ID (Opsiyonel)
+            campaign_id TEXT, -- Aktif kampanya ID
             assigned_user_id INTEGER, -- Atanan Danışman
             status TEXT DEFAULT 'new', -- new, contacted, qualified, lost, converted
             ai_score INTEGER DEFAULT 0, -- Yapay zeka öncelik puanı (0-100)

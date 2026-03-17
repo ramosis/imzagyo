@@ -5,6 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boğaz Manzaralı Villa | İmza Gayrimenkul</title>
+    
+    <!-- Dynamic SEO Meta Tags (Phase 2) -->
+    <meta name="description" content="İmza Gayrimenkul ile hayalinizdeki portföyü keşfedin.">
+    <meta property="og:title" content="İmza Gayrimenkul | Lüks Portföy">
+    <meta property="og:description" content="Detaylı bilgi için tıklayın.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -563,7 +571,7 @@
             }
 
             try {
-                const response = await fetch(`/api/portfoyler/${pId}`);
+                const response = await fetch(`/api/portfoyler/${pId}?lang=${i18n.getLang()}`);
                 if (!response.ok) throw new Error('Portföy bulunamadı');
 
                 const veri = await response.json();
@@ -656,7 +664,7 @@
 
                 // === BENZER İLANLAR (Buna Bakanlar Buna da Baktı) ===
                 try {
-                    const allRes = await fetch('/api/portfoyler');
+                    const allRes = await fetch(`/api/portfoyler?lang=${i18n.getLang()}`);
                     if (allRes.ok) {
                         const allItems = await allRes.json();
                         const others = allItems.filter(item => item.id !== pId);

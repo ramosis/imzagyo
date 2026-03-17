@@ -2,6 +2,7 @@ import uuid
 from flask import Blueprint, request, jsonify, g
 from database import get_db_connection
 import json
+from api.ai import translate_content
 
 portfolio_bp = Blueprint('portfolio', __name__)
 
@@ -28,11 +29,22 @@ def add_portfolio():
     if not new_id:
         new_id = str(uuid.uuid4())
 
+    # --- AI OTOMATİK ÇEVİRİ (Faz 4) ---
+    baslik1_en = translate_content(data.get('baslik1', ''), 'İngilizce')
+    baslik1_ar = translate_content(data.get('baslik1', ''), 'Arapça')
+    baslik2_en = translate_content(data.get('baslik2', ''), 'İngilizce')
+    baslik2_ar = translate_content(data.get('baslik2', ''), 'Arapça')
+    lokasyon_en = translate_content(data.get('lokasyon', ''), 'İngilizce')
+    lokasyon_ar = translate_content(data.get('lokasyon', ''), 'Arapça')
+    hikaye_en = translate_content(data.get('hikaye', ''), 'İngilizce')
+    hikaye_ar = translate_content(data.get('hikaye', ''), 'Arapça')
+
     cur.execute('''
-        INSERT INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, isitma, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, ozellik_kategori, mulk_tipi)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        INSERT INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, isitma, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, ozellik_kategori, mulk_tipi, baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ''', (
-        new_id, data.get('koleksiyon'), data.get('baslik1'), data.get('baslik2'), data.get('lokasyon'), data.get('refNo'), data.get('fiyat'), data.get('oda'), data.get('alan'), data.get('kat'), data.get('isitma'), data.get('ozellik_renk', 'bg-navy text-gold'), data.get('bg_renk'), data.get('btn_renk'), data.get('icon_renk'), data.get('resim_hero'), data.get('resim_hikaye'), data.get('hikaye'), json.dumps(data.get('ozellikler_arr', [])), data.get('ozellik_kategori'), data.get('mulk_tipi', 'Konut')
+        new_id, data.get('koleksiyon'), data.get('baslik1'), data.get('baslik2'), data.get('lokasyon'), data.get('refNo'), data.get('fiyat'), data.get('oda'), data.get('alan'), data.get('kat'), data.get('isitma'), data.get('ozellik_renk', 'bg-navy text-gold'), data.get('bg_renk'), data.get('btn_renk'), data.get('icon_renk'), data.get('resim_hero'), data.get('resim_hikaye'), data.get('hikaye'), json.dumps(data.get('ozellikler_arr', [])), data.get('ozellik_kategori'), data.get('mulk_tipi', 'Konut'),
+        baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar
     ))
     conn.commit()
     conn.close()
@@ -44,10 +56,21 @@ def update_portfolio(id):
     data = request.json
     conn = get_db_connection()
     cur = conn.cursor()
+    # --- AI OTOMATİK ÇEVİRİ (Faz 4) ---
+    baslik1_en = translate_content(data.get('baslik1', ''), 'İngilizce')
+    baslik1_ar = translate_content(data.get('baslik1', ''), 'Arapça')
+    baslik2_en = translate_content(data.get('baslik2', ''), 'İngilizce')
+    baslik2_ar = translate_content(data.get('baslik2', ''), 'Arapça')
+    lokasyon_en = translate_content(data.get('lokasyon', ''), 'İngilizce')
+    lokasyon_ar = translate_content(data.get('lokasyon', ''), 'Arapça')
+    hikaye_en = translate_content(data.get('hikaye', ''), 'İngilizce')
+    hikaye_ar = translate_content(data.get('hikaye', ''), 'Arapça')
+
     cur.execute('''
-        UPDATE portfoyler SET koleksiyon=?, baslik1=?, baslik2=?, lokasyon=?, refNo=?, fiyat=?, oda=?, alan=?, kat=?, isitma=?, ozellik_renk=?, resim_hero=?, resim_hikaye=?, hikaye=?, ozellikler=?, ozellik_kategori=?, mulk_tipi=? WHERE id=?
+        UPDATE portfoyler SET koleksiyon=?, baslik1=?, baslik2=?, lokasyon=?, refNo=?, fiyat=?, oda=?, alan=?, kat=?, isitma=?, ozellik_renk=?, resim_hero=?, resim_hikaye=?, hikaye=?, ozellikler=?, ozellik_kategori=?, mulk_tipi=?, baslik1_en=?, baslik1_ar=?, baslik2_en=?, baslik2_ar=?, lokasyon_en=?, lokasyon_ar=?, hikaye_en=?, hikaye_ar=? WHERE id=?
     ''', (
-        data.get('koleksiyon'), data.get('baslik1'), data.get('baslik2'), data.get('lokasyon'), data.get('refNo'), data.get('fiyat'), data.get('oda'), data.get('alan'), data.get('kat'), data.get('isitma'), data.get('ozellik_renk', 'bg-navy text-gold'), data.get('resim_hero'), data.get('resim_hikaye'), data.get('hikaye'), json.dumps(data.get('ozellikler_arr', [])), data.get('ozellik_kategori'), data.get('mulk_tipi', 'Konut'), id
+        data.get('koleksiyon'), data.get('baslik1'), data.get('baslik2'), data.get('lokasyon'), data.get('refNo'), data.get('fiyat'), data.get('oda'), data.get('alan'), data.get('kat'), data.get('isitma'), data.get('ozellik_renk', 'bg-navy text-gold'), data.get('resim_hero'), data.get('resim_hikaye'), data.get('hikaye'), json.dumps(data.get('ozellikler_arr', [])), data.get('ozellik_kategori'), data.get('mulk_tipi', 'Konut'),
+        baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar, id
     ))
     conn.commit()
     conn.close()

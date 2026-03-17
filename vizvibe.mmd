@@ -1,7 +1,7 @@
 flowchart TD
     %% === PROJE HEDEFLERİ ===
-    %% Ultimate Goal: İmza Gayrimenkul portalını modern UI/UX ve birleşik mantıkla yeniden inşa etmek.
-    %% Current Goal: Klasör yapısını modernize etmek ve yeni özellikler için hazır hale getirmek.
+    %% Ultimate Goal: İmza Gayrimenkul portalını modern UI/UX, akıllı analiz ve birleşik mantıkla yeniden inşa etmek.
+    %% Current Goal: İmza Lens zekasıyla kullanıcı davranışlarını analiz etmek ve kişiselleştirilmiş deneyim sunmak.
 
     %% === KULLANICI KATMANI ===
     subgraph Users [Kullanıcı Katmanı]
@@ -13,37 +13,33 @@ flowchart TD
     %% === UYGULAMA KATMANI ===
     subgraph Apps [Uygulama Katmanı]
         frontend("Web Frontend<br/><sub>pages/ klasöründe toplanmış<br/>Premium HTML/JS arayüzü</sub>")
-        mobile("Mobil Uygulama<br/><sub>Expo / React Native<br/>iOS & Android</sub>")
+        imza_lens("İmza Lens Module<br/><sub>Akıllı karşılama, Geo-Targeting<br/>ve davranışsal analiz motoru</sub>")
     end
 
     %% === API & BACKEND KATMANI ===
     subgraph Backend [API & Backend Katmanı]
         flask_api("Flask Python API<br/><sub>pages/ ve root servisleri<br/>merkezi iş mantığı</sub>")
         db[("Veritabanı<br/><sub>Mülkler, Müşteriler<br/>ve Sistem Ayarları</sub>")]
-        gemini_ai("Gemini AI Servisi<br/><sub>Otomatik ilan hikayesi ve<br/>portföy analizi üretimi</sub>")
-        mail_service("E-Posta Servisi<br/><sub>Google Workspace tabanlı<br/>bildirim ve şifre işlemleri</sub>")
+        geo_api("FreeIPAPI Integration<br/><sub>IP tabanlı konum tespiti ve<br/>yerelleştirilmiş karşılama</sub>")
     end
 
     %% === ALTYAPI & DAĞITIM ===
     subgraph Infra [Altyapı & Dağıtım]
         docker("Docker & Compose<br/><sub>Root dizininde korunan<br/>dağıtım konfigürasyonu</sub>")
-        nginx("Nginx Proxy<br/><sub>SSL yönetimi, Domain<br/>yönlendirme (imzaemlak.com)</sub>")
-        gcp_vps("Google Cloud VPS<br/><sub>Esnek ve ölçeklenebilir<br/>bulut sunucu altyapısı</sub>")
+        pwa("PWA & Service Worker<br/><sub>Offline destek ve v2<br/>önbellek yönetimi (sw.js)</sub>")
     end
 
     %% === İLİŞKİLER ===
     visitor & investor --> frontend
-    visitor & investor --> mobile
+    frontend --> imza_lens
+    imza_lens <--> geo_api
+    imza_lens -- "Shadow Bridge" --> flask_api
     admin --> frontend
 
-    frontend & mobile <==> flask_api
+    frontend <==> flask_api
     flask_api <==> db
-    flask_api --> gemini_ai
-    flask_api --> mail_service
-
-    flask_api & db & nginx --> docker
-    docker --> gcp_vps
-    nginx <--> Apps
+    flask_api & db --> docker
+    frontend --> pwa
 
     %% === GELİŞİM ÇİZGELGESİ (TRAJECTORY) ===
     subgraph Trajectory [Gelişim Yolculuğu]
@@ -51,86 +47,48 @@ flowchart TD
         %% @project_start [start, closed, 2026-03-01, nam]
         start("Başlangıç")
         
-        %% @feature_leads [ai-task, closed, 2026-03-05, nam]
-        leads("CRM Altyapı")
-        
-        %% @feature_contract_builder [ai-task, closed, 2026-03-10, nam]
-        contracts("Sözleşme Sihirbazı")
-        
-        %% @feature_ai_integration [ai-task, closed, 2026-03-10, nam]
-        ai("AI Entegrasyonu")
-        
-        %% @feature_docker_deployment [ai-task, closed, 2026-03-11, nam]
-        deploy("Canlı Dağıtım")
-        
-        %% @feature_mobile_ui_fixes [ai-task, closed, 2026-03-12, antigravity]
-        mobile_fix("Mobil & UI Fix")
-        
-        %% @feature_performance_opt [ai-task, closed, 2026-03-12, antigravity]
-        perf_opt("Performans Turbo")
-
-        %% @feature_cloudinary [ai-task, closed, 2026-03-12, antigravity]
-        cloudinary("Bulut Depolama")
-
-        %% @feature_cleanup [ai-task, closed, 2026-03-14, antigravity]
-        cleanup("Yama & Temizlik")
-
         %% @feature_refactor [ai-task, closed, 2026-03-14, antigravity]
-        refactor("Klasör Refaktörü<br/><sub>Dokümanlar docs/, sayfalar pages/<br/>altına alındı; app.py yeni<br/>yapıya göre optimize edildi</sub>")
-
-        %% @feature_design_standard [ai-task, closed, 2026-03-14, antigravity]
-        design_standard("Tasarım Standardizasyonu<br/><sub>Tüm sayfalarda 1.1s Maybach hızı,<br/>12px Montserrat nav fontu ve<br/>premium marka uyumu sağlandı</sub>")
+        refactor("Yeniden Yapılanma")
 
         %% @feature_mobile_web [ai-task, closed, 2026-03-15, antigravity]
-        mobile_web("Mobil Web Geliştirme<br/><sub>1.1s Maybach senkronizasyonu,<br/>responsive görsel optimizasyonu (srcset)<br/>ve PWA (manifest/sw) entegrasyonu</sub>")
+        mobile_web("Mobil & PWA")
 
-        %% @ultimate_goal [end, opened, 2026-03-15, nam]
+        %% @feature_l_metrics [ai-task, closed, 2026-03-16, antigravity]
+        l_metrics("L-Metrics (Faz 11)<br/><sub>Ziyaretçilerin scroll ve odaklanma<br/>kalitesini ölçen derinlik analiz<br/>motoru (Luxury Metrics) aktif edildi</sub>")
+
+        %% @feature_geo_seo [ai-task, closed, 2026-03-17, antigravity]
+        geo_seo("SEO & Geo Lens (Faz 12)<br/><sub>IP-Geo ile şehir bazlı karşılama<br/>ve kullanıcı ilgisine göre dinamik<br/>meta-tag optimizasyonu tamamlandı</sub>")
+
+        %% @feature_shadow_bridge [ai-task, closed, 2026-03-17, antigravity]
+        shadow_bridge("Shadow Bridge (Faz 13)<br/><sub>Anonim verilerin arka planda<br/>senkronize edilmesi ve yönetici<br/>görünürlüğü altyapısı kuruldu</sub>")
+
+        %% @feature_campaign_module [ai-task, closed, 2026-03-17, antigravity]
+        campaign("Kampanya Modülü (Faz 14)<br/><sub>Hero slider kampanya enjeksiyonu,<br/>merkezi talep formu ve L-Metrics<br/>backend entegrasyonu tamamlandı</sub>")
+
+        %% @ultimate_goal [end, opened, 2026-03-17, nam]
         goal("Büyük Hedef")
 
-        start --> leads --> contracts --> ai --> deploy --> mobile_fix --> perf_opt --> cloudinary --> cleanup --> refactor --> portal_fix --> server_up --> design_standard --> mobile_test --> mobile_web -.-> goal
+        start --> refactor --> mobile_web --> l_metrics --> geo_seo --> shadow_bridge --> campaign
+        campaign -.-> goal
     end
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [SON ÇALIŞMA]
-        mobile_web
+        campaign
     end
 
     %% === STYLES ===
-    %% Kullanıcılar
-    style visitor fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style investor fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style admin fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-
-    %% Apps
-    style frontend fill:#1a1a2e,stroke:#c084fc,color:#e9d5ff,stroke-width:1px
-    style mobile fill:#1a1a2e,stroke:#c084fc,color:#e9d5ff,stroke-width:1px
-
-    %% Backend
-    style flask_api fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:2px
-    style db fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style gemini_ai fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style mail_service fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-
-    %% Infra
-    style docker fill:#1a1a2e,stroke:#94a3b8,color:#cbd5e1,stroke-width:1px
-    style nginx fill:#1a1a2e,stroke:#94a3b8,color:#cbd5e1,stroke-width:1px
-    style gcp_vps fill:#1a1a2e,stroke:#94a3b8,color:#cbd5e1,stroke-width:1px
-
-    %% Trajectory
-    style cleanup fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style refactor fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    %% Closed tasks
     style start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style leads fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style contracts fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style ai fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style deploy fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style portal_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style server_up fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style design_standard fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    
-    %% Recent highlight
-    style design_standard fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style refactor fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style mobile_web fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style l_metrics fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+
+    %% Recent nodes
+    style geo_seo fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style shadow_bridge fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style campaign fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
-    %% Target
+    %% Open tasks
     style goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

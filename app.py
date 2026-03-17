@@ -14,6 +14,9 @@ load_dotenv()
 
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from marshmallow import Schema, fields, validate, ValidationError
 from database import init_db, doldur_ornek_veriler, DB_NAME, get_db_connection
 from api.portfolio import portfolio_bp
 from api.users import users_bp
@@ -40,6 +43,17 @@ from api.ai import ai_bp
 from api.neighborhood import neighborhood_bp
 from api.projects import projects_bp
 app = Flask(__name__, static_folder=None)
+
+# Rate Limiter Yapılandırması
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
+
+# --- VERİ DOĞRULAMA ŞEMALARI (MARSHMALLOW) ---
+# Şemalar merkezi olarak api/schemas.py dosyasına taşındı.
 
 UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -86,12 +100,10 @@ app.register_blueprint(projects_bp)
 
 @app.after_request
 def add_header(r):
-    # API uç noktaları için cache kapatılabilir ama statik sayfalar için açık kalmalı
-    if request.path.startswith('/api/'):
-        r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    else:
-        # Statik dosyalar için 1 gün önbellek önerisi
-        r.headers["Cache-Control"] = "public, max-age=86400"
+    # Geliştirme sürecinde tüm cache'i kapatıyoruz
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
     return r
 
 # CORS Ayarları
@@ -127,6 +139,49 @@ def serve_file(path):
     full_html_path = os.path.join(pages_dir, file_name)
     
     if os.path.exists(full_html_path) and os.path.isfile(full_html_path):
+        # --- DİNAMİK SEO ENJEKSİYONU (Faz 2) ---
+        if clean_path == 'detay' or clean_path == 'detay.html':
+            prop_id = request.args.get('id')
+            if prop_id:
+                try:
+                    conn = get_db_connection()
+                    prop = conn.execute('SELECT * FROM portfoyler WHERE id = ?', (prop_id,)).fetchone()
+                    conn.close()
+                    
+                    if prop:
+                        with open(full_html_path, 'r', encoding='utf-8') as f:
+                            html_content = f.read()
+                        
+                        lang = request.args.get('lang', 'tr').lower()
+                        
+                        # Dil bazlı içerik seçimi
+                        title_key = 'baslik1'
+                        loc_key = 'lokasyon'
+                        if lang == 'en' and prop['baslik1_en']: 
+                            title_key = 'baslik1_en'
+                            loc_key = 'lokasyon_en'
+                        elif lang == 'ar' and prop['baslik1_ar']:
+                            title_key = 'baslik1_ar'
+                            loc_key = 'lokasyon_ar'
+
+                        title = f"{prop[title_key]} | İmza Gayrimenkul"
+                        base_desc = "İstanbul'un en seçkin portföyleri."
+                        if prop[loc_key]:
+                            base_desc = f"{prop[loc_key]} lokasyonunda lüks portföy."
+                        
+                        desc = f"{base_desc} - {prop['fiyat']}."
+                        image = prop['resim_hero'] or "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200"
+                        
+                        html_content = html_content.replace('<title>Boğaz Manzaralı Villa | İmza Gayrimenkul</title>', f'<title>{title}</title>')
+                        html_content = html_content.replace('content="İmza Gayrimenkul ile hayalinizdeki portföyü keşfedin."', f'content="{desc}"')
+                        html_content = html_content.replace('content="İmza Gayrimenkul | Lüks Portföy"', f'content="{title}"')
+                        html_content = html_content.replace('content="Detaylı bilgi için tıklayın."', f'content="{desc}"')
+                        html_content = html_content.replace('content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200"', f'content="{image}"')
+                        
+                        return html_content
+                except Exception as e:
+                    print(f"SEO Injection Hatası: {e}")
+        
         return send_from_directory(pages_dir, file_name)
 
     # 3. Diğer statik dosyaları (js, css, img) root'tan servis et
@@ -136,6 +191,45 @@ def serve_file(path):
 
     # 4. Hiçbir şey bulunamazsa 404 sayfasına gönder
     return send_from_directory(pages_dir, '404.html'), 404
+
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory(app.root_path, 'robots.txt')
+
+@app.route('/sitemap.xml')
+def sitemap():
+    conn = get_db_connection()
+    portfoyler = conn.execute('SELECT id, updated_at FROM portfoyler').fetchall()
+    conn.close()
+
+    base_url = "https://imzaemlak.com" # Gerçek domain ile güncellenmeli
+    pages = [
+        {'loc': f"{base_url}/", 'changefreq': 'daily', 'priority': '1.0'},
+        {'loc': f"{base_url}/kurumsal", 'changefreq': 'monthly', 'priority': '0.5'},
+        {'loc': f"{base_url}/ekip", 'changefreq': 'monthly', 'priority': '0.5'},
+        {'loc': f"{base_url}/araclar", 'changefreq': 'monthly', 'priority': '0.5'},
+    ]
+
+    for p in portfoyler:
+        pages.append({
+            'loc': f"{base_url}/detay?id={p['id']}",
+            'changefreq': 'weekly',
+            'priority': '0.8'
+        })
+
+    sitemap_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    sitemap_xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    
+    for page in pages:
+        sitemap_xml.append('  <url>')
+        sitemap_xml.append(f'    <loc>{page["loc"]}</loc>')
+        sitemap_xml.append(f'    <changefreq>{page["changefreq"]}</changefreq>')
+        sitemap_xml.append(f'    <priority>{page["priority"]}</priority>')
+        sitemap_xml.append('  </url>')
+    
+    sitemap_xml.append('</urlset>')
+    
+    return "\n".join(sitemap_xml), 200, {'Content-Type': 'application/xml'}
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -162,8 +256,22 @@ def get_portfoyler():
     
     # SQLite Row nesnelerini dictionary'e çevir
     result = []
+    lang = request.args.get('lang', 'tr').lower()
+
     for p in portfoyler:
         d = dict(p)
+        # Dil bazlı içerik ezme (Phase 4)
+        if lang == 'en' and d.get('baslik1_en'):
+            d['baslik1'] = d['baslik1_en']
+            d['baslik2'] = d['baslik2_en'] or d['baslik2']
+            d['lokasyon'] = d['lokasyon_en'] or d['lokasyon']
+            d['hikaye'] = d['hikaye_en'] or d['hikaye']
+        elif lang == 'ar' and d.get('baslik1_ar'):
+            d['baslik1'] = d['baslik1_ar']
+            d['baslik2'] = d['baslik2_ar'] or d['baslik2']
+            d['lokasyon'] = d['lokasyon_ar'] or d['lokasyon']
+            d['hikaye'] = d['hikaye_ar'] or d['hikaye']
+
         if d['ozellikler']:
             d['ozellikler'] = json.loads(d['ozellikler'])
         result.append(d)
@@ -181,6 +289,20 @@ def get_portfoy(id):
         return jsonify({"error": "Portföy bulunamadı"}), 404
         
     d = dict(portfoy)
+    lang = request.args.get('lang', 'tr').lower()
+
+    # Dil bazlı içerik ezme (Phase 4)
+    if lang == 'en' and d.get('baslik1_en'):
+        d['baslik1'] = d['baslik1_en']
+        d['baslik2'] = d['baslik2_en'] or d['baslik2']
+        d['lokasyon'] = d['lokasyon_en'] or d['lokasyon']
+        d['hikaye'] = d['hikaye_en'] or d['hikaye']
+    elif lang == 'ar' and d.get('baslik1_ar'):
+        d['baslik1'] = d['baslik1_ar']
+        d['baslik2'] = d['baslik2_ar'] or d['baslik2']
+        d['lokasyon'] = d['lokasyon_ar'] or d['lokasyon']
+        d['hikaye'] = d['hikaye_ar'] or d['hikaye']
+
     if d['ozellikler']:
         d['ozellikler'] = json.loads(d['ozellikler'])
         

@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from database import get_db_connection
 import json
+from api.schemas import lead_schema, ValidationError
 
 leads_bp = Blueprint('leads', __name__)
 
@@ -72,6 +73,13 @@ def get_lead(id):
 @leads_bp.route('/api/leads', methods=['POST'])
 def add_lead():
     data = request.json
+    
+    # --- VERİ DOĞRULAMA (Faz 1) ---
+    try:
+        validated_data = lead_schema.load(data)
+    except ValidationError as err:
+        return jsonify({"error": "Geçersiz veri", "details": err.messages}), 400
+
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -88,25 +96,26 @@ def add_lead():
 
     try:
         cur.execute('''
-            INSERT INTO leads (name, phone, email, source, interest_property_id, assigned_user_id, status, ai_score, notes, tags)
-            VALUES (?,?,?,?,?,?,?,?,?,?)
+            INSERT INTO leads (name, phone, email, source, interest_property_id, campaign_id, assigned_user_id, status, ai_score, notes, tags)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?)
         ''', (
-            data.get('name'),
-            data.get('phone'),
-            data.get('email'),
-            data.get('source', 'portal'),
-            data.get('interest_property_id'),
-            data.get('assigned_user_id'),
-            data.get('status', 'new'),
+            validated_data.get('name'),
+            validated_data.get('phone'),
+            validated_data.get('email'),
+            validated_data.get('source', 'portal'),
+            validated_data.get('interest_property_id'),
+            validated_data.get('campaign_id'),
+            validated_data.get('assigned_user_id'),
+            validated_data.get('status', 'new'),
             ai_score,
-            data.get('notes'),
-            data.get('tags')
+            validated_data.get('notes'),
+            validated_data.get('tags')
         ))
         lead_id = cur.lastrowid
 
         # --- DİJİTAL AYAK İZİ EŞLEŞTİRME ---
         # Kullanıcının anonim iken yaptığı işlemleri (session_id) bu yeni lead'e bağla
-        session_id = data.get('session_id')
+        session_id = validated_data.get('session_id')
         if session_id:
             cur.execute('UPDATE lead_interactions SET lead_id = ? WHERE session_id = ?', (lead_id, session_id))
 

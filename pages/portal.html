@@ -11,11 +11,14 @@
     <!-- Leaflet Harita Kütüphanesi -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../js/mobile_polish.js"></script>
 
     <style>
-        body {
+        html, body {
             background-color: #f8fafc;
-            overflow-x: hidden;
+            overflow-x: hidden !important;
+            width: 100%;
+            position: relative;
         }
 
         .glass-panel {
@@ -250,9 +253,9 @@
                                 <div class="flex items-center justify-between mb-2">
                                     <label
                                         class="block text-xs font-bold text-navy uppercase tracking-wider">Şifre</label>
-                                    <a href="#"
+                                    <button type="button" onclick="openResetModal()"
                                         class="text-[10px] text-gray-400 hover:text-gold transition-colors font-medium">Şifremi
-                                        Unuttum</a>
+                                        Unuttum</button>
                                 </div>
                                 <div class="relative group">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -2293,7 +2296,38 @@
             document.getElementById('step-' + stepIndex).classList.remove('hidden');
         };
 
-        // --- LOGIN MANTIĞI ---
+        // --- AUTH & LOGIN ---
+        function checkAuth() {
+            const token = localStorage.getItem('imza_admin_token');
+            const role = localStorage.getItem('imza_admin_role');
+            const loginSection = document.getElementById('login-section');
+            const portalApp = document.getElementById('portal-app');
+            
+            if (token) {
+                loginSection.classList.add('hidden');
+                portalApp.classList.remove('hidden');
+                portalApp.classList.add('show-app');
+                
+                // Sidebar info
+                const userSpan = document.getElementById('sidebar-user-name');
+                if (userSpan) userSpan.textContent = localStorage.getItem('imza_admin_username') || 'Yönetici';
+                
+                // URL'de reset token var mı kontrol et (Şifre sıfırlama akışı için)
+                const params = new URLSearchParams(window.location.search);
+                if (params.has('reset_token')) {
+                    document.getElementById('reset-token').value = params.get('reset_token');
+                    document.getElementById('new-password-modal').classList.remove('hidden');
+                    // URL'den token'ı temizle (güvenlik için)
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                fetchDashboardStats();
+            } else {
+                loginSection.classList.remove('hidden');
+                portalApp.classList.add('hidden');
+            }
+        }
+
         async function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -2310,7 +2344,7 @@
             // Loading state
             loginBtn.disabled = true;
             loginBtn.classList.add('opacity-70', 'cursor-not-allowed');
-            loginBtnText.textContent = 'Giriş Yapılıyor...';
+            if (loginBtnText) loginBtnText.textContent = 'Giriş Yapılıyor...';
             errorDiv.classList.add('hidden');
 
             try {
@@ -2324,6 +2358,7 @@
                     const data = await response.json();
                     localStorage.setItem('imza_admin_token', data.token);
                     localStorage.setItem('imza_admin_role', data.role);
+                    localStorage.setItem('imza_admin_username', data.username || username);
                     window.location.reload();
                 } else {
                     const errorData = await response.json().catch(() => ({}));
@@ -2337,47 +2372,73 @@
             } finally {
                 loginBtn.disabled = false;
                 loginBtn.classList.remove('opacity-70', 'cursor-not-allowed');
-                loginBtnText.textContent = 'Güvenli Giriş';
+                if (loginBtnText) loginBtnText.textContent = 'Güvenli Giriş';
             }
         }
 
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggle-icon');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            }
+        // --- PASSWORD RESET LOGIC ---
+        function openResetModal() {
+            document.getElementById('reset-modal').classList.remove('hidden');
+            document.getElementById('reset-request-step').classList.remove('hidden');
+            document.getElementById('reset-success-step').classList.add('hidden');
         }
 
-        // Enter tuşu desteği
-        document.getElementById('password')?.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') login();
-        });
-        document.getElementById('username')?.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') login();
-        });
+        function closeResetModal() {
+            document.getElementById('reset-modal').classList.add('hidden');
+        }
 
-        // Sayfa yüklendiğinde oturum kontrolü
-        function checkAuth() {
-            const token = localStorage.getItem('imza_admin_token');
-            const loginSection = document.getElementById('login-section');
-            const portalApp = document.getElementById('portal-app');
+        async function requestPasswordReset() {
+            const email = document.getElementById('reset-email').value;
+            if (!email || !email.includes('@')) return alert('Lütfen geçerli bir e-posta adresi girin.');
             
-            if (token) {
-                loginSection.classList.add('hidden');
-                portalApp.classList.remove('hidden');
-                portalApp.classList.add('show-app');
-                // Dashboard verilerini çek
-                fetchDashboardStats();
-            } else {
-                loginSection.classList.remove('hidden');
-                portalApp.classList.add('hidden');
+            const btn = document.getElementById('reset-req-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gönderiliyor...';
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/request-reset`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                if (res.ok) {
+                    document.getElementById('reset-request-step').classList.add('hidden');
+                    document.getElementById('reset-success-step').classList.remove('hidden');
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Sıfırlama talebi başarısız oldu.');
+                }
+            } catch (e) {
+                alert('Bağlantı hatası.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Bağlantı Gönder';
+            }
+        }
+
+        async function submitNewPassword() {
+            const token = document.getElementById('reset-token').value;
+            const pass = document.getElementById('new-password').value;
+            const confirm = document.getElementById('new-password-confirm').value;
+            
+            if (pass !== confirm) return alert('Şifreler eşleşmiyor.');
+            if (pass.length < 6) return alert('Şifre en az 6 karakter olmalıdır.');
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token, password: pass })
+                });
+                if (res.ok) {
+                    alert('Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
+                    location.href = 'portal.html';
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'İşlem başarısız.');
+                }
+            } catch (e) {
+                alert('Bir hata oluştu.');
             }
         }
 
@@ -3790,4 +3851,59 @@
     </div>
 </div>
 
+    <!-- ŞİFRE SIFIRLAMA MODALI -->
+    <div id="reset-modal" class="fixed inset-0 z-[100] hidden bg-navy/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl p-8 relative slide-up-anim">
+            <button onclick="closeResetModal()" class="absolute top-6 right-6 text-gray-400 hover:text-navy transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <div id="reset-request-step">
+                <h3 class="text-2xl font-serif font-bold text-navy mb-4 text-center">Şifremi Unuttum</h3>
+                <p class="text-sm text-gray-500 mb-6 text-center">Hesabınıza bağlı e-posta adresinizi girin, size bir sıfırlama bağlantısı gönderelim.</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">E-Posta Adresi</label>
+                        <input type="email" id="reset-email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none" placeholder="ornek@imzagayrimenkul.com">
+                    </div>
+                    <button onclick="requestPasswordReset()" id="reset-req-btn" class="w-full bg-navy text-gold font-bold py-4 rounded-lg uppercase tracking-widest text-xs shadow-lg shadow-navy/20">
+                        Bağlantı Gönder
+                    </button>
+                </div>
+            </div>
+
+            <div id="reset-success-step" class="hidden text-center py-4">
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <h3 class="text-xl font-bold text-navy mb-2">E-Posta Gönderildi!</h3>
+                <p class="text-sm text-gray-500 mb-6">Lütfen gelen kutunuzu (ve gereksiz kutusunu) kontrol edin.</p>
+                <button onclick="closeResetModal()" class="w-full bg-gray-100 text-navy font-bold py-3 rounded-lg text-xs uppercase">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ŞİFRE BELİRLEME MODALI (Token ile gelindiğinde) -->
+    <div id="new-password-modal" class="fixed inset-0 z-[100] hidden bg-navy/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl p-8 relative slide-up-anim">
+            <h3 class="text-2xl font-serif font-bold text-navy mb-4 text-center">Yeni Şifre Belirle</h3>
+            <p class="text-sm text-gray-500 mb-6 text-center">Lütfen hesabınız için yeni ve güvenli bir şifre seçiniz.</p>
+            
+            <div class="space-y-4">
+                <input type="hidden" id="reset-token">
+                <div>
+                    <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Yeni Şifre</label>
+                    <input type="password" id="new-password" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none" placeholder="••••••••">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Şifre Tekrar</label>
+                    <input type="password" id="new-password-confirm" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none" placeholder="••••••••">
+                </div>
+                <button onclick="submitNewPassword()" class="w-full bg-navy text-gold font-bold py-4 rounded-lg uppercase tracking-widest text-xs shadow-lg shadow-navy/20">
+                    Şifreyi Güncelle
+                </button>
+            </div>
+        </div>
+    </div>
 </html>
