@@ -207,7 +207,7 @@ def sync_extension_data():
             elif listing_type == 'Kiralık':
                 estimated_rent = price_numeric # Kiralık ilan için fiyatın kendisi tahmini kiradır
 
-            source = 'sahibinden' if 'sahibinden.com' in url else 'hepsiemlak' if 'hepsiemlak.com' in url else 'other'
+            source = 'sahibinden' if 'sahibinden.com' in url else 'hepsiemlak' if 'hepsiemlak.com' in url else 'zingat' if 'zingat.com' in url else 'other'
             # İlanı kaydet veya güncelle
             conn.execute('''
                 INSERT INTO listings_shadow (

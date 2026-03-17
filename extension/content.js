@@ -5,6 +5,7 @@ function scrapeListingData() {
     const url = window.location.href;
     const isSahibinden = url.includes('sahibinden.com');
     const isHepsiemlak = url.includes('hepsiemlak.com');
+    const isZingat = url.includes('zingat.com');
 
     const data = {
         title: document.title,
@@ -109,6 +110,43 @@ function scrapeListingData() {
                 const lngMatch = scriptText.match(/centerLng\s*:\s*([\d.]+)/);
                 if (latMatch) data.latitude = parseFloat(latMatch[1]);
                 if (lngMatch) data.longitude = parseFloat(lngMatch[1]);
+            }
+        } catch (e) {}
+    } else if (isZingat) {
+        // Zingat Fiyat
+        data.price = document.querySelector('.detail-price')?.innerText?.trim() || 
+                     document.querySelector('span[itemprop="price"]')?.innerText?.trim() || "Bilinmiyor";
+        
+        // Zingat Konum
+        const locPath = document.querySelector('.detail-location-path')?.innerText || "";
+        if (locPath) {
+            const parts = locPath.split(',').map(p => p.trim());
+            data.city = parts[0] || "";
+            data.district = parts[1] || "";
+            data.neighborhood = parts[2] || "";
+        }
+
+        // Zingat İlan Sahibi & Tarih
+        data.owner_name = document.querySelector('.agent-info .name')?.innerText?.trim() || 
+                          document.querySelector('.firm-name')?.innerText?.trim() || "";
+        
+        const detailList = document.querySelectorAll('.detail-info-list li');
+        detailList.forEach(li => {
+            if (li.innerText.includes("İlan Tarihi")) {
+                data.listing_date = li.innerText.replace("İlan Tarihi", "").trim();
+            }
+        });
+
+        // Zingat Telefon
+        data.owner_phone = Array.from(document.querySelectorAll('.agent-phone a'))
+                                .map(el => el.innerText.trim()).filter(t => t).join(' / ');
+
+        // Zingat Koordinat
+        try {
+            const mapContainer = document.querySelector('#map');
+            if (mapContainer) {
+                data.latitude = parseFloat(mapContainer.getAttribute('data-lat'));
+                data.longitude = parseFloat(mapContainer.getAttribute('data-lng'));
             }
         } catch (e) {}
     }
