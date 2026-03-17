@@ -356,6 +356,9 @@ def init_db():
             url TEXT UNIQUE,
             source TEXT, -- 'sahibinden', 'hepsiemlak'
             listing_type TEXT, -- 'Satılık', 'Kiralık'
+            owner_name TEXT,
+            owner_phone TEXT,
+            listing_date TEXT,
             data_json TEXT, -- Tüm ham veri
             last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -373,7 +376,10 @@ def init_db():
         ('neighborhood', 'TEXT'),
         ('latitude', 'REAL'),
         ('longitude', 'REAL'),
-        ('listing_type', 'TEXT')
+        ('listing_type', 'TEXT'),
+        ('owner_name', 'TEXT'),
+        ('owner_phone', 'TEXT'),
+        ('listing_date', 'TEXT')
     ]
     for col_name, col_type in columns_to_add:
         try:

@@ -3021,8 +3021,11 @@
                             </td>
                             <td class="py-4 px-6">
                                 <div class="font-bold text-navy text-sm leading-tight">${item.title}</div>
-                                <div class="text-[9px] text-gray-400 font-mono mt-1 opacity-60 truncate max-w-xs">${item.url}</div>
-                                <div class="text-[9px] text-gray-400 mt-1 italic">Senk: ${dateStr}</div>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] text-navy/60 font-semibold" title="${item.owner_phone || ''}"><i class="fas fa-user-circle mr-1"></i>${item.owner_name || 'Bilinmiyor'}</span>
+                                    <span class="text-[10px] text-gray-400"><i class="fas fa-calendar-alt mr-1"></i>${item.listing_date || 'Tarih Yok'}</span>
+                                </div>
+                                <div class="text-[9px] text-gray-500/50 mt-1 italic font-medium">Senk: ${dateStr}</div>
                             </td>
                             <td class="py-4 px-6">
                                 <div class="text-sm font-medium text-navy/80">${location}</div>

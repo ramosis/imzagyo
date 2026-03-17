@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     neighborhood: "",
                     latitude: null,
                     longitude: null,
+                    owner_name: "",
+                    owner_phone: "",
+                    listing_date: "",
                     url: url,
                     listing_type: url.includes('kiralik') ? 'Kiralık' : 'Satılık',
                     timestamp: new Date().toISOString()
@@ -53,6 +56,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         data.district = parts[1] || "";
                         data.neighborhood = parts[2] || "";
                     }
+
+                    // Sahibinden İlan Sahibi & Tarih
+                    data.owner_name = document.querySelector('.username')?.innerText?.trim() || 
+                                      document.querySelector('.site-buyer-info .username')?.innerText?.trim() || "";
+                    
+                    const infoList = document.querySelectorAll('.classifiedInfoList li');
+                    infoList.forEach(li => {
+                        const label = li.querySelector('strong')?.innerText || "";
+                        if (label.includes("İlan Tarihi")) {
+                            data.listing_date = li.querySelector('span')?.innerText?.trim() || "";
+                        }
+                    });
+
+                    // Sahibinden Telefon
+                    data.owner_phone = Array.from(document.querySelectorAll('.phone-numbers span, .phone-box'))
+                                            .map(el => el.innerText.trim()).filter(t => t).join(' / ');
                     try {
                         const scripts = Array.from(document.querySelectorAll('script'));
                         const mapScript = scripts.find(s => s.textContent.includes('googleMapsData'));
@@ -74,6 +93,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         data.district = parts[1] || "";
                         data.neighborhood = parts[2] || "";
                     }
+
+                    // Hepsiemlak İlan Sahibi & Tarih
+                    data.owner_name = document.querySelector('.owner-info .name')?.innerText?.trim() || 
+                                      document.querySelector('.firm-name')?.innerText?.trim() || "";
+                    
+                    const detailItems = document.querySelectorAll('.detay-liste li');
+                    detailItems.forEach(li => {
+                        if (li.innerText.includes("İlan Tarihi")) {
+                            data.listing_date = li.innerText.replace("İlan Tarihi", "").trim();
+                        }
+                    });
+
+                    // Hepsiemlak Telefon
+                    data.owner_phone = Array.from(document.querySelectorAll('.phone-numbers'))
+                                            .map(el => el.innerText.trim()).filter(t => t).join(' / ');
+
                     try {
                         const mapEl = document.querySelector('#map');
                         if (mapEl) {

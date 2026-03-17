@@ -159,6 +159,11 @@ def sync_extension_data():
         latitude = data.get('latitude')
         longitude = data.get('longitude')
         
+        # Arbitraj & Eşleştirme Alanları
+        owner_name = data.get('owner_name')
+        owner_phone = data.get('owner_phone')
+        listing_date = data.get('listing_date')
+        
         if not url:
             return jsonify({'error': 'URL bilgisi gerekli'}), 400
 
@@ -209,9 +214,10 @@ def sync_extension_data():
                     title, price, price_numeric, estimated_rent, 
                     roi_score, amortization_years,
                     city, district, neighborhood, 
-                    latitude, longitude, url, source, listing_type, data_json
+                    latitude, longitude, url, source, listing_type, 
+                    owner_name, owner_phone, listing_date, data_json
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(url) DO UPDATE SET
                     title=excluded.title,
                     price=excluded.price,
@@ -225,13 +231,17 @@ def sync_extension_data():
                     latitude=excluded.latitude,
                     longitude=excluded.longitude,
                     listing_type=excluded.listing_type,
+                    owner_name=excluded.owner_name,
+                    owner_phone=excluded.owner_phone,
+                    listing_date=excluded.listing_date,
                     data_json=excluded.data_json,
                     last_seen_at=CURRENT_TIMESTAMP
             ''', (
                 title, price, price_numeric, estimated_rent, 
                 roi_score, amortization_years,
                 city, district, neighborhood, 
-                latitude, longitude, url, source, listing_type, json.dumps(data)
+                latitude, longitude, url, source, listing_type,
+                owner_name, owner_phone, listing_date, json.dumps(data)
             ))
             conn.commit()
             return jsonify({'status': 'Success', 'message': 'İlan verisi senkronize edildi'}), 201
