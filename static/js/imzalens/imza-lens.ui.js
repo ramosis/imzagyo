@@ -150,15 +150,15 @@ const ImzaLensUI = {
     async injectHeroCampaign(wrapperId, dotsId) {
         try {
             // Aktif kampanyaları çek (Gelecekte API'den gelecek)
-            // Simülasyon: Türk Sağlık-Sen & Arsa Yatırımı
+            // Simülasyon: Sağlık Yatırım Ortaklığı (SYO)
             const campaigns = [{
-                id: 'saglik-sen-arsa',
+                id: 'syo-arsa',
                 type: 'arsa',
-                title: 'Türk Sağlık-Sen\'e Özel Arsa Fırsatı',
-                subtitle: 'Yatırımın Geleceğine Ortak Olun',
+                title: 'Sağlık Yatırım Ortaklığı Arsa Projesi',
+                subtitle: 'Geleceğinize Güvenle İmza Atın',
                 image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1920',
                 cta: 'Hemen Bilgi Al',
-                partner: 'Türk Sağlık-Sen'
+                partner: 'YATIRIM FIRSATI'
             }];
 
             if (campaigns.length === 0) return;
@@ -177,7 +177,7 @@ const ImzaLensUI = {
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative h-full flex items-center w-full">
                         <div class="max-w-4xl text-left">
                             <div class="flex items-center gap-4 mb-6">
-                                <span class="bg-gold text-navy px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">${camp.partner} İŞ BİRLİĞİ</span>
+                                <span class="bg-gold text-navy px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">${camp.partner}</span>
                                 <span class="text-white/50 text-[10px] font-bold uppercase tracking-[0.3em]">Süreli Lansman</span>
                             </div>
                             <p class="text-gold uppercase tracking-[0.4em] text-xs font-bold mb-4 drop-shadow-md border-l-2 border-gold pl-4 italic slide-up">
@@ -248,12 +248,21 @@ const ImzaLensUI = {
                     <form onsubmit="ImzaLensUI.submitCampaignLead(event, '${campaignId}')" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
-                                <label class="text-[10px] font-bold uppercase tracking-widest text-navy/40 ml-4">Ad Soyad</label>
-                                <input type="text" name="name" required class="w-full bg-soft border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-gold/50 transition-all text-navy font-medium" placeholder="Örn: Selim Bey">
+                                <label class="text-[10px] font-bold uppercase tracking-widest text-navy/40 ml-4">Ad</label>
+                                <input type="text" name="firstName" required class="w-full bg-soft border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-gold/50 transition-all text-navy font-medium" placeholder="Örn: Selim">
                             </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold uppercase tracking-widest text-navy/40 ml-4">Soyad</label>
+                                <input type="text" name="lastName" required class="w-full bg-soft border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-gold/50 transition-all text-navy font-medium" placeholder="Örn: Bey">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 <label class="text-[10px] font-bold uppercase tracking-widest text-navy/40 ml-4">Telefon</label>
                                 <input type="tel" name="phone" required class="w-full bg-soft border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-gold/50 transition-all text-navy font-medium" placeholder="05xx xxx xx xx">
+                            </div>
+                            <div class="space-y-2 flex items-end">
+                                <p class="text-[9px] text-gray-400 font-light leading-tight mb-2 italic">Telefon numaranız sadece bilgilendirme için kullanılacaktır.</p>
                             </div>
                         </div>
                         <div class="space-y-2">
@@ -300,9 +309,9 @@ const ImzaLensUI = {
 
         const formData = {
             campaign_id: campaignId,
-            name: form.name.value,
+            name: `${form.firstName.value} ${form.lastName.value}`.trim(),
             phone: form.phone.value,
-            note: form.note.value,
+            notes: form.note.value,
             source: 'hero_campaign',
             metrics: window.ImzaLensMetrics ? window.ImzaLensMetrics.getMetrics() : {}
         };
@@ -313,11 +322,16 @@ const ImzaLensUI = {
                 window.ImzaLens.syncShadowBridge();
             }
 
-            // Gerçek API'ye gönder (Gelecek fazda eklenecek)
-            console.log("[İmza Lens] Kurşun Toplandı:", formData);
-            
-            // Simüle edilmiş başarı
-            await new Promise(r => setTimeout(r, 1500));
+            // Gerçek API'ye gönder
+            const response = await fetch('/api/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) throw new Error('API hatası');
+            const result = await response.json();
+            console.log("[İmza Lens] Kurşun Başarıyla Gönderildi:", result);
 
             form.innerHTML = `
                 <div class="text-center py-12 animate-bounce">
