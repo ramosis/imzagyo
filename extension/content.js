@@ -73,12 +73,30 @@ function scrapeListingData() {
         data.listing_type = "Kiralık";
     }
 
-    // 5. Kategori Tespiti
-    const categories = ["Arsa", "Tarla", "Villa", "İşyeri", "Prefabrik", "Daire", "Rezidans"];
+    // 5. Kategori Tespiti - Genişletilmiş liste
+    const categories = [
+        "Arsa", "Tarla", "Villa", "İşyeri", "Prefabrik", "Daire", "Rezidans",
+        "Bahçe", "Çiftlik", "Ofis", "Depo", "Fabrika", "Dükkan", "Kompleks",
+        "Yalı", "Köşk", "Bina", "Plaza", "Site", "Köyüstü", "Yatırımlık",
+        "Turistik Tesis", "Otel", "Restoran", "Kafe", "Mağaza", "Salon",
+        "Tesis", "Loft", "Penthouse", "Stüdyo", "Atölye", "Kültür Merkezi"
+    ];
+    
+    // Önce başlıktan kontrol et
     for (const cat of categories) {
-        if (bodyText.includes(cat) || data.title.includes(cat)) {
+        if (data.title.includes(cat)) {
             data.category = cat;
             break;
+        }
+    }
+    
+    // Bulamadıysak body içeriğinden kontrol et
+    if (data.category === "Daire") { // Varsayılan değerse
+        for (const cat of categories) {
+            if (bodyText.includes(cat)) {
+                data.category = cat;
+                break;
+            }
         }
     }
 

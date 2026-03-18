@@ -21,6 +21,36 @@
         <h1><span>🖥️</span> Karşılaştırma Masası (Yerel)</h1>
         <p style="color: #94a3b8;">Bu listedeki veriler sadece sizin bilgisayarınızda (chrome.storage.local) saklanır.</p>
         
+        <!-- Filtreleme Alanı -->
+        <div style="margin: 20px 0; display: flex; gap: 15px; flex-wrap: wrap;">
+            <div>
+                <label for="filterType" style="display: block; margin-bottom: 5px; color: #94a3b8;">İlan Türü:</label>
+                <select id="filterType" class="border rounded px-2 py-1" style="background: #334155; color: white; border: 1px solid #475569; padding: 8px;">
+                    <option value="">Tümü</option>
+                    <option value="Satılık">Satılık</option>
+                    <option value="Kiralık">Kiralık</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="filterCategory" style="display: block; margin-bottom: 5px; color: #94a3b8;">Kategori:</label>
+                <select id="filterCategory" class="border rounded px-2 py-1" style="background: #334155; color: white; border: 1px solid #475569; padding: 8px;">
+                    <option value="">Tümü</option>
+                    <option value="konut">Konut</option>
+                    <option value="isyeri">İş Yeri</option>
+                    <option value="arsa">Arsa</option>
+                    <option value="devremulk">Devremülk</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="filterSearch" style="display: block; margin-bottom: 5px; color: #94a3b8;">Ara:</label>
+                <input type="text" id="filterSearch" placeholder="Konum, ilan no..." style="background: #334155; color: white; border: 1px solid #475569; padding: 8px; border-radius: 4px;">
+            </div>
+            
+            <button id="clearFilters" style="align-self: flex-end; background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Filtreleri Temizle</button>
+        </div>
+        
         <table id="comparisonTable">
             <thead>
                 <tr>

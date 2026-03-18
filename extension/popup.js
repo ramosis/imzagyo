@@ -32,13 +32,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function updateUI(data) {
-    document.getElementById('listingTitle').value = data.title;
-    document.getElementById('listingPrice').value = data.price;
-    document.getElementById('listingRooms').value = data.rooms;
-    document.getElementById('listingM2Brut').value = data.m2_brut;
-    document.getElementById('listingM2Net').value = data.m2_net;
-    document.getElementById('listingType').value = data.listing_type;
-    document.getElementById('listingCategory').value = data.category;
+    // Kategori seçimi - varsayılan değer ayarı
+    const categorySelect = document.getElementById('listingCategory');
+    categorySelect.value = data.category || 'Daire'; // Varsayılan değer
+    
+    // İlan tipi seçimi - varsayılan değer ayarı
+    const typeSelect = document.getElementById('listingType');
+    typeSelect.value = data.listing_type || 'Satılık'; // Varsayılan değer
+    
+    // Diğer alanların güncellenmesi
+    document.getElementById('listingTitle').value = data.title || '';
+    document.getElementById('listingPrice').value = data.price || 'Bilinmiyor';
+    document.getElementById('listingM2Brut').value = data.m2_brut || 0;
+    document.getElementById('listingM2Net').value = data.m2_net || 0;
+    document.getElementById('listingRooms').value = data.rooms || '0+0';
     
     // Değişiklikleri dinle (Override)
     const fields = ['listingTitle', 'listingPrice', 'listingRooms', 'listingM2Brut', 'listingM2Net', 'listingType', 'listingCategory'];
