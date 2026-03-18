@@ -2,107 +2,111 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evrensel ROI Asistanı</title>
     <style>
         :root {
-            --gold: #D4AF37;
-            --bg: #0F0F13;
-            --card: #1A1A22;
+            --navy: #0f172a;
+            --gold: #f59e0b;
+            --green: #10b981;
+            --bg: #1e293b;
         }
         body {
             width: 320px;
-            background: var(--bg);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--navy);
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 16px;
         }
         .header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 12px;
         }
-        .logo {
-            width: 24px;
-            height: 24px;
-            border: 1px solid var(--gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: var(--gold);
-        }
-        h2 {
-            margin: 0;
-            font-size: 16px;
-            letter-spacing: 1px;
-        }
-        .status-card {
-            background: var(--card);
+        .card {
+            background: var(--bg);
             border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .status-label {
-            font-size: 10px;
-            color: #9CA3AF;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .status-value {
-            font-size: 14px;
-            margin-top: 5px;
-            color: var(--gold);
-            font-weight: 600;
-        }
-        .btn {
-            background: var(--gold);
-            color: var(--bg);
-            border: none;
+        .label { font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; }
+        .value { font-size: 16px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+        
+        input {
             width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
             padding: 10px;
             border-radius: 8px;
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
             font-weight: 700;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            margin-top: 10px;
         }
-        .btn:hover {
-            opacity: 0.9;
-        }
-        .footer {
-            margin-top: 15px;
-            font-size: 10px;
-            text-align: center;
-            color: #6B7280;
+        .btn-add { background: var(--gold); color: var(--navy); }
+        .btn-panel { background: #334155; color: white; margin-top: 20px; }
+        .roi-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: var(--green);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">İ</div>
-        <h2>İMZA ASİSTAN</h2>
+        <span style="font-size: 20px;">🥂</span>
+        <div style="font-weight: 800; font-size: 14px;">ROI ASİSTANI (MVP)</div>
     </div>
 
-    <div class="status-card">
-        <div class="status-label">Aktif Sayfa Analizi</div>
-        <div id="pageStatus" class="status-value">Bekleniyor...</div>
-    </div>
-
-    <div class="status-card">
-        <div id="analysisResult" style="display: none;">
-            <div class="status-label">Yatırım Skoru</div>
-            <div class="status-value" style="font-size: 24px;">%88</div>
+    <div id="dataCard" class="card">
+        <div class="label">İlan Başlığı</div>
+        <div id="listingTitle" class="value" style="font-size: 12px;">Yükleniyor...</div>
+        
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <div class="label">Fiyat</div>
+                <div id="listingPrice" class="value">Bilinmiyor</div>
+            </div>
+            <div>
+                <div class="label">m2</div>
+                <div id="listingM2" class="value">0</div>
+            </div>
         </div>
-        <button id="analyzeBtn" class="btn">İmza Lens ile Analiz Et</button>
+
+        <div class="label">Tahmini Aylık Kira (₺)</div>
+        <input type="number" id="rentInput" placeholder="Örn: 25000">
+        
+        <div id="resultArea" style="display: none; margin-top: 15px; border-top: 1px dashed #334155; padding-top: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="label">ROI Score:</span>
+                <span id="roiValue" class="roi-badge">0%</span>
+            </div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+                Amortisman: <span id="amortizationYears" style="color: white; font-weight: bold;">0</span> Yıl
+            </div>
+        </div>
     </div>
 
-    <div class="footer">
-        İmza Gayrimenkul © 2026 | v1.0.0
-    </div>
+    <button id="addToListBtn" class="btn-add">🌟 Karşılaştırma Listeme Ekle</button>
+    <button id="openDashboardBtn" class="btn-panel">Karşılaştırma Panelini Aç 🖥️</button>
 
     <script src="popup.js"></script>
 </body>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Karşılaştırma Masası | İmzalı ROI</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; padding: 40px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { border-bottom: 2px solid #f59e0b; padding-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #1e293b; border-radius: 12px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #334155; color: #94a3b8; font-size: 12px; text-transform: uppercase; }
+        tr:hover { background: #2d3748; }
+        .roi-tag { background: #10b981; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        .delete-btn { color: #f87171; cursor: pointer; background: none; border: 1px solid #f87171; padding: 5px 10px; border-radius: 4px; }
+        .link-btn { color: #38bdf8; text-decoration: none; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span>🖥️</span> Karşılaştırma Masası (Yerel)</h1>
+        <p style="color: #94a3b8;">Bu listedeki veriler sadece sizin bilgisayarınızda (chrome.storage.local) saklanır.</p>
+        
+        <table id="comparisonTable">
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>İlan / Konum</th>
+                    <th>Fiyat</th>
+                    <th>m2 / Birim</th>
+                    <th>Tahmini Kira</th>
+                    <th>ROI</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Veriler buraya gelecek -->
+            </tbody>
+        </table>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+</html>
