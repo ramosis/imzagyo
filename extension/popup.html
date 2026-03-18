@@ -78,16 +78,49 @@
 
     <div id="dataCard" class="card">
         <div class="label">İlan Başlığı</div>
-        <div id="listingTitle" class="value" style="font-size: 12px;">Yükleniyor...</div>
+        <input type="text" id="listingTitle" style="font-size: 12px; margin-bottom: 12px;" value="Yükleniyor...">
         
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
             <div>
                 <div class="label">Fiyat</div>
-                <div id="listingPrice" class="value">Bilinmiyor</div>
+                <input type="text" id="listingPrice" value="Bilinmiyor">
             </div>
             <div>
-                <div class="label">m2</div>
-                <div id="listingM2" class="value">0</div>
+                <div class="label">Oda</div>
+                <input type="text" id="listingRooms" value="0+0">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+            <div>
+                <div class="label">Brüt m2</div>
+                <input type="number" id="listingM2Brut" value="0">
+            </div>
+            <div>
+                <div class="label">Net m2</div>
+                <input type="number" id="listingM2Net" value="0">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+            <div>
+                <div class="label">İlan Tipi</div>
+                <select id="listingType">
+                    <option value="Satılık">Satılık</option>
+                    <option value="Kiralık">Kiralık</option>
+                </select>
+            </div>
+            <div>
+                <div class="label">Kategori</div>
+                <select id="listingCategory">
+                    <option value="Daire">Daire</option>
+                    <option value="Rezidans">Rezidans</option>
+                    <option value="Villa">Villa</option>
+                    <option value="Arsa">Arsa</option>
+                    <option value="Tarla">Tarla</option>
+                    <option value="İşyeri">İşyeri</option>
+                    <option value="Prefabrik">Prefabrik</option>
+                </select>
             </div>
         </div>
 

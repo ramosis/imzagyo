@@ -12,13 +12,18 @@ function scrapeListingData() {
     const data = {
         title: document.title,
         price: "Bilinmiyor",
-        m2: 0,
+        m2_brut: 0,
+        m2_net: 0,
         rooms: "0+0",
         city: "",
         district: "",
         neighborhood: "",
-        url: window.location.href // Sadece yerel karşılaştırma için kullanılır
+        listing_type: "Satılık", // Varsayılan
+        category: "Daire",      // Varsayılan
+        url: window.location.href 
     };
+
+    const bodyText = document.body.innerText;
 
     // 1. JSON-LD (Schema.org) Analizi
     try {
@@ -40,15 +45,42 @@ function scrapeListingData() {
         });
     } catch (e) {}
 
-    // 2. Jenerik Fiyat Tespiti (TL, USD, EUR etiketleri)
+    // 2. Fiyat Tespiti 
     if (data.price === "Bilinmiyor") {
-        const pm = document.body.innerText.match(/(\d{1,3}(\.\d{3})*|(\d+))(\s*)(TL|₺|USD|€)/i);
+        const pm = bodyText.match(/(\d{1,3}(\.\d{3})*|(\d+))(\s*)(TL|₺|USD|€)/i);
         if (pm) data.price = pm[0];
     }
 
-    // 3. Jenerik m2 Tespiti
-    const m2Match = document.body.innerText.match(/(\d+)\s*(m2|metrekare)/i);
-    if (m2Match) data.m2 = parseInt(m2Match[1]);
+    // 3. m2 Tespiti (Net / Brüt Ayrımı)
+    const m2Keywords = [
+        { key: 'm2_brut', regex: /(Brüt|Toplam)\s*(Alan|m2|Metrekare)?\s*[:\s]*(\d+)/i },
+        { key: 'm2_net', regex: /(Net|Kullanım)\s*(Alan|m2|Metrekare)?\s*[:\s]*(\d+)/i }
+    ];
+
+    m2Keywords.forEach(mk => {
+        const match = bodyText.match(mk.regex);
+        if (match) data[mk.key] = parseInt(match[3]);
+    });
+
+    // Eğer Brüt/Net bulunamadıysa jenerik m2 
+    if (!data.m2_brut && !data.m2_net) {
+        const genericM2 = bodyText.match(/(\d+)\s*(m2|metrekare)/i);
+        if (genericM2) data.m2_brut = parseInt(genericM2[1]);
+    }
+
+    // 4. İlan Tipi (Satılık / Kiralık)
+    if (bodyText.match(/Kiralık/i) || window.location.href.includes('kiralik')) {
+        data.listing_type = "Kiralık";
+    }
+
+    // 5. Kategori Tespiti
+    const categories = ["Arsa", "Tarla", "Villa", "İşyeri", "Prefabrik", "Daire", "Rezidans"];
+    for (const cat of categories) {
+        if (bodyText.includes(cat) || data.title.includes(cat)) {
+            data.category = cat;
+            break;
+        }
+    }
 
     // 4. Jenerik Oda Sayısı (Örn: 3+1, 2+1)
     const roomMatch = document.body.innerText.match(/(\d\+\d)/);

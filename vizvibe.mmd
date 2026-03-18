@@ -90,15 +90,17 @@ flowchart TD
     %% @feature_roi_analysis [ai-task, closed, 2026-03-18, antigravity]
     roi_analysis("Bölgesel ROI (Faz 26)<br/><sub>Veritabanında biriken kiralık<br/>ilan verileriyle satış ilanlarına<br/>gerçekçi amortisman analizi yapıldı.</sub>")
 
+        %% @extension_ui_overhaul [ai-task, closed, 2026-03-18, antigravity]
+        extension_ui_overhaul("Eklenti UI & Scraping (Faz 27)<br/><sub>Popup UI yenileme, Manual Override<br/>ve detaylı m2 (Net/Brüt) tespiti<br/>ile scraping mantığı güçlendirildi</sub>")
+
         start --> refactor --> mobile_web --> l_metrics --> geo_seo --> shadow_bridge --> campaign --> admin_fix --> mobile_ops --> extensions
         extensions --> extension_mvp --> extension_sync --> imza_lens_merkezi --> deep_scraping --> roi_analysis
-        roi_analysis --> env_setup
+        roi_analysis --> extension_ui_overhaul --> env_setup
         env_setup -.-> goal
     end
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [SON ÇALIŞMA]
-        deep_scraping
     end
 
     %% === STYLES ===
@@ -119,7 +121,9 @@ flowchart TD
     style extension_mvp fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style extension_sync fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style imza_lens_merkezi fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style deep_scraping fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style deep_scraping fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style roi_analysis fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style extension_ui_overhaul fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Open tasks
