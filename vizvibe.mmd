@@ -34,6 +34,9 @@ flowchart TD
     %% @feature_multi_domain [ai-task, closed, 2026-03-21, antigravity]
     feature_multi_domain("Çoklu Domain & SSL<br/><sub>imzaemlak.com ve imzamahalle.com<br/>yönlendirmeleri ve SSL<br/>otomasyonu yapılandırıldı</sub>")
 
+    %% @db_schema_refactor [ai-task, closed, 2026-03-24, antigravity]
+    db_schema_refactor("Veritabanı Konsolidasyonu<br/><sub>Şema hataları giderildi,<br/>tablo yaratım sırası ve<br/>FK bağımlılıkları düzeltildi</sub>")
+
     %% @ultimate_goal [end, opened, 2026-03-19, user]
     ultimate_goal("Smart Ecosystem<br/><sub>Tüm modüllerin (CRM, Saha,<br/>Mahalle) kusursuz çalıştığı<br/>operasyonel ekosistem</sub>")
 
@@ -47,11 +50,12 @@ flowchart TD
     email_service --> appraisal_module
     appraisal_module --> wizard_v2
     wizard_v2 --> feature_multi_domain
-    feature_multi_domain -.-> ultimate_goal
+    feature_multi_domain --> db_schema_refactor
+    db_schema_refactor -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        feature_multi_domain
+        db_schema_refactor
     end
 
     %% === STYLES ===
@@ -66,9 +70,10 @@ flowchart TD
     style appraisal_module fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style wizard_v2 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_multi_domain fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style db_schema_refactor fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
     %% Recent (bright purple)
-    style feature_multi_domain fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style db_schema_refactor fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5

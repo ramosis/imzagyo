@@ -113,7 +113,16 @@ def init_db():
             email TEXT,
             address TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    # Saha Personeli Konum Takibi (Staff Tracking)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS staff_locations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            latitude REAL NOT NULL,
+            longitude REAL NOT NULL,
+            location_type TEXT, -- 'checkin', 'periodic', 'assigned'
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
 
@@ -808,19 +817,7 @@ def init_db():
     ''')
     
     
-    # --- AKILLI PAZARLAMA OTOMASYONU TABLOLARI ---
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS automation_rules (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            trigger_type TEXT NOT NULL, -- 'time_based', 'status_based'
-            condition_json TEXT, -- Örn: {"days_inactive": 3, "segment": "investor"}
-            action_type TEXT DEFAULT 'email', -- 'email', 'sms', 'notification'
-            action_template_id INTEGER, -- message_templates tablosuna referans
-            is_active BOOLEAN DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
+    # (automation_rules already defined above at line 567)
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS notifications (
