@@ -37,6 +37,26 @@ def init_db():
     except:
         pass
 
+    # --- Neighborhood & Facilities (Mahalle Özellikleri) ---
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS neighborhood_facilities (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            category TEXT,
+            icon TEXT,
+            description TEXT
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS shuttle_schedule (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            route_name TEXT NOT NULL,
+            departure_time TEXT NOT NULL,
+            estimated_arrival TEXT
+        )
+    ''')
+
     # Örnek Tesisler
     cursor.execute('INSERT OR IGNORE INTO neighborhood_facilities (id, name, category, icon, description) VALUES (?, ?, ?, ?, ?)',
                    ('gym', 'Fitness Center', 'Sport', 'fa-dumbbell', 'Modern ekipmanlarla donatılmış spor salonu.'))
