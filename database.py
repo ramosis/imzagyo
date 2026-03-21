@@ -43,7 +43,27 @@ def init_db():
         pass
 
     try:
+        cursor.execute("ALTER TABLE staff_locations ADD COLUMN staff_name TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE staff_locations ADD COLUMN lat REAL")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE staff_locations ADD COLUMN lng REAL")
+    except:
+        pass
+
+    try:
         cursor.execute("ALTER TABLE staff_locations ADD COLUMN timestamp DATETIME DEFAULT CURRENT_TIMESTAMP")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE staff_locations ADD COLUMN status TEXT")
     except:
         pass
 
