@@ -42,6 +42,11 @@ def init_db():
     except:
         pass
 
+    try:
+        cursor.execute("ALTER TABLE staff_locations ADD COLUMN timestamp DATETIME DEFAULT CURRENT_TIMESTAMP")
+    except:
+        pass
+
     # --- Neighborhood & Facilities (Mahalle Özellikleri) ---
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS neighborhood_facilities (
