@@ -1,6 +1,13 @@
 from flask import Blueprint, request, jsonify
 from database import get_db_connection
 from api.auth import get_current_user
+from api.mail_service import send_email
+import urllib.request
+import urllib.error
+import re
+from datetime import datetime
+import os
+import threading
 
 neighborhood_bp = Blueprint('neighborhood', __name__)
 
@@ -99,10 +106,85 @@ def get_neighborhood_listings():
     query += ' ORDER BY id DESC LIMIT ?'
     params.append(limit)
     
-    listings = conn.execute(query, params).fetchall()
+    portfoyler = conn.execute(query, params).fetchall()
     conn.close()
     
-    return jsonify([dict(l) for l in listings]), 200
+    return jsonify([dict(p) for p in portfoyler]), 200
+
+@neighborhood_bp.route('/api/neighborhood/pharmacies/duty', methods=['GET'])
+def get_duty_pharmacies():
+    """Kütahya Eczacı Odası web sitesinden anlık nöbetçi eczaneleri çeker."""
+    try:
+        url = "https://www.kutahyaeo.org.tr/nobetci-eczaneler/30"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            html = response.read().decode('utf-8')
+
+        pharmacies = []
+        
+        # Regex to match the typical structure of the Kutahya Eczacı Odası page
+        # The page has patterns like: <h4>NAME - DISTRICT</h4><p>ADDRESS <a href="tel:PHONE">
+        matches = re.finditer(r'<h4[^>]*>(.*?)</h4>(.*?)(?=<h4|$)', html, re.DOTALL | re.IGNORECASE)
+        
+        for match in matches:
+            name_raw = match.group(1).strip()
+            # Ignore unrelated h4 tags like Cookie warnings
+            if "Çerez" in name_raw or "OBEN" in name_raw:
+                continue
+                
+            block = match.group(2)
+            
+            # Extract phone
+            phone_match = re.search(r'href=["\']tel:([^"\']+)["\']', block, re.IGNORECASE)
+            phone = phone_match.group(1).strip() if phone_match else ""
+            
+            # Extract maps link to get coordinates
+            maps_match = re.search(r'href=["\']https://maps\.google\.com/maps\?q=([^"\']+)["\']', block, re.IGNORECASE)
+            lat, lng = None, None
+            if maps_match:
+                coords = maps_match.group(1).split(',')
+                if len(coords) == 2:
+                    lat, lng = coords[0].strip(), coords[1].strip()
+            
+            # Clean up address by removing HTML tags
+            # Address is usually the text before the phone link
+            addr_text = re.sub(r'<[^>]+>', ' ', block).strip()
+            # Remove phone number from address if it leaked
+            if phone:
+                addr_text = addr_text.replace(phone, '').strip()
+            # Remove redundant whitespaces
+            addr_text = re.sub(r'\s+', ' ', addr_text).strip()
+            
+            # Remove the appended " Haritada görüntülemek için tıklayınız..." text
+            addr_text = addr_text.replace("Haritada görüntülemek için tıklayınız...", "").strip()
+            
+            if name_raw:
+                pharmacies.append({
+                    "name": name_raw,
+                    "address": addr_text,
+                    "phone": phone,
+                    "latitude": lat,
+                    "longitude": lng,
+                    "is_duty": True
+                })
+
+        # Fallback if parsing completely fails but we know the site is up
+        if not pharmacies:
+            raise ValueError("Kayıt bulunamadı veya site yapısı değişmiş olabilir.")
+
+        return jsonify({
+            "status": "success",
+            "date": datetime.now().strftime("%Y-%m-%d"),
+            "data": pharmacies
+        }), 200
+
+    except Exception as e:
+        # Hata durumunda loglama yapılabilir, şimdilik mock veri veya hata dönüyoruz
+        return jsonify({
+            "status": "error",
+            "message": f"Nöbetçi eczaneler alınırken hata oluştu: {str(e)}",
+            "data": []
+        }), 500
 
 @neighborhood_bp.route('/api/neighborhood/relocation-guide', methods=['GET'])
 def get_relocation_guide():
@@ -229,6 +311,28 @@ def create_demand():
     new_id = cur.lastrowid
     conn.close()
     
+    # E-posta Bildirimi Gönder (Asenkron)
+    try:
+        admin_email = os.environ.get("ADMIN_EMAIL", "info@imzagayrimenkul.com")
+        subject = f"Yeni Mahalle Talebi: {data['type']}"
+        body = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+            <h2 style="color: #D4AF37; text-align: center;">Yeni İmza Mahalle Talebi</h2>
+            <p><strong>Talep Türü:</strong> {data['type']}</p>
+            <p><strong>Ad Soyad:</strong> {data.get('user_name', 'Bilinmiyor')}</p>
+            <p><strong>Telefon:</strong> {data.get('user_phone', 'Bilinmiyor')}</p>
+            <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 20px 0;">
+            <p><strong>Detaylar:</strong></p>
+            <p style="background-color: #f9f9f9; padding: 15px; border-radius: 5px;">{data['content']}</p>
+            <p style="font-size: 12px; color: #777777; text-align: center; margin-top: 30px;">
+                Talebi yönetmek için İmza Portal'a giriş yapın.
+            </p>
+        </div>
+        """
+        threading.Thread(target=send_email, args=(subject, admin_email, body)).start()
+    except Exception as e:
+        print(f"E-posta bildirim hatası: {e}")
+        
     return jsonify({'status': 'created', 'id': new_id}), 201
 
 @neighborhood_bp.route('/api/neighborhood/demands', methods=['GET'])
@@ -366,3 +470,232 @@ def create_wall_post():
     conn.close()
     
     return jsonify({'status': 'created', 'id': new_id}), 201
+
+# --- MÜLK VE BİNA YÖNETİMİ (PROPERTY & UNIT MANAGEMENT) ---
+
+@neighborhood_bp.route('/api/neighborhood/property/<property_id>/units', methods=['GET'])
+def get_property_units(property_id):
+    """Bir binaya (portföye) ait tüm bağımsız bölümleri (daire/dükkan) getirir."""
+    conn = get_db_connection()
+    units = conn.execute('''
+        SELECT * FROM property_units
+        WHERE property_id = ?
+        ORDER BY unit_number ASC
+    ''', (property_id,)).fetchall()
+    
+    # Her daire için aktif kiracı/sahip bilgisini de çekebiliriz
+    result = []
+    for u in units:
+        unit_dict = dict(u)
+        active_lease = conn.execute('''
+            SELECT l.id, l.tenant_id, u.username as tenant_name, l.rent_amount, l.end_date
+            FROM leases l
+            JOIN users u ON l.tenant_id = u.id
+            WHERE l.property_unit_id = ? AND l.status = 'Aktif'
+            LIMIT 1
+        ''', (unit_dict['id'],)).fetchone()
+        
+        if active_lease:
+            unit_dict['active_lease'] = dict(active_lease)
+        else:
+            unit_dict['active_lease'] = None
+            
+        result.append(unit_dict)
+        
+    conn.close()
+    return jsonify(result), 200
+
+@neighborhood_bp.route('/api/neighborhood/property/<property_id>/units', methods=['POST'])
+@admin_required
+def add_property_unit(property_id):
+    """Binaya yeni bir bağımsız bölüm (daire/dükkan) ekler."""
+    data = request.json
+    unit_number = data.get('unit_number')
+    if not unit_number:
+        return jsonify({'error': 'Daire/Kapı numarası zorunludur'}), 400
+        
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        INSERT INTO property_units (property_id, unit_number, floor, unit_type, area_sqm, status)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (
+        property_id,
+        unit_number,
+        data.get('floor'),
+        data.get('unit_type', 'Konut'),
+        data.get('area_sqm'),
+        data.get('status', 'Boş')
+    ))
+    conn.commit()
+    new_id = cur.lastrowid
+    conn.close()
+    
+    return jsonify({'status': 'created', 'id': new_id}), 201
+
+
+@neighborhood_bp.route('/api/neighborhood/property/<property_id>/cashbox', methods=['GET'])
+def get_transparent_cashbox(property_id):
+    """Şeffaf Kasa (Transparent Cash Box) raporunu getirir."""
+    # Toplanan Aidatlar (dues_payments üzerinden)
+    # Giderler (apartment_expenses üzerinden)
+    conn = get_db_connection()
+    
+    # 1. Gelirler (Sadece Ödendi statüsündeki Aidat ve Demirbaşlar)
+    incomes = conn.execute('''
+        SELECT d.payment_type, SUM(d.amount) as total
+        FROM dues_payments d
+        JOIN property_units pu ON d.property_unit_id = pu.id
+        WHERE pu.property_id = ? AND d.status = 'Ödendi'
+        GROUP BY d.payment_type
+    ''', (property_id,)).fetchall()
+    
+    total_income = sum([row['total'] for row in incomes]) if incomes else 0
+    
+    # 2. Giderler
+    expenses = conn.execute('''
+        SELECT expense_type, SUM(amount) as total
+        FROM apartment_expenses
+        WHERE property_id = ?
+        GROUP BY expense_type
+    ''', (property_id,)).fetchall()
+    
+    total_expense = sum([row['total'] for row in expenses]) if expenses else 0
+    
+    # 3. Son 5 İşlem (Özet Liste İçin)
+    recent_transactions = []
+    
+    recent_incomes = conn.execute('''
+        SELECT 'GELİR' as type, d.payment_type as category, d.amount, d.paid_date as date, u.username as source
+        FROM dues_payments d
+        JOIN property_units pu ON d.property_unit_id = pu.id
+        JOIN users u ON d.user_id = u.id
+        WHERE pu.property_id = ? AND d.status = 'Ödendi'
+        ORDER BY d.paid_date DESC LIMIT 5
+    ''', (property_id,)).fetchall()
+    
+    recent_exp = conn.execute('''
+        SELECT 'GİDER' as type, expense_type as category, amount, expense_date as date, description as source
+        FROM apartment_expenses
+        WHERE property_id = ?
+        ORDER BY expense_date DESC LIMIT 5
+    ''', (property_id,)).fetchall()
+    
+    for inc in recent_incomes:
+        recent_transactions.append(dict(inc))
+    for exp in recent_exp:
+        recent_transactions.append(dict(exp))
+        
+    # Tarihe göre sırala
+    recent_transactions.sort(key=lambda x: x['date'], reverse=True)
+    
+    conn.close()
+    
+    return jsonify({
+        'total_income': total_income,
+        'total_expense': total_expense,
+        'balance': total_income - total_expense,
+        'income_breakdown': [dict(i) for i in incomes],
+        'expense_breakdown': [dict(e) for e in expenses],
+        'recent_transactions': recent_transactions[:10]
+    }), 200
+
+@neighborhood_bp.route('/api/neighborhood/units/<unit_id>/leases', methods=['GET'])
+def get_unit_leases(unit_id):
+    """Bir bağımsız bölümün kira geçmişini ve aktif sözleşmesini getirir."""
+    conn = get_db_connection()
+    leases = conn.execute('''
+        SELECT l.*, u.username as tenant_name, u.telefon as tenant_phone 
+        FROM leases l
+        JOIN users u ON l.tenant_id = u.id
+        WHERE l.property_unit_id = ?
+        ORDER BY l.start_date DESC
+    ''', (unit_id,)).fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in leases]), 200
+
+@neighborhood_bp.route('/api/neighborhood/units/<unit_id>/leases', methods=['POST'])
+@admin_required
+def add_unit_lease(unit_id):
+    """Yeni bir kira sözleşmesi başlatır."""
+    data = request.json
+    tenant_id = data.get('tenant_id')
+    rent_amount = data.get('rent_amount')
+    start_date = data.get('start_date')
+    
+    if not all([tenant_id, rent_amount, start_date]):
+        return jsonify({'error': 'Kiracı, kira bedeli ve başlangıç tarihi zorunludur.'}), 400
+        
+    conn = get_db_connection()
+    cur = conn.cursor()
+    # Mevcut kirayı pasif et
+    cur.execute('''
+        UPDATE leases SET status = 'Sonlandı' 
+        WHERE property_unit_id = ? AND status = 'Aktif'
+    ''', (unit_id,))
+    
+    # Yeni kirayı ekle
+    cur.execute('''
+        INSERT INTO leases (property_unit_id, tenant_id, start_date, end_date, rent_amount, currency, payment_day, deposit_amount)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        unit_id, tenant_id, start_date,
+        data.get('end_date'), rent_amount,
+        data.get('currency', 'TRY'),
+        data.get('payment_day', 1),
+        data.get('deposit_amount', 0)
+    ))
+    
+    # Daire durumunu güncelle
+    cur.execute('UPDATE property_units SET status = "Dolu" WHERE id = ?', (unit_id,))
+    
+    conn.commit()
+    new_id = cur.lastrowid
+    conn.close()
+    
+    return jsonify({'status': 'created', 'id': new_id}), 201
+
+@neighborhood_bp.route('/api/neighborhood/dues', methods=['POST'])
+@admin_required
+def add_due_payment():
+    """Yeni bir aidat, kira veya ek demirbaş borcu tahakkuk ettirir."""
+    data = request.json
+    property_unit_id = data.get('property_unit_id')
+    amount = data.get('amount')
+    due_date = data.get('due_date')
+    payment_type = data.get('payment_type', 'AIDAT')
+    
+    if not all([property_unit_id, amount, due_date]):
+        return jsonify({'error': 'Eksik bilgi girdiniz.'}), 400
+        
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Dairenin aktif kiracısını bul
+    active_lease = cur.execute('''
+        SELECT id, tenant_id FROM leases 
+        WHERE property_unit_id = ? AND status = 'Aktif' LIMIT 1
+    ''', (property_unit_id,)).fetchone()
+    
+    user_id = data.get('user_id')
+    lease_id = None
+    if active_lease:
+        user_id = user_id or active_lease['tenant_id']
+        lease_id = active_lease['id']
+        
+    if not user_id:
+        # Eğer manuel atanmadıysa ve aktif kiracı yoksa hata verir
+        return jsonify({'error': 'Bu daire için sorumlu bir kullanıcı bulunamadı.'}), 400
+        
+    cur.execute('''
+        INSERT INTO dues_payments (lease_id, property_unit_id, user_id, payment_type, amount, due_date, description)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        lease_id, property_unit_id, user_id, payment_type, amount, due_date, data.get('description')
+    ))
+    
+    conn.commit()
+    new_id = cur.lastrowid
+    conn.close()
+    
+    return jsonify({'status': 'created', 'id': new_id}), 201

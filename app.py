@@ -46,6 +46,8 @@ from api.neighborhood import neighborhood_bp
 from api.projects import projects_bp
 from api.pipeline import pipeline_bp
 from api.automation import automation_bp
+from api.media import media_bp
+from api.appraisal import appraisal_bp
 app = Flask(__name__, static_folder=None)
 
 # Rate Limiter Yapılandırması
@@ -96,6 +98,8 @@ app.register_blueprint(neighborhood_bp)
 app.register_blueprint(projects_bp)
 app.register_blueprint(pipeline_bp)
 app.register_blueprint(automation_bp)
+app.register_blueprint(media_bp)
+app.register_blueprint(appraisal_bp)
 
 @app.after_request
 def add_header(r):
@@ -119,6 +123,9 @@ doldur_ornek_veriler()
 
 @app.route('/')
 def index():
+    host = request.headers.get('Host', '')
+    if 'imzamahalle.com' in host:
+        return send_from_directory('pages', 'mahalle.html')
     return send_from_directory('pages', 'anasayfa.html')
 
 @app.route('/portal')

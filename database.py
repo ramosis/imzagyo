@@ -32,6 +32,11 @@ def init_db():
     except:
         pass # Zaten varsa hata verme
 
+    try:
+        cursor.execute("ALTER TABLE portfoy_medya ADD COLUMN local_path TEXT")
+    except:
+        pass
+
     # Örnek Tesisler
     cursor.execute('INSERT OR IGNORE INTO neighborhood_facilities (id, name, category, icon, description) VALUES (?, ?, ?, ?, ?)',
                    ('gym', 'Fitness Center', 'Sport', 'fa-dumbbell', 'Modern ekipmanlarla donatılmış spor salonu.'))
@@ -75,6 +80,21 @@ def init_db():
             alt_tip TEXT, -- Daire, Villa, Ofis, Arsa vb.
             denetim_notlari TEXT,
             mahalle_id TEXT -- İmza Mahalle eşleşmesi için
+        )
+    ''')
+
+    # Media table for portfolio images/videos
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS portfoy_medya (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            portfolio_id TEXT NOT NULL,
+            category TEXT NOT NULL, -- iç, dış, drone, video, plan
+            file_path TEXT NOT NULL,
+            local_path TEXT, -- Server-side relative path
+            focal_x REAL, -- percentage (0-100)
+            focal_y REAL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(portfolio_id) REFERENCES portfoyler(id)
         )
     ''')
 
@@ -150,6 +170,73 @@ def init_db():
             status TEXT DEFAULT 'Açık', -- Açık, İşlemde, Çözüldü, İptal
             FOREIGN KEY(property_id) REFERENCES portfoyler(id),
             FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS property_units (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            property_id TEXT NOT NULL,
+            unit_number TEXT NOT NULL,
+            floor TEXT,
+            unit_type TEXT DEFAULT 'Konut',
+            area_sqm REAL,
+            status TEXT DEFAULT 'Boş', -- Boş, Dolu, Tadilatta
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(property_id) REFERENCES portfoyler(id)
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS leases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            property_unit_id INTEGER NOT NULL,
+            tenant_id INTEGER NOT NULL,
+            start_date TEXT,
+            end_date TEXT,
+            rent_amount REAL,
+            currency TEXT DEFAULT 'TRY',
+            payment_day INTEGER, 
+            deposit_amount REAL,
+            status TEXT DEFAULT 'Aktif', -- Aktif, Sonlandı
+            contract_file TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(property_unit_id) REFERENCES property_units(id),
+            FOREIGN KEY(tenant_id) REFERENCES users(id)
+        )
+    ''')
+    
+    # Yeni Eklenen: Aidat, Kira ve Ekstra Ödemeler tablosu
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS dues_payments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lease_id INTEGER,
+            property_unit_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL, -- Ödemeyi yapan kişi
+            payment_type TEXT DEFAULT 'AIDAT', -- AIDAT, DEMIRBAS, KIRA, EKSTRA
+            amount REAL NOT NULL,
+            status TEXT DEFAULT 'Ödenmedi', -- Ödenmedi, Ödendi, Gecikmiş
+            due_date TEXT NOT NULL,
+            paid_date TEXT,
+            description TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(lease_id) REFERENCES leases(id),
+            FOREIGN KEY(property_unit_id) REFERENCES property_units(id),
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+
+    # Yeni Eklenen: Apartman ve Site Giderleri (Kasa) Tablosu
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS apartment_expenses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            property_id TEXT NOT NULL, -- Hangi apartman/bina (portföy)
+            expense_type TEXT, -- Temizlik, Asansör Bakımı, Elektrik, Su
+            amount REAL NOT NULL,
+            expense_date TEXT NOT NULL,
+            invoice_file TEXT, -- Fatura/Dekont Upload URL
+            description TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(property_id) REFERENCES portfoyler(id)
         )
     ''')
     cursor.execute('''

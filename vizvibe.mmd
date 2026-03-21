@@ -1,78 +1,72 @@
 flowchart TD
     %% === PROJE HEDEFLERİ ===
     %% Ultimate Goal: İmza Gayrimenkul portalını modern UI/UX, akıllı analiz ve birleşik mantıkla yeniden inşa etmek.
-    %% Current Goal: Faz 2.1 tamamlandı (Modülerite). Faz 3'e (Mülk & Apartman Yönetimi) başlanıyor.
+    %% Current Goal: Faz 3 kapsamında Mülk Yönetimi, Ekspertiz Modülü ve Medya Arşiv Yapısı kuruluyor.
 
     %% === NODES ===
     %% @project_start [start, closed, 2026-03-01, nam]
     start("Proje Başlangıcı<br/><sub>İmza Gayrimenkul dijital<br/>dönüşüm sürecinin temel<br/>yapıtaşlarının atılması</sub>")
 
-    %% @feature_lmetrics [ai-task, closed, 2026-03-20, antigravity]
-    lmetrics("L-Metrics & Analitik<br/><sub>Davranışsal takip ve niyet<br/>skoru altyapısının CRM ile<br/>entegre edilmesi tamamlandı</sub>")
-
-    %% @feature_kanban [ai-task, closed, 2026-03-20, antigravity]
-    kanban("Satış Hunisi (Kanban)<br/><sub>Sürükle-bırak destekli<br/>pipeline.html ve backend<br/>aşama yönetimi eklendi</sub>")
-
-    %% @feature_automation [ai-task, closed, 2026-03-20, antigravity]
-    automation("Otomasyon Scheduler<br/><sub>scheduler.py ile arka plan<br/>pazarlama görevleri ve kural<br/>denetimi devreye alındı</sub>")
-
-    %% @feature_ux_fix [ai-task, closed, 2026-03-20, antigravity]
-    ux_fix("Global UX & Bildirimler<br/><sub>Tümünü oku fonksiyonu ve<br/>premium Toast bildirim<br/>sistemi entegre edildi</sub>")
-
-    %% @feature_concierge_ui [ai-task, closed, 2026-03-24, antigravity]
-    concierge_ui("Tablo & Takvim UI<br/><sub>Concierge ve Rezervasyonlar<br/>için haftalık takvimli<br/>arayüz başarıyla uygulandı</sub>")
-
-    %% @feature_route_playback [ai-task, closed, 2026-03-24, antigravity]
-    route_playback("Route Playback<br/><sub>Saha personelinin geçmiş<br/>rota verilerinin haritada<br/>oynatılması motoru kuruldu</sub>")
-
-    %% @feature_appointment_service [ai-task, closed, 2026-03-24, antigravity]
-    appointment_service("Modüler Randevu Servisi<br/><sub>appointment-service.js ile<br/>enjekte edilebilir rezervasyon<br/>altyapısı kuruldu</sub>")
-
     %% @feature_health_whatsapp [ai-task, closed, 2026-03-24, antigravity]
     health_whatsapp("Eczane WhatsApp Entegrasyonu<br/><sub>Mahalle sağlık rehberi ve<br/>WhatsApp ile ilaç hazırlatma<br/>akışı tamamlandı</sub>")
 
-    %% @feature_mulk_yonetim [ai-task, opened, 2026-03-24, user]
-    mulk_yonetim("Mülk & Apt. Yönetimi<br/><sub>Daire bazlı aidat, kira<br/>takibi ve şeffaf kasa<br/>modüllerinin geliştirilmesi</sub>")
+    %% @feature_pharmacy_scrape [ai-task, closed, 2026-03-21, antigravity]
+    pharmacy_scrape("Nöbetçi Eczane Botu<br/><sub>Kütahya Eczacı Odası'ndan<br/>anlık nöbetçi eczane verisi<br/>çeken scraper entegre edildi</sub>")
+
+    %% @feature_media_manager [ai-task, closed, 2026-03-24, antigravity]
+    feature_media_manager("Medya Yönetimi v1<br/><sub>Görsel kırpma, focal point ve<br/>kategorize galeri sistemi<br/>başarıyla uygulandı</sub>")
+
+    %% @feature_folder_structure [ai-task, opened, 2026-03-21, user]
+    folder_structure("Sunucu Klasör Arşivi<br/><sub>Mülk bazlı düzenli dosya<br/>ve belge depolama sistemi<br/>(Fotoğraf, Sözleşme, Belge)</sub>")
+
+    %% @feature_mulk_yonetim_db [ai-task, closed, 2026-03-21, antigravity]
+    mulk_yonetim_db("Mülk Yönetimi: Backend<br/><sub>Daire takibi, şeffaf kasa ve<br/>kira altyapısı veritabanı<br/>seviyesinde tamamlandı</sub>")
+
+    %% @feature_email_service [ai-task, closed, 2026-03-21, antigravity]
+    email_service("E-posta Servisi<br/><sub>SMTP altyapısı ve mahalle<br/>talepleri için otomatik<br/>bildirim motoru kuruldu</sub>")
+
+    %% @feature_appraisal_module [ai-task, opened, 2026-03-21, user]
+    appraisal_module("Emlak Ekspertiz (YENİ)<br/><sub>Extension verisi ile<br/>bölgesel fiyat tahmini ve<br/>değer hesaplama asistanı</sub>")
+
+    %% @feature_wizard_v2 [ai-task, opened, 2026-03-21, user]
+    wizard_v2("Sihirbaz v2: Araç & Konut<br/><sub>Takas seçeneklerine marka/model<br/>ve konut takası özelliklerinin<br/>eklenmesi</sub>")
 
     %% @ultimate_goal [end, opened, 2026-03-19, user]
     ultimate_goal("Smart Ecosystem<br/><sub>Tüm modüllerin (CRM, Saha,<br/>Mahalle) kusursuz çalıştığı<br/>operasyonel ekosistem</sub>")
 
     %% === CONNECTIONS ===
-    start --> lmetrics
-    lmetrics --> kanban
-    kanban --> automation
-    automation --> ux_fix
-    ux_fix --> concierge_ui
-    ux_fix --> route_playback
-    concierge_ui --> appointment_service
-    appointment_service --> health_whatsapp
-    health_whatsapp --> mulk_yonetim
-    route_playback --> mulk_yonetim
-    mulk_yonetim -.-> ultimate_goal
+    start --> health_whatsapp
+    health_whatsapp --> pharmacy_scrape
+    pharmacy_scrape --> feature_media_manager
+    feature_media_manager --> folder_structure
+    feature_media_manager --> mulk_yonetim_db
+    mulk_yonetim_db --> email_service
+    email_service --> appraisal_module
+    appraisal_module --> wizard_v2
+    wizard_v2 -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        appointment_service
-        health_whatsapp
+        email_service
     end
 
     %% === STYLES ===
     %% Closed tasks (soft purple)
     style start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style lmetrics fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style kanban fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style automation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style ux_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style concierge_ui fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style route_playback fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style health_whatsapp fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style pharmacy_scrape fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_media_manager fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style mulk_yonetim_db fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style email_service fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
     %% Recent node (highlighted purple)
-    style appointment_service fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
-    style health_whatsapp fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style email_service fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph (dashed border)
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Open tasks (soft green)
+    style folder_structure fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style appraisal_module fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style wizard_v2 fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style mulk_yonetim fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
