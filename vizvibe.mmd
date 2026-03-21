@@ -1,7 +1,7 @@
 flowchart TD
     %% === PROJE HEDEFLERİ ===
     %% Ultimate Goal: İmza Gayrimenkul portalını modern UI/UX, akıllı analiz ve birleşik mantıkla yeniden inşa etmek.
-    %% Current Goal: Faz 3 kapsamında Mülk Yönetimi, Ekspertiz Modülü ve Medya Arşiv Yapısı kuruluyor.
+    %% Current Goal: Çoklu domain yapısı ve ekspertiz modülü yayına alınıyor.
 
     %% === NODES ===
     %% @project_start [start, closed, 2026-03-01, nam]
@@ -16,8 +16,8 @@ flowchart TD
     %% @feature_media_manager [ai-task, closed, 2026-03-24, antigravity]
     feature_media_manager("Medya Yönetimi v1<br/><sub>Görsel kırpma, focal point ve<br/>kategorize galeri sistemi<br/>başarıyla uygulandı</sub>")
 
-    %% @feature_folder_structure [ai-task, opened, 2026-03-21, user]
-    folder_structure("Sunucu Klasör Arşivi<br/><sub>Mülk bazlı düzenli dosya<br/>ve belge depolama sistemi<br/>(Fotoğraf, Sözleşme, Belge)</sub>")
+    %% @feature_folder_structure [ai-task, closed, 2026-03-21, antigravity]
+    folder_structure("Sunucu Klasör Arşivi<br/><sub>Mülk bazlı düzenli dosya<br/>ve belge depolama sistemi<br/>Artık /imzagyo/uploads altında</sub>")
 
     %% @feature_mulk_yonetim_db [ai-task, closed, 2026-03-21, antigravity]
     mulk_yonetim_db("Mülk Yönetimi: Backend<br/><sub>Daire takibi, şeffaf kasa ve<br/>kira altyapısı veritabanı<br/>seviyesinde tamamlandı</sub>")
@@ -25,11 +25,14 @@ flowchart TD
     %% @feature_email_service [ai-task, closed, 2026-03-21, antigravity]
     email_service("E-posta Servisi<br/><sub>SMTP altyapısı ve mahalle<br/>talepleri için otomatik<br/>bildirim motoru kuruldu</sub>")
 
-    %% @feature_appraisal_module [ai-task, opened, 2026-03-21, user]
-    appraisal_module("Emlak Ekspertiz (YENİ)<br/><sub>Extension verisi ile<br/>bölgesel fiyat tahmini ve<br/>değer hesaplama asistanı</sub>")
+    %% @feature_appraisal_module [ai-task, closed, 2026-03-21, antigravity]
+    appraisal_module("Ekspertiz & Değerleme<br/><sub>Bölgesel fiyat tahmini ve<br/>Imza Mahalle için değer<br/>hesaplama asistanı kuruldu</sub>")
 
-    %% @feature_wizard_v2 [ai-task, opened, 2026-03-21, user]
-    wizard_v2("Sihirbaz v2: Araç & Konut<br/><sub>Takas seçeneklerine marka/model<br/>ve konut takası özelliklerinin<br/>eklenmesi</sub>")
+    %% @feature_wizard_v2 [ai-task, closed, 2026-03-21, antigravity]
+    wizard_v2("Sihirbaz v2: Takas<br/><sub>Araç marka/model ve konut<br/>takas özelliklerinin<br/>eklenmesi tamamlandı</sub>")
+
+    %% @feature_multi_domain [ai-task, closed, 2026-03-21, antigravity]
+    feature_multi_domain("Çoklu Domain & SSL<br/><sub>imzaemlak.com ve imzamahalle.com<br/>yönlendirmeleri ve SSL<br/>otomasyonu yapılandırıldı</sub>")
 
     %% @ultimate_goal [end, opened, 2026-03-19, user]
     ultimate_goal("Smart Ecosystem<br/><sub>Tüm modüllerin (CRM, Saha,<br/>Mahalle) kusursuz çalıştığı<br/>operasyonel ekosistem</sub>")
@@ -43,30 +46,32 @@ flowchart TD
     mulk_yonetim_db --> email_service
     email_service --> appraisal_module
     appraisal_module --> wizard_v2
-    wizard_v2 -.-> ultimate_goal
+    wizard_v2 --> feature_multi_domain
+    feature_multi_domain -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        email_service
+        feature_multi_domain
     end
 
     %% === STYLES ===
-    %% Closed tasks (soft purple)
+    %% Closed (soft purple)
     style start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style health_whatsapp fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style pharmacy_scrape fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_media_manager fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style folder_structure fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style mulk_yonetim_db fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style email_service fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style appraisal_module fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style wizard_v2 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_multi_domain fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
-    %% Recent node (highlighted purple)
-    style email_service fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    %% Recent (bright purple)
+    style feature_multi_domain fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
-    %% Recent subgraph (dashed border)
+    %% Recent subgraph
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
-    %% Open tasks (soft green)
-    style folder_structure fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style appraisal_module fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style wizard_v2 fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    %% Open (soft green)
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

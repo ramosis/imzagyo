@@ -15,9 +15,9 @@ After=network.target
 [Service]
 User=www-data
 Group=www-data
-WorkingDirectory=/opt/imzagayrimenkul
-Environment="PATH=/opt/imzagayrimenkul/venv/bin"
-ExecStart=/opt/imzagayrimenkul/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 app:app
+WorkingDirectory=/imzagyo
+Environment="PATH=/imzagyo/venv/bin"
+ExecStart=/imzagyo/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 app:app
 Restart=always
 RestartSec=5
 
