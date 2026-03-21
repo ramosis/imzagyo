@@ -26,76 +26,98 @@ def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
-    # --- Şema Güncelleme (Migration Simülasyonu) ---
-    try:
-        cursor.execute("ALTER TABLE leads ADD COLUMN campaign_id TEXT")
-    except:
-        pass # Zaten varsa hata verme
+    # --- Temel Tablolar (Bağımlılığı Olmayanlar) ---
 
-    try:
-        cursor.execute("ALTER TABLE portfoy_medya ADD COLUMN local_path TEXT")
-    except:
-        pass
+    # Kullanıcılar
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL CHECK(role IN ("admin","super_admin","broker","danisman","vip","kiraci","muteahhit","standart","employee","owner","tenant","partner"))
+        )
+    ''')
 
-    try:
-        cursor.execute("ALTER TABLE staff_locations ADD COLUMN staff_id INTEGER")
-    except:
-        pass
+    # Portföyler (Mülkler)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS portfoyler (
+            id TEXT PRIMARY KEY,
+            koleksiyon TEXT,
+            baslik1 TEXT,
+            baslik2 TEXT,
+            lokasyon TEXT,
+            refNo TEXT,
+            fiyat TEXT,
+            oda TEXT,
+            alan TEXT,
+            kat TEXT,
+            ozellik_renk TEXT,
+            bg_renk TEXT,
+            btn_renk TEXT,
+            icon_renk TEXT,
+            resim_hero TEXT,
+            resim_hikaye TEXT,
+            hikaye TEXT,
+            ozellikler TEXT, -- JSON formatında liste
+            danisman_isim TEXT,
+            danisman_unvan TEXT,
+            danisman_resim TEXT,
+            mulk_tipi TEXT DEFAULT 'Konut',
+            alt_tip TEXT, -- Daire, Villa, Ofis, Arsa vb.
+            denetim_notlari TEXT,
+            mahalle_id TEXT -- İmza Mahalle eşleşmesi için
+        )
+    ''')
 
-    try:
-        cursor.execute("ALTER TABLE staff_locations ADD COLUMN staff_name TEXT")
-    except:
-        pass
+    # Pipeline Aşamaları
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pipeline_stages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            order_index INTEGER DEFAULT 0,
+            color TEXT, -- Frontend'de sütun başlığı rengi için
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
 
-    try:
-        cursor.execute("ALTER TABLE staff_locations ADD COLUMN lat REAL")
-    except:
-        pass
+    # Sözleşme Şablon Tipleri
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS contract_templates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            description TEXT
+        )
+    ''')
 
-    try:
-        cursor.execute("ALTER TABLE staff_locations ADD COLUMN lng REAL")
-    except:
-        pass
+    # Sözleşme Maddeleri (Clauses)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS contract_clauses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            template_id INTEGER NOT NULL,
+            clause_text TEXT NOT NULL,
+            is_mandatory BOOLEAN DEFAULT 0,
+            sort_order INTEGER DEFAULT 0,
+            FOREIGN KEY(template_id) REFERENCES contract_templates(id)
+        )
+    ''')
 
-    try:
-        cursor.execute("ALTER TABLE staff_locations ADD COLUMN timestamp DATETIME DEFAULT CURRENT_TIMESTAMP")
-    except:
-        pass
+    # Taraflar (Müşteriler, Satıcılar vb.)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS parties (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tc_no TEXT UNIQUE,
+            vkn TEXT UNIQUE,
+            party_type TEXT NOT NULL CHECK(party_type IN ('individual', 'corporate')),
+            name TEXT NOT NULL,
+            phone TEXT,
+            email TEXT,
+            address TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
 
-    try:
-        cursor.execute("ALTER TABLE staff_locations ADD COLUMN status TEXT")
-    except:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE property_units ADD COLUMN mahalle_id INTEGER")
-    except:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE property_units ADD COLUMN block TEXT")
-    except:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE property_units ADD COLUMN unit_number TEXT")
-    except:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE property_units ADD COLUMN owner_name TEXT")
-    except:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE property_units ADD COLUMN tenant_name TEXT")
-    except:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE property_units ADD COLUMN dues_amount REAL")
-    except:
-        pass
+    # --- Bağımlı Tablolar (Foreign Key Kullananlar) ---
 
     # --- Neighborhood & Facilities (Mahalle Özellikleri) ---
     cursor.execute('''
@@ -131,37 +153,7 @@ def init_db():
     cursor.execute('INSERT OR IGNORE INTO shuttle_schedule (route_name, departure_time, estimated_arrival) VALUES (?, ?, ?)',
                    ('Site - Maslak Metro', '09:00', '09:15'))
 
-    # Portföyler Tablosu (Tam olarak portfoy-data.js'deki alanlarla eşleşecek)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS portfoyler (
-            id TEXT PRIMARY KEY,
-            koleksiyon TEXT,
-            baslik1 TEXT,
-            baslik2 TEXT,
-            lokasyon TEXT,
-            refNo TEXT,
-            fiyat TEXT,
-            oda TEXT,
-            alan TEXT,
-            kat TEXT,
-            ozellik_renk TEXT,
-            bg_renk TEXT,
-            btn_renk TEXT,
-            icon_renk TEXT,
-            resim_hero TEXT,
-            resim_hikaye TEXT,
-            hikaye TEXT,
-            ozellikler TEXT, -- JSON formatında liste
-            -- Danışman objesi veritabanında ayrı tablo olabilir ama biz direkt buraya JSON gömeceğiz veya alt alan açacağız
-            danisman_isim TEXT,
-            danisman_unvan TEXT,
-            danisman_resim TEXT,
-            mulk_tipi TEXT DEFAULT 'Konut',
-            alt_tip TEXT, -- Daire, Villa, Ofis, Arsa vb.
-            denetim_notlari TEXT,
-            mahalle_id TEXT -- İmza Mahalle eşleşmesi için
-        )
-    ''')
+    # (portfoyler table moved to top)
 
     # Media table for portfolio images/videos
     cursor.execute('''
@@ -197,14 +189,7 @@ def init_db():
     ''')
 
     # New tables for expanded functionality
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            role TEXT NOT NULL CHECK(role IN ("admin","super_admin","broker","danisman","vip","kiraci","muteahhit","standart"))
-        )
-    ''')
+    # (users table moved to top)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS contracts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -330,6 +315,7 @@ def init_db():
             purpose TEXT DEFAULT 'gosterim',
             notes TEXT,
             assigned_user_id INTEGER,
+            pipeline_stage_id INTEGER, -- Added missing column
             original_datetime TEXT,
             reschedule_count INTEGER DEFAULT 0,
             status TEXT DEFAULT 'pending',
@@ -356,45 +342,10 @@ def init_db():
         )
     ''')
 
-    # --- Sözleşme Hazırlama Sistemi Tabloları ---
-
-    # Sözleşme Şablon Tipleri (Kira, Satış, Satış Vaadi vb.)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS contract_templates (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE, -- Örn: "Konut Kira Sözleşmesi"
-            description TEXT
-        )
-    ''')
-
-    # Sözleşme Maddeleri (Clauses)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS contract_clauses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            template_id INTEGER NOT NULL,
-            clause_text TEXT NOT NULL,
-            is_mandatory BOOLEAN DEFAULT 0,
-            sort_order INTEGER DEFAULT 0,
-            FOREIGN KEY(template_id) REFERENCES contract_templates(id)
-        )
-    ''')
+    # (contract_templates and clauses moved/consolidated)
 
 
-    # Taraflar (Müşteriler, Satıcılar vb.)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS parties (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            tc_no TEXT UNIQUE, -- T.C. Kimlik Numarası (bireysel)
-            vkn TEXT UNIQUE, -- Vergi Numarası (kurumsal)
-            party_type TEXT NOT NULL CHECK(party_type IN ('individual', 'corporate')), -- Bireysel veya Kurumsal
-            name TEXT NOT NULL, -- Ad Soyad (bireysel) veya Ünvan (kurumsal)
-            phone TEXT,
-            email TEXT,
-            address TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
+    # (parties table moved to top)
 
     # Hazırlanan / Kaydedilen Sözleşmeler
     cursor.execute('''
@@ -442,19 +393,8 @@ def init_db():
             FOREIGN KEY(pipeline_stage_id) REFERENCES pipeline_stages(id)
         )
     ''')
-    
-    # 1. Yeni Tablo: pipeline_stages (Aşamalar)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS pipeline_stages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            order_index INTEGER DEFAULT 0,
-            color TEXT, -- Frontend'de sütun başlığı rengi için
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
 
-    # 2. Yeni Tablo: pipeline_history (Geçiş Tarihçesi)
+    # Pipeline Geçiş Tarihçesi
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS pipeline_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -561,21 +501,7 @@ def init_db():
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_interactions_session ON user_interactions(session_id)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_interactions_type ON user_interactions(event_type)')
 
-    # 6. Yeni Tablo: staff_locations (Personel Konum Takibi)
-    #    - Amaç: Saha ekibinin konum bilgilerini ve check-in/out sürelerini takip etmek.
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS staff_locations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            latitude REAL NOT NULL,
-            longitude REAL NOT NULL,
-            accuracy REAL, -- Metre cinsinden doğruluk
-            location_type TEXT DEFAULT 'checkin', -- 'checkin', 'checkout', 'periodic'
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(user_id) REFERENCES users(id)
-        )
-    ''')
+    # (staff_locations table moved/consolidated)
     # -----------------------------------------------------------------------
 
     # 7. Yeni Tablo: listings_shadow (Eklenti Veri Havuzu)
@@ -953,11 +879,11 @@ def doldur_ornek_veriler():
     # (Removed redundant table creations and fixed sample data to match consolidated schema)
     
     # Sample data for tracking (mock)
-    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (1, 1, 'Ahmet Yilmaz', 41.1123, 29.0234, 'Active')")
-    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (2, 2, 'Ayse Kaya', 41.1150, 29.0210, 'Active')")
+    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, user_id, latitude, longitude, location_type) VALUES (1, 1, 41.1123, 29.0234, 'checkin')")
+    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, user_id, latitude, longitude, location_type) VALUES (2, 2, 41.1150, 29.0210, 'periodic')")
 
     # Sample data for Property Units (Using property_id from portfoyler)
-    # Schema: (id, property_id, unit_number, floor, unit_type, area_sqm, status, notes)
+    # Schema: (id, property_id, unit_number, floor, unit_type, area_sqm, status)
     cursor.execute("INSERT OR IGNORE INTO property_units (id, property_id, unit_number, floor, unit_type, area_sqm, status) VALUES (1, 'bogaz-villa', 'A-12', '1', 'Villa', 450.0, 'Dolu')")
     
     # Sample dues payments (Using property_unit_id and user_id=5 for 'kiraci')
@@ -969,31 +895,6 @@ def doldur_ornek_veriler():
     # Schema: (id, property_id, expense_type, amount, expense_date, description)
     cursor.execute("INSERT OR IGNORE INTO apartment_expenses (property_id, expense_type, amount, expense_date, description) VALUES ('bogaz-villa', 'Asansör Bakımı', 4500.0, '2026-03-10', 'A Blok asansör halat değişimi ve periyodik bakım.')")
     cursor.execute("INSERT OR IGNORE INTO apartment_expenses (property_id, expense_type, amount, expense_date, description) VALUES ('bogaz-villa', 'Bahçe Düzenleme', 2200.0, '2026-03-05', 'Bahar bakımı ve yeni çiçek ekimi.')")
-
-    # Sample data for tracking (mock)
-    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (1, 1, 'Ahmet Yilmaz', 41.1123, 29.0234, 'Active')")
-    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (2, 2, 'Ayse Kaya', 41.1150, 29.0210, 'Active')")
-
-    # Sample data for Property Units
-    cursor.execute("INSERT OR IGNORE INTO property_units (id, mahalle_id, block, unit_number, owner_name, dues_amount) VALUES (1, 1, 'A', '12', 'Selim Bey', 1250.0)")
-    
-    # Sample dues payments
-    cursor.execute("INSERT OR IGNORE INTO dues_payments (unit_id, amount, payment_date, period) VALUES (1, 1250.0, '2026-03-01', 'Mart 2026')")
-    cursor.execute("INSERT OR IGNORE INTO dues_payments (unit_id, amount, payment_date, period) VALUES (1, 1250.0, '2026-02-02', 'Şubat 2026')")
-
-    # Sample apartment expenses
-    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (mahalle_id, title, amount, expense_date, description) VALUES (1, 'Asansör Bakımı', 4500.0, '2026-03-10', 'A Blok asansör halat değişimi ve periyodik bakım.')")
-    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (mahalle_id, title, amount, expense_date, description) VALUES (1, 'Bahçe Düzenleme', 2200.0, '2026-03-05', 'Bahar bakımı ve yeni çiçek ekimi.')")
-
-    # Imza Mahalle - Shuttle Saatleri (Demo verisi için tabloya gerek yok, kodda dönebiliriz ama buraya ekleyelim)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS shuttle_schedule (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            route_name TEXT,
-            departure_time TEXT,
-            estimated_arrival TEXT
-        )
-    ''')
     print("Mesaj şablonları kontrol ediliyor...")
     cursor.execute('SELECT COUNT(*) FROM message_templates')
     if cursor.fetchone()[0] == 0:
