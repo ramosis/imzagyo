@@ -112,7 +112,10 @@ def init_db():
             phone TEXT,
             email TEXT,
             address TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     # Saha Personeli Konum Takibi (Staff Tracking)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS staff_locations (
