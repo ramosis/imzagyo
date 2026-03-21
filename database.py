@@ -950,77 +950,25 @@ def doldur_ornek_veriler():
     cursor.execute('INSERT OR IGNORE INTO contracts (property_id, user_id, start_date, end_date, type) VALUES (?, ?, ?, ?, ?)', 
                    ('bogaz-villa', 5, '2024-01-01', '2025-01-01', 'Kira Sözleşmesi'))
 
-    # Imza Mahalle - Tesisler (Facilities)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS neighborhood_facilities (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            category TEXT, -- Sport, Entertainment, Health
-            icon TEXT,
-            description TEXT
-        )
-    ''')
+    # (Removed redundant table creations and fixed sample data to match consolidated schema)
+    
+    # Sample data for tracking (mock)
+    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (1, 1, 'Ahmet Yilmaz', 41.1123, 29.0234, 'Active')")
+    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (2, 2, 'Ayse Kaya', 41.1150, 29.0210, 'Active')")
 
-    # Imza Mahalle - Rezervasyonlar (Reservations)
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS neighborhood_reservations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        facility_id INTEGER,
-        user_name TEXT,
-        user_phone TEXT,
-        reservation_date DATE,
-        time_slot TEXT,
-        status TEXT DEFAULT 'Pending',
-        FOREIGN KEY (facility_id) REFERENCES neighborhood_facilities(id)
-    )''')
+    # Sample data for Property Units (Using property_id from portfoyler)
+    # Schema: (id, property_id, unit_number, floor, unit_type, area_sqm, status, notes)
+    cursor.execute("INSERT OR IGNORE INTO property_units (id, property_id, unit_number, floor, unit_type, area_sqm, status) VALUES (1, 'bogaz-villa', 'A-12', '1', 'Villa', 450.0, 'Dolu')")
+    
+    # Sample dues payments (Using property_unit_id and user_id=5 for 'kiraci')
+    # Schema: (property_unit_id, user_id, amount, due_date, status, description)
+    cursor.execute("INSERT OR IGNORE INTO dues_payments (property_unit_id, user_id, amount, due_date, status, description) VALUES (1, 5, 1250.0, '2026-03-01', 'Ödendi', 'Mart 2026 Aidatı')")
+    cursor.execute("INSERT OR IGNORE INTO dues_payments (property_unit_id, user_id, amount, due_date, status, description) VALUES (1, 5, 1250.0, '2026-02-02', 'Ödendi', 'Şubat 2026 Aidatı')")
 
-    # --- PLAN 4: STAFF TRACKING ---
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS staff_locations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            staff_id INTEGER,
-            staff_name TEXT,
-            lat REAL,
-            lng REAL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            status TEXT -- 'active', 'check-in', 'check-out'
-        )
-    ''')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_staff_locations_id ON staff_locations(staff_id)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_staff_locations_time ON staff_locations(timestamp)')
-
-    # --- PLAN 3.1: PROPERTY & APARTMENT MANAGEMENT ---
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS property_units (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        mahalle_id INTEGER,
-        block TEXT,
-        unit_number TEXT,
-        owner_name TEXT,
-        tenant_name TEXT,
-        dues_amount REAL
-    )''')
-
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS dues_payments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        unit_id INTEGER,
-        amount REAL,
-        payment_date DATE,
-        period TEXT, -- E.g., '2026-03'
-        status TEXT DEFAULT 'Paid'
-    )''')
-
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS apartment_expenses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        mahalle_id INTEGER,
-        title TEXT,
-        amount REAL,
-        expense_date DATE,
-        receipt_url TEXT,
-        description TEXT
-    )''')
+    # Sample apartment expenses (Using property_id from portfoyler)
+    # Schema: (id, property_id, expense_type, amount, expense_date, description)
+    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (property_id, expense_type, amount, expense_date, description) VALUES ('bogaz-villa', 'Asansör Bakımı', 4500.0, '2026-03-10', 'A Blok asansör halat değişimi ve periyodik bakım.')")
+    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (property_id, expense_type, amount, expense_date, description) VALUES ('bogaz-villa', 'Bahçe Düzenleme', 2200.0, '2026-03-05', 'Bahar bakımı ve yeni çiçek ekimi.')")
 
     # Sample data for tracking (mock)
     cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (1, 1, 'Ahmet Yilmaz', 41.1123, 29.0234, 'Active')")
