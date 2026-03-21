@@ -1,14 +1,14 @@
 from flask import Blueprint, request, jsonify
 from database import get_db_connection
 import json
-from api.schemas import lead_schema, ValidationError
+from .schemas import lead_schema, ValidationError
 
 leads_bp = Blueprint('leads', __name__)
 
 
 @leads_bp.route('/api/leads', methods=['GET'])
 def get_leads():
-    from api.auth import get_current_user
+    from .auth import get_current_user
     user = get_current_user()
     if not user:
         return jsonify([]), 401
@@ -113,6 +113,20 @@ def add_lead():
         ))
         lead_id = cur.lastrowid
 
+        # --- Akıllı Bildirim: Danışmana Bilgi Ver ---
+        assigned_user_id = validated_data.get('assigned_user_id')
+        if assigned_user_id:
+            from .notifications import create_notification
+            try:
+                msg_title = '🔥 SICAK FIRSAT!' if ai_score >= 70 else 'Yeni Aday Atandı'
+                create_notification(
+                    assigned_user_id,
+                    'ai_alert' if ai_score >= 70 else 'system',
+                    msg_title,
+                    f"{validated_data.get('name')} adlı aday %{ai_score} ilgi puanı ile size atandı."
+                )
+            except: pass
+
         # --- DİJİTAL AYAK İZİ EŞLEŞTİRME ---
         # Kullanıcının anonim iken yaptığı işlemleri (session_id) bu yeni lead'e bağla
         session_id = validated_data.get('session_id')
@@ -185,11 +199,49 @@ def get_lead_interactions(id):
     result = []
     for row in interactions:
         item = dict(row)
-        if item.get('data_json'):
+        data_json = item.get('data_json')
+        if data_json:
             try:
-                item['data'] = json.loads(item['data_json'])
+                item['data'] = json.loads(str(data_json))
             except:
                 item['data'] = {}
         result.append(item)
         
     return jsonify(result)
+
+@leads_bp.route('/api/leads/<int:id>/footprint', methods=['GET'])
+def get_lead_footprint(id):
+    """
+    Adayın tüm dijital yolculuğunu kronolojik olarak döner.
+    """
+    conn = get_db_connection()
+    try:
+        # 1. Lead bilgilerini doğrula
+        lead = conn.execute('SELECT name, ai_score FROM leads WHERE id = ?', (id,)).fetchone()
+        if not lead:
+            return jsonify({'error': 'Lead not found'}), 404
+
+        # 2. Tüm etkileşimleri çek
+        interactions = conn.execute('''
+            SELECT * FROM lead_interactions 
+            WHERE lead_id = ? 
+            ORDER BY created_at ASC
+        ''', (id,)).fetchall()
+        
+        # 3. Veriyi formatla
+        timeline = []
+        for row in interactions:
+            item = dict(row)
+            data_json = item.get('data_json')
+            if data_json:
+                try: item['data'] = json.loads(str(data_json))
+                except: item['data'] = {}
+            timeline.append(item)
+            
+        return jsonify({
+            'lead_name': lead['name'],
+            'ai_score': lead['ai_score'],
+            'timeline': timeline
+        }), 200
+    finally:
+        conn.close()

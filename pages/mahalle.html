@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İmza Mahalle | Mahalle Yaşam Portalı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="/static/js/lmetrics.js"></script>
+    <script src="/static/js/appointment-service.js"></script>
+    <style>
+        :root {
+            --navy: #1a1a2e;
+            --gold: #c5a059;
+            --sage: #8da290;
+            --clay: #b87d64;
+        }
+        body { font-family: 'Outfit', sans-serif; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .bg-navy { background-color: var(--navy); }
+        .text-gold { color: var(--gold); }
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(26,26,46,0.95) 0%, rgba(141,162,144,0.8) 100%),
+                        url('https://images.unsplash.com/photo-1449156001935-d28730b967b0?q=80&w=2000');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-navy">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 glass-card py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-house-chimney-window text-gold text-xl"></i>
+            </div>
+            <span class="text-xl font-serif font-bold tracking-tight">İmza <span class="text-sage">Mahalle</span></span>
+        </div>
+        <div class="hidden md:flex gap-8 text-sm font-semibold uppercase tracking-wider">
+            <a href="#about" class="hover:text-gold transition-colors">Mahallemiz</a>
+            <a href="#tools" class="hover:text-gold transition-colors">Araçlar</a>
+            <a href="#businesses" class="hover:text-gold transition-colors">Esnaf Girişi</a>
+            <a href="#demands" class="hover:text-gold transition-colors">Talep Bırak</a>
+        </div>
+        <button onclick="window.location.href='/anasayfa'" class="bg-navy text-gold px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-lg shadow-navy/20">Emlak Portalı</button>
+    </nav>
+
+    <!-- MANAGEMENT & TRACKING -->
+    <section id="management" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Unit Management -->
+                <div class="glass-card p-10 rounded-[2.5rem] border-navy/5 bg-navy/[0.02]">
+                    <div class="flex items-center justify-between mb-10">
+                        <div>
+                            <h3 class="text-2xl font-serif text-navy">Mülk Yönetimi</h3>
+                            <p class="text-xs text-gray-400 mt-1">Dairenize ait güncel durum bilgileri</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center text-gold">
+                            <i class="fa-solid fa-house-chimney-user text-xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div id="unit-info" class="space-y-6">
+                        <!-- Dynamic Unit Info -->
+                        <div class="animate-pulse flex space-x-4">
+                            <div class="flex-1 space-y-4 py-1">
+                                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                                <div class="space-y-2">
+                                    <div class="h-4 bg-gray-200 rounded"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Staff Tracking -->
+                <div class="glass-card p-10 rounded-[2.5rem] border-gold/10 bg-gold/[0.02]">
+                    <div class="flex items-center justify-between mb-10">
+                        <div>
+                            <h3 class="text-2xl font-serif text-navy">Saha Operasyon</h3>
+                            <p class="text-xs text-gray-400 mt-1">Mahallemizdeki İmza ekipleri (Canlı)</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                            <i class="fa-solid fa-location-dot text-xl"></i>
+                        </div>
+                    </div>
+
+                    <div id="staff-map" class="h-64 bg-gray-100 rounded-[2rem] relative overflow-hidden flex items-center justify-center border border-dashed border-gray-300">
+                        <div class="text-center">
+                            <i class="fa-solid fa-map-location-dot text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-xs text-gray-400">Canlı Harita Yükleniyor...</p>
+                        </div>
+                        <!-- Mini Map UI Simulation -->
+                        <div id="staff-list" class="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gold/10">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-green-500 rounded-full animate-ping mr-3"></div>
+                                <span class="text-[10px] font-bold text-navy uppercase tracking-widest" id="live-staff-label">Sistem Aktif</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RELOCATION ASSISTANT -->
+    <section id="relocation" class="py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="glass-card p-12 rounded-[3rem] bg-gold/5 border-gold/10 relative overflow-hidden">
+                <div class="flex flex-col lg:flex-row gap-16 relative z-10">
+                    <div class="lg:w-1/3">
+                        <h2 class="text-xs font-bold text-gold uppercase tracking-[0.3em] mb-4">Yeni Komşularımız İçin</h2>
+                        <h3 class="text-4xl font-serif text-navy mb-8">Taşınma Asistanı</h3>
+                        <p class="text-gray-500 mb-8 leading-relaxed">Yeni evinize taşınırken resmi aboneliklerden nakliyeye, mahalle kurallarından yerel hizmetlere kadar her şey burada. Adımları takip edin, taşınma sürecini stresiz tamamlayın.</p>
+                        <div class="flex items-center p-4 bg-white rounded-2xl shadow-sm border border-gold/10">
+                            <i class="fa-solid fa-circle-check text-gold text-2xl mr-4"></i>
+                            <div>
+                                <p class="text-xs font-bold text-navy uppercase tracking-wider">İmza Güvencesi</p>
+                                <p class="text-[10px] text-gray-400">Tüm bilgiler güncel ve onaylıdır.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8" id="relocation-checklist">
+                        <!-- Dynamic Content from API -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HERO SECTION -->
+    <section class="min-h-screen hero-gradient flex items-center justify-center pt-20 px-4">
+        <div class="max-w-4xl text-center text-white animate-fade-in">
+            <h1 class="text-5xl md:text-7xl font-serif mb-6 leading-tight">Mahallenizin Dijital Kalbi <span class="text-gold italic">Burada Atıyor.</span></h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">Sadece binaları değil, komşuluğu ve yerel değerleri önemsiyoruz. İmza Mahalle ile yaşamınızı kolaylaştırın, mahallenizle bütünleşin.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#demands" class="bg-gold text-navy px-8 py-4 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-white transition-colors">Bir Talep Bırak</a>
+                <a href="#tools" class="bg-white/10 backdrop-blur-md border border-white/20 px-8 py-4 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-white/20 transition-colors">Yaşam Araçlarını Keşfet</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TOOLS GRID -->
+    <section id="tools" class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-xs font-bold text-sage uppercase tracking-[0.3em] mb-4">Dijital Yaşam</h2>
+            <h3 class="text-4xl font-serif text-navy">Mahalleli İçin Özel Araçlar</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Tool 1: Wedding -->
+            <div class="glass-card p-10 rounded-[2.5rem] hover:shadow-2xl transition-all border-b-4 border-gold">
+                <div class="w-16 h-16 bg-gold/10 rounded-2xl flex items-center justify-center mb-8">
+                    <i class="fa-solid fa-ring text-3xl text-gold"></i>
+                </div>
+                <h4 class="text-2xl font-serif mb-4">Düğün Organizatörü</h4>
+                <p class="text-gray-500 leading-relaxed mb-6">Mahalledeki mekanlar, çiçekçiler ve kuaförlerle entegre planlama asistanı.</p>
+                <button class="text-xs font-bold uppercase text-gold tracking-widest hover:underline">Yakında <i class="fa-solid fa-arrow-right ml-1"></i></button>
+            </div>
+            <!-- Tool 2: Campaign Request -->
+            <div class="glass-card p-10 rounded-[2.5rem] hover:shadow-2xl transition-all border-b-4 border-sage">
+                <div class="w-16 h-16 bg-sage/10 rounded-2xl flex items-center justify-center mb-8">
+                    <i class="fa-solid fa-bullhorn text-3xl text-sage"></i>
+                </div>
+                <h4 class="text-2xl font-serif mb-4">Kampanya Başlat</h4>
+                <p class="text-gray-500 leading-relaxed mb-6">Mahallen için bir kampanya önerisinde bulun, komşularınla birlikte sesini duyur.</p>
+                <button onclick="document.getElementById('demands').scrollIntoView({behavior: 'smooth'})" class="text-xs font-bold uppercase text-sage tracking-widest hover:underline">Talep Oluştur <i class="fa-solid fa-arrow-right ml-1"></i></button>
+            </div>
+            <!-- Tool 3: Digital Authorization -->
+            <div class="glass-card p-10 rounded-[2.5rem] hover:shadow-2xl transition-all border-b-4 border-clay">
+                <div class="w-16 h-16 bg-clay/10 rounded-2xl flex items-center justify-center mb-8">
+                    <i class="fa-solid fa-file-contract text-3xl text-clay"></i>
+                </div>
+                <h4 class="text-2xl font-serif mb-4">Dijital Yetki Belgesi</h4>
+                <p class="text-gray-500 leading-relaxed mb-6">Mülkünüzü güvenle kiralamak veya satmak için dijital yetki belgesi sürecini başlatın.</p>
+                <button onclick="document.getElementById('demands').scrollIntoView({behavior: 'smooth'})" class="text-xs font-bold uppercase text-clay tracking-widest hover:underline">Başvuru Yap <i class="fa-solid fa-arrow-right ml-1"></i></button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- HEALTH & PHARMACY -->
+    <section id="health" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div class="space-y-2">
+                    <h2 class="text-xs font-bold text-red-500 uppercase tracking-[0.3em] font-sans">Mahalle Sağlık Rehberi</h2>
+                    <h3 class="text-4xl font-serif text-navy">Eczaneler & Sağlık</h3>
+                    <p class="text-gray-400 max-w-lg">İlaçlarınızı gitmeden önce hazırlatın, nöbetçi eczaneleri kontrol edin ve hızlıca iletişim kurun.</p>
+                </div>
+            </div>
+            
+            <div id="pharmacy-list" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Dynamic Pharmacies -->
+                <div class="animate-pulse col-span-3 h-32 bg-gray-50 rounded-[2.5rem]"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCIERGE HUB -->
+    <section id="concierge" class="py-24 bg-navy text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-1/3 h-full bg-gold/5 -skew-x-12 transform translate-x-20"></div>
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-xs font-bold text-gold uppercase tracking-[0.3em] mb-4">Yaşam Asistanınız</h2>
+                <h3 class="text-4xl font-serif mb-8 text-white">İmza Concierge Hub</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">Sitenizdeki tüm sosyal olanaklara erişin, servis saatlerini takip edin ve teknik destek taleplerinizi tek merkezden yönetin.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Shuttle Tracking -->
+                <div class="glass-card bg-white/5 border-white/10 p-10 rounded-[2.5rem]">
+                    <div class="flex items-center justify-between mb-8">
+                        <h4 class="text-2xl font-serif text-gold">Shuttle Takibi</h4>
+                        <span class="bg-green-500/20 text-green-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase">Canlı</span>
+                    </div>
+                    <div id="shuttle-list" class="space-y-4 mb-8">
+                        <!-- Loading -->
+                        <div class="text-gray-500 text-sm italic">Servis saatleri yükleniyor...</div>
+                    </div>
+                    <button class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-widest transition-all">Haritada Gör <i class="fa-solid fa-map-location-dot ml-2"></i></button>
+                </div>
+
+                <!-- Facility Reservation -->
+                <div class="glass-card bg-white/5 border-white/10 p-10 rounded-[2.5rem]">
+                    <div class="flex items-center justify-between mb-8">
+                        <h4 class="text-2xl font-serif text-gold">Tesis Rezervasyonu</h4>
+                    </div>
+                    <div id="facility-list" class="grid grid-cols-2 gap-4 mb-8">
+                        <!-- Loading -->
+                    </div>
+                    <div id="reservation-form" class="hidden animate-fade-in">
+                        <input type="date" id="res-date" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-4 text-white outline-none">
+                        <select id="res-time" class="w-full bg-navy border border-white/10 rounded-xl px-4 py-3 mb-6 text-white outline-none">
+                            <option value="10:00-11:00">10:00 - 11:00</option>
+                            <option value="14:00-15:00">14:00 - 15:00</option>
+                            <option value="19:00-20:00">19:00 - 20:00</option>
+                        </select>
+                        <button id="confirm-res-btn" class="w-full bg-gold text-navy font-bold py-4 rounded-xl text-xs uppercase tracking-widest hover:bg-white transition-all">Rezervasyonu Onayla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LISTINGS SECTION -->
+    <section id="listings" class="py-24 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-xs font-bold text-gold uppercase tracking-[0.3em] mb-4">Mahallenizdeki Fırsatlar</h2>
+                    <h3 class="text-4xl font-serif text-navy">Bölgeye Özel İlanlar</h3>
+                </div>
+                <button onclick="window.location.href='/anasayfa'" class="bg-navy text-gold px-8 py-4 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-gold hover:text-navy transition-all">İlanımı Yayınla <i class="fa-solid fa-plus ml-2"></i></button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="listing-container">
+                <!-- Loading placeholder -->
+                <div class="text-center py-20 col-span-full text-gray-400">Yükleniyor...</div>
+            </div>
+            <div class="mt-16 text-center">
+                <p class="text-gray-500 mb-6 italic">Tüm ilanları gormek ve detaylı arama yapmak için ana portalımıza gecin.</p>
+                <button onclick="window.location.href='/anasayfa'" class="text-navy font-bold border-b-2 border-navy hover:text-gold hover:border-gold transition-all pb-1">Tüm İlanları Görüntüle</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- REPORT PREVIEW -->
+    <section class="bg-navy py-24 px-6 overflow-hidden relative">
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,100 Q50,0 100,100" fill="none" stroke="white" stroke-width="0.1" />
+                <path d="M0,80 Q50,0 100,80" fill="none" stroke="white" stroke-width="0.1" />
+            </svg>
+        </div>
+        <div class="max-w-7xl mx-auto flex flex-wrap md:flex-nowrap items-center gap-16">
+            <div class="w-full md:w-1/2">
+                <h2 class="text-gold font-bold uppercase tracking-[0.3em] text-xs mb-4">Şeffaf Veri</h2>
+                <h3 class="text-4xl md:text-5xl font-serif text-white mb-8 leading-tight">Mahallenizin Değeri Bir Tık Uzağınızda</h3>
+                <p class="text-gray-400 text-lg leading-relaxed mb-10">Artık mülkünüzün gerçek değerini öğrenmek için kapı kapı gezmenize gerek yok. İmza Mahalle raporları ile güncel pazar analizlerini, bölge demografisini ve gelecek projeksiyonlarını anlık takip edin.</p>
+                <div class="flex gap-12 text-white">
+                    <div>
+                        <span class="block text-4xl font-serif text-gold mb-2">%24</span>
+                        <span class="text-xs uppercase tracking-wider text-gray-500">Yıllık Ortalama Değer Artışı</span>
+                    </div>
+                    <div>
+                        <span class="block text-4xl font-serif text-gold mb-2">1.2k</span>
+                        <span class="text-xs uppercase tracking-wider text-gray-500">Aktif Komşu Etkileşimi</span>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 glass-card bg-white/5 border-white/10 p-8 rounded-[3rem]">
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                        <span class="text-white font-semibold">Ortalama Kira Birim Fiyatı</span>
+                        <span class="text-gold">₺450 / m²</span>
+                    </div>
+                    <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                        <span class="text-white font-semibold">Eğitim Seviyesi (Akademik)</span>
+                        <span class="text-sage">%68</span>
+                    </div>
+                    <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                        <span class="text-white font-semibold">Ulaşım Erişilebilirliği</span>
+                        <span class="text-clay">Mükemmel</span>
+                    </div>
+                    <button class="w-full bg-white text-navy font-bold py-4 rounded-2xl uppercase text-xs tracking-widest hover:bg-gold transition-colors">Tüm Raporu Gör</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FORMS SECTION -->
+    <section class="py-24 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+        <!-- Demand Form -->
+        <div id="demands" class="bg-white p-12 rounded-[3.5rem] shadow-xl">
+            <h3 class="text-3xl font-serif mb-6 text-navy">Bir Talep Bırakın</h3>
+            <p class="text-gray-500 mb-10">İhtiyacınızı belirtin, komşularınız ve yerel profesyoneller arasından en doğru eşleşmeyi sağlayalım.</p>
+            <form id="demand-form" class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Talep Türü</label>
+                    <select id="demand-type" class="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-sage/20 transition-all">
+                        <option value="Gayrimenkul">Acil Gayrimenkul Arayışı</option>
+                        <option value="Kampanya">Mahalle Kampanyası Talebi</option>
+                        <option value="Yetki_Belgesi">Dijital Yetki Belgesi Başvurusu</option>
+                        <option value="Hizmet">Yerel Hizmet / Usta İhtiyacı</option>
+                        <option value="Organizasyon">Mahalle Organizasyonu</option>
+                        <option value="Diger">Diğer İhtiyaçlar</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Detaylar</label>
+                    <textarea id="demand-content" rows="4" class="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-sage/20 transition-all" placeholder="Tam olarak neye ihtiyacınız var?"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="demand-name" placeholder="Ad Soyad" class="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-sage/20 transition-all">
+                    <input type="tel" id="demand-phone" placeholder="Telefon" class="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-sage/20 transition-all">
+                </div>
+                <button type="button" onclick="submitDemand()" class="w-full bg-sage text-white font-bold py-5 rounded-[2rem] uppercase text-sm tracking-widest hover:shadow-2xl transition-all">Talebi Gönder</button>
+            </form>
+        </div>
+
+        <!-- Business Form -->
+        <div id="businesses" class="bg-navy p-12 rounded-[3.5rem] text-white">
+            <h3 class="text-3xl font-serif mb-6 text-gold">Esnaf İşbirliği</h3>
+            <p class="text-gray-400 mb-10">Mahallemizin değerli esnafı; İmza Mahalle sakinlerine özel fırsatlar sunmak ve işinizi büyütmek için bize katılın.</p>
+            <form id="business-form" class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">İşletme Adı</label>
+                    <input type="text" id="biz-name" class="w-full bg-white/5 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-gold/20 transition-all text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">İş Birliği Alanı / Kategori</label>
+                    <input type="text" id="biz-category" placeholder="Örn: Tesisatçı, Restoran" class="w-full bg-white/5 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-gold/20 transition-all text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">İletişim / Detaylar</label>
+                    <textarea id="biz-desc" class="w-full bg-white/5 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-gold/20 transition-all text-white" placeholder="Bize kendinizden bahsedin..."></textarea>
+                </div>
+                <div class="grid grid-cols-1 gap-4">
+                    <input type="tel" id="biz-phone" placeholder="İletişim Telefonu" class="w-full bg-white/5 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-gold/20 transition-all text-white">
+                </div>
+                <div class="facility-booking mt-4">
+                    <label class="block text-sm text-gray-400 mb-2">Tesis Rezervasyonu (Haftalık Görünüm)</label>
+                    <select id="facility-select" onchange="loadWeeklyCalendar()" class="w-full bg-navy border border-white/10 rounded px-3 py-2 text-sm text-white mb-4">
+                        <option value="gym">Fitness Merkezi</option>
+                        <option value="pool">Açık Havuz</option>
+                        <option value="tennis">Tenis Kortu</option>
+                    </select>
+                    
+                    <!-- Haftalık Takvim Grid -->
+                    <div id="reservation-calendar" class="grid grid-cols-7 gap-1 text-[10px] sm:text-xs">
+                        <!-- Gün Başlıkları JS ile dolacak -->
+                    </div>
+                    
+                    <div id="selected-slot-info" class="mt-3 p-2 bg-white/5 rounded hidden">
+                        <p class="text-xs text-gold">Seçili: <span id="display-date"></span> - <span id="display-time"></span></p>
+                    </div>
+
+                    <button id="book-btn" onclick="bookFacility()" disabled class="w-full bg-gold/50 text-navy font-bold py-2 rounded mt-3 cursor-not-allowed transition-all">
+                        Rezervasyon Yap
+                    </button>
+                </div>
+                <button type="button" onclick="registerBusiness()" class="w-full bg-gold text-navy font-bold py-5 rounded-[2rem] uppercase text-sm tracking-widest hover:bg-white transition-all">BİRLİKTE KAZANALIM</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-100 py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-navy rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-house-chimney-window text-gold text-sm"></i>
+                </div>
+                <span class="text-lg font-serif font-bold tracking-tight">İmza <span class="text-sage">Mahalle</span></span>
+            </div>
+            <p class="text-gray-400 text-sm">© 2026 İmza Gayrimenkul Teknolojileri. Komşuluk için tasarlandı.</p>
+            <div class="flex gap-6 text-gray-400">
+                <a href="#" class="hover:text-navy"><i class="fa-brands fa-instagram text-xl"></i></a>
+                <a href="#" class="hover:text-navy"><i class="fa-brands fa-linkedin text-xl"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        async function submitDemand() {
+            const data = {
+                type: document.getElementById('demand-type').value,
+                content: document.getElementById('demand-content').value,
+                user_name: document.getElementById('demand-name').value,
+                user_phone: document.getElementById('demand-phone').value
+            };
+
+            if (!data.content || !data.user_name) {
+                alert('Lütfen tüm alanları doldurun.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/neighborhood/demands', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    alert('Talebiniz alınmıştır. Mahalle sorumlumuz sizinle iletişime geçecektir.');
+                    document.getElementById('demand-form').reset();
+                } else {
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Sunucuya erişilemedi.');
+            }
+        }
+
+        async function registerBusiness() {
+            const data = {
+                name: document.getElementById('biz-name').value,
+                category: document.getElementById('biz-category').value,
+                description: document.getElementById('biz-desc').value,
+                phone: document.getElementById('biz-phone').value
+            };
+
+            if (!data.name || !data.category) {
+                alert('İşletme adı ve kategori zorunludur.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/neighborhood/businesses/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    alert('İş birliği başvurunuz başarıyla kaydedildi. Teşekkür ederiz!');
+                    document.getElementById('business-form').reset();
+                } else {
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Sunucuya erişilemedi.');
+            }
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Fetch Regional Listings
+        async function fetchRegionalListings() {
+            try {
+                const response = await fetch('/api/neighborhood/listings?limit=3');
+                const listings = await response.json();
+                const container = document.getElementById('listing-container');
+                
+                if (listings.length === 0) {
+                    container.innerHTML = '<div class="text-center py-20 col-span-full text-gray-400">Bu mahallede henüz yayınlanmış güncel ilan bulunmuyor.</div>';
+                    return;
+                }
+
+                container.innerHTML = listings.map(item => `
+                    <div class="glass-card overflow-hidden rounded-[2rem] hover:shadow-2xl transition-all group">
+                        <div class="relative h-64">
+                            <img src="${item.resim_hero}" alt="${item.baslik1}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-navy">İmza Seçimi</div>
+                        </div>
+                        <div class="p-8">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-gold font-bold text-xs uppercase tracking-widest">${item.koleksiyon}</span>
+                                <span class="text-navy font-bold">${item.fiyat}</span>
+                            </div>
+                            <h4 class="text-xl font-serif text-navy mb-4">${item.baslik1} ${item.baslik2}</h4>
+                            <p class="text-gray-400 text-sm mb-6 flex items-center"><i class="fa-solid fa-location-dot mr-2"></i> ${item.lokasyon}</p>
+                            <button onclick="window.location.href='/anasayfa'" class="w-full border border-navy/10 text-navy font-bold py-4 rounded-xl text-xs uppercase tracking-widest hover:bg-navy hover:text-white transition-all">İncele</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching listings:', error);
+                document.getElementById('listing-container').innerHTML = '<div class="text-center py-20 col-span-full text-red-400">İlanlar yüklenirken bir sorun oluştu.</div>';
+            }
+        }
+
+        // Initialize
+        fetchRegionalListings();
+
+        // Concierge Logic
+        async function fetchConciergeData() {
+            try {
+                // Fetch Shuttle
+                const shuttleRes = await fetch('/api/neighborhood/shuttle');
+                const shuttleData = await shuttleRes.json();
+                document.getElementById('shuttle-list').innerHTML = shuttleData.map(s => `
+                    <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5 hover:border-gold/30 transition-all">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-bus text-gold mr-4"></i>
+                            <div>
+                                <p class="text-sm font-bold text-white">${s.route_name}</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-tighter">İmza Shuttle</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gold font-bold">${s.departure_time}</p>
+                            <p class="text-[10px] text-gray-500">Kalkış</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Fetch Facilities
+                const facilityRes = await fetch('/api/neighborhood/facilities');
+                const facilityData = await facilityRes.json();
+                document.getElementById('facility-list').innerHTML = facilityData.map(f => `
+                    <button onclick="selectFacility('${f.id}', '${f.name}')" class="flex flex-col items-center justify-center p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-gold transition-all group">
+                        <i class="fa-solid ${f.icon} text-2xl text-gray-400 group-hover:text-gold mb-3"></i>
+                        <span class="text-xs font-bold text-gray-400 group-hover:text-white">${f.name}</span>
+                    </button>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching concierge data:', error);
+            }
+        }
+
+        // --- APPOINTMENT SERVICE REFACTOR ---
+        window.imzaAppService = new ImzaAppointmentService('reservation-calendar', {
+            onSelect: (date, time) => {
+                document.getElementById('selected-slot-info').classList.remove('hidden');
+                document.getElementById('display-date').innerText = date;
+                document.getElementById('display-time').innerText = time;
+                
+                const btn = document.getElementById('book-btn');
+                btn.disabled = false;
+                btn.classList.remove('bg-gold/50', 'cursor-not-allowed');
+                btn.classList.add('bg-gold', 'hover:bg-yellow-600');
+            },
+            onBooked: () => {
+                alert('Rezervasyonunuz başarıyla oluşturuldu!');
+                document.getElementById('selected-slot-info').classList.add('hidden');
+                document.getElementById('book-btn').disabled = true;
+            }
+        });
+
+        async function loadWeeklyCalendar() {
+            const facilityId = document.getElementById('facility-select').value;
+            window.imzaAppService.loadCalendar(facilityId);
+        }
+
+        async function bookFacility() {
+            const res = await window.imzaAppService.book('Mahalle Sakini');
+            if (!res.success) alert('Rezervasyon oluşturulamadı: ' + res.error);
+        }
+
+        // --- PHARMACY LOGIC ---
+        async function fetchPharmacies() {
+            try {
+                const res = await fetch('/api/neighborhood/businesses?category=Eczane');
+                const data = await res.json();
+                const container = document.getElementById('pharmacy-list');
+                
+                container.innerHTML = data.map(e => `
+                    <div class="glass-card p-10 rounded-[2.5rem] border-red-500/10 hover:border-red-500/30 transition-all flex flex-col h-full group">
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-xl shadow-inner">
+                                <i class="fa-solid fa-house-medical"></i>
+                            </div>
+                            <span class="px-3 py-1 bg-red-500/10 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-500/10">Açık</span>
+                        </div>
+                        <h4 class="text-2xl font-serif text-navy mb-2 group-hover:text-red-600 transition-colors">${e.name}</h4>
+                        <p class="text-gray-500 text-xs mb-6 flex-1">${e.description}</p>
+                        <div class="space-y-4">
+                            <div class="flex items-center text-xs font-bold text-gray-400">
+                                <i class="fa-solid fa-phone mr-3"></i> ${e.phone}
+                            </div>
+                            <div class="flex items-center text-xs font-bold text-gray-400">
+                                <i class="fa-solid fa-location-dot mr-3"></i> ${e.address}
+                            </div>
+                            <a href="https://wa.me/${e.phone.replace(/\s/g, '')}?text=Merhaba%20${encodeURIComponent(e.name)},%20bir%20reçete/ilaç%20hazırlatmak%20istiyorum." 
+                               target="_blank"
+                               class="w-full py-4 bg-navy text-gold rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors">
+                                <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp ile İletişim
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        // Initialize Service
+        window.imzaAppService.init();
+        fetchPharmacies();
+
+        // Relocation Guide Logic
+        async function fetchRelocationGuide() {
+            try {
+                const response = await fetch('/api/neighborhood/relocation-guide');
+                const data = await response.json();
+                const container = document.getElementById('relocation-checklist');
+                
+                let html = '';
+                
+                const categories = [
+                    {key: 'resmi', title: 'Resmi Abonelikler', icon: 'fa-file-signature'},
+                    {key: 'altyapi', title: 'Altyapı & Teknik', icon: 'fa-tower-broadcast'},
+                    {key: 'hizmetler', title: 'Yerel Hizmetler', icon: 'fa-truck-fast'}
+                ];
+
+                categories.forEach(cat => {
+                    html += `
+                        <div>
+                            <h5 class="flex items-center text-navy font-bold mb-4 uppercase text-xs tracking-widest">
+                                <i class="fa-solid ${cat.icon} mr-3 text-gold"></i> ${cat.title}
+                            </h5>
+                            <div class="space-y-3">
+                                ${data[cat.key].map((item, idx) => `
+                                    <div class="flex items-center p-4 bg-gray-50 rounded-2xl group hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-gold/20">
+                                        <input type="checkbox" id="${cat.key}-${idx}" class="w-5 h-5 rounded-full border-2 border-gray-300 text-gold focus:ring-gold transition-all cursor-pointer">
+                                        <label for="${cat.key}-${idx}" class="ml-4 flex-1 cursor-pointer">
+                                            <p class="text-sm font-bold text-navy group-hover:text-gold transition-colors">${item.title} ${item.name ? '- ' + item.name : ''}</p>
+                                            <p class="text-[10px] text-gray-400 font-medium">${item.provider || item.desc || item.phone}</p>
+                                        </label>
+                                        ${item.link ? `<a href="${item.link}" target="_blank" class="text-gold opacity-0 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error fetching relocation guide:', error);
+            }
+        }
+
+        // Management & Tracking Logic
+        async function fetchManagementData() {
+            try {
+                // Fetch My Unit
+                const unitRes = await fetch('/api/neighborhood/my-unit');
+                const unitData = await unitRes.json();
+                const unitContainer = document.getElementById('unit-info');
+                
+                if (unitData.unit) {
+                    unitContainer.innerHTML = `
+                        <div class="flex justify-between items-center p-6 bg-white rounded-3xl border border-navy/5 shadow-sm">
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase">Blok / Daire</p>
+                                <p class="text-lg font-serif text-navy">${unitData.unit.block} Blok - No: ${unitData.unit.unit_number}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase">Aylık Aidat</p>
+                                <p class="text-lg font-serif text-gold">${unitData.unit.dues_amount} ₺</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <p class="text-[10px] font-bold text-navy uppercase tracking-widest pl-2">Son Ödemeler</p>
+                            ${unitData.payments.map(p => `
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gold/20 transition-all">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-4">
+                                            <i class="fa-solid fa-check text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-bold text-navy">${p.period} Aidat Ödemesi</p>
+                                            <p class="text-[10px] text-gray-400">${p.payment_date}</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-navy">${p.amount} ₺</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button data-lmetrics-id="btn-pay-dues" class="w-full py-4 bg-navy text-gold rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:scale-[1.02] transition-transform">Online Aidat Öde</button>
+                    `;
+                }
+
+                // Fetch Live Staff
+                const staffRes = await fetch('/api/tracking/live');
+                const staffData = await staffRes.json();
+                const staffLabel = document.getElementById('live-staff-label');
+                
+                if (staffData.length > 0) {
+                    staffLabel.innerText = `${staffData.length} PERSONEL SAHADA AKTİF`;
+                    // Harita simülasyonu için liste veya pin eklenebilir
+                }
+            } catch (error) {
+                console.error('Error fetching management data:', error);
+            }
+        }
+
+        fetchRelocationGuide();
+        fetchConciergeData();
+        fetchManagementData();
+    </script>
+</body>
+</html>

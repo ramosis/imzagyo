@@ -1,130 +1,78 @@
 flowchart TD
     %% === PROJE HEDEFLERİ ===
     %% Ultimate Goal: İmza Gayrimenkul portalını modern UI/UX, akıllı analiz ve birleşik mantıkla yeniden inşa etmek.
-    %% Current Goal: İmza Lens zekasıyla kullanıcı davranışlarını analiz etmek ve kişiselleştirilmiş deneyim sunmak.
+    %% Current Goal: Faz 2.1 tamamlandı (Modülerite). Faz 3'e (Mülk & Apartman Yönetimi) başlanıyor.
 
-    %% === KULLANICI KATMANI ===
-    subgraph Users [Kullanıcı Katmanı]
-        visitor("Ziyaretçi<br/><sub>İlanları gezer, arama yapar<br/>ve iletişim formu doldurur</sub>")
-        investor("Yatırımcı<br/><sub>Portföy analizlerini görür,<br/>AI fırsat rotasını kullanır</sub>")
-        admin("Danışman / Admin<br/><sub>Müşteri yönetimi, sözleşme<br/>oluşturma ve ilan girişi yapar</sub>")
-    end
+    %% === NODES ===
+    %% @project_start [start, closed, 2026-03-01, nam]
+    start("Proje Başlangıcı<br/><sub>İmza Gayrimenkul dijital<br/>dönüşüm sürecinin temel<br/>yapıtaşlarının atılması</sub>")
 
-    %% === UYGULAMA KATMANI ===
-    subgraph Apps [Uygulama Katmanı]
-        frontend("Web Frontend<br/><sub>pages/ klasöründe toplanmış<br/>Premium HTML/JS arayüzü</sub>")
-        imza_lens("İmza Lens Module<br/><sub>Akıllı karşılama, Geo-Targeting<br/>ve davranışsal analiz motoru</sub>")
-    end
+    %% @feature_lmetrics [ai-task, closed, 2026-03-20, antigravity]
+    lmetrics("L-Metrics & Analitik<br/><sub>Davranışsal takip ve niyet<br/>skoru altyapısının CRM ile<br/>entegre edilmesi tamamlandı</sub>")
 
-    %% === API & BACKEND KATMANI ===
-    subgraph Backend [API & Backend Katmanı]
-        flask_api("Flask Python API<br/><sub>pages/ ve root servisleri<br/>merkezi iş mantığı</sub>")
-        db[("Veritabanı<br/><sub>Mülkler, Müşteriler<br/>ve Sistem Ayarları</sub>")]
-        geo_api("FreeIPAPI Integration<br/><sub>IP tabanlı konum tespiti ve<br/>yerelleştirilmiş karşılama</sub>")
-    end
+    %% @feature_kanban [ai-task, closed, 2026-03-20, antigravity]
+    kanban("Satış Hunisi (Kanban)<br/><sub>Sürükle-bırak destekli<br/>pipeline.html ve backend<br/>aşama yönetimi eklendi</sub>")
 
-    %% === ALTYAPI & DAĞITIM ===
-    subgraph Infra [Altyapı & Dağıtım]
-        docker("Docker & Compose<br/><sub>Root dizininde korunan<br/>dağıtım konfigürasyonu</sub>")
-        pwa("PWA & Service Worker<br/><sub>Offline destek ve v2<br/>önbellek yönetimi (sw.js)</sub>")
-        data_logs("Data & Logs<br/><sub>data/ klasöründe toplanmış<br/>veritabanı, log ve yedekler</sub>")
-    end
+    %% @feature_automation [ai-task, closed, 2026-03-20, antigravity]
+    automation("Otomasyon Scheduler<br/><sub>scheduler.py ile arka plan<br/>pazarlama görevleri ve kural<br/>denetimi devreye alındı</sub>")
 
-    %% === İLİŞKİLER ===
-    visitor & investor --> frontend
-    frontend --> imza_lens
-    imza_lens <--> geo_api
-    imza_lens -- "Shadow Bridge" --> flask_api
-    admin --> frontend
+    %% @feature_ux_fix [ai-task, closed, 2026-03-20, antigravity]
+    ux_fix("Global UX & Bildirimler<br/><sub>Tümünü oku fonksiyonu ve<br/>premium Toast bildirim<br/>sistemi entegre edildi</sub>")
 
-    frontend <==> flask_api
-    flask_api <==> db
-    flask_api & db --> docker
-    frontend --> pwa
+    %% @feature_concierge_ui [ai-task, closed, 2026-03-24, antigravity]
+    concierge_ui("Tablo & Takvim UI<br/><sub>Concierge ve Rezervasyonlar<br/>için haftalık takvimli<br/>arayüz başarıyla uygulandı</sub>")
 
-    %% === GELİŞİM ÇİZGELGESİ (TRAJECTORY) ===
-    subgraph Trajectory [Gelişim Yolculuğu]
-        direction LR
-        %% @project_start [start, closed, 2026-03-01, nam]
-        start("Başlangıç")
-        
-        %% @feature_refactor [ai-task, closed, 2026-03-14, antigravity]
-        refactor("Yeniden Yapılanma")
+    %% @feature_route_playback [ai-task, closed, 2026-03-24, antigravity]
+    route_playback("Route Playback<br/><sub>Saha personelinin geçmiş<br/>rota verilerinin haritada<br/>oynatılması motoru kuruldu</sub>")
 
-        %% @feature_mobile_web [ai-task, closed, 2026-03-15, antigravity]
-        mobile_web("Mobil & PWA")
+    %% @feature_appointment_service [ai-task, closed, 2026-03-24, antigravity]
+    appointment_service("Modüler Randevu Servisi<br/><sub>appointment-service.js ile<br/>enjekte edilebilir rezervasyon<br/>altyapısı kuruldu</sub>")
 
-        %% @feature_l_metrics [ai-task, closed, 2026-03-16, antigravity]
-        l_metrics("L-Metrics (Faz 11)<br/><sub>Ziyaretçilerin scroll ve odaklanma<br/>kalitesini ölçen derinlik analiz<br/>motoru (Luxury Metrics) aktif edildi</sub>")
+    %% @feature_health_whatsapp [ai-task, closed, 2026-03-24, antigravity]
+    health_whatsapp("Eczane WhatsApp Entegrasyonu<br/><sub>Mahalle sağlık rehberi ve<br/>WhatsApp ile ilaç hazırlatma<br/>akışı tamamlandı</sub>")
 
-        %% @feature_geo_seo [ai-task, closed, 2026-03-17, antigravity]
-        geo_seo("SEO & Geo Lens (Faz 12)<br/><sub>IP-Geo ile şehir bazlı karşılama<br/>ve kullanıcı ilgisine göre dinamik<br/>meta-tag optimizasyonu tamamlandı</sub>")
+    %% @feature_mulk_yonetim [ai-task, opened, 2026-03-24, user]
+    mulk_yonetim("Mülk & Apt. Yönetimi<br/><sub>Daire bazlı aidat, kira<br/>takibi ve şeffaf kasa<br/>modüllerinin geliştirilmesi</sub>")
 
-        %% @feature_shadow_bridge [ai-task, closed, 2026-03-17, antigravity]
-        shadow_bridge("Shadow Bridge (Faz 13)<br/><sub>Anonim verilerin arka planda<br/>senkronize edilmesi ve yönetici<br/>görünürlüğü altyapısı kuruldu</sub>")
+    %% @ultimate_goal [end, opened, 2026-03-19, user]
+    ultimate_goal("Smart Ecosystem<br/><sub>Tüm modüllerin (CRM, Saha,<br/>Mahalle) kusursuz çalıştığı<br/>operasyonel ekosistem</sub>")
 
-        %% @feature_campaign_module [ai-task, closed, 2026-03-17, antigravity]
-        campaign("Kampanya Modülü (Faz 14)<br/><sub>Hero slider kampanya enjeksiyonu,<br/>merkezi talep formu ve L-Metrics<br/>backend entegrasyonu tamamlandı</sub>")
-
-        %% @feature_mobile_ops [ai-task, closed, 2026-03-17, antigravity]
-        mobile_ops("Mobil Operasyon (Faz 18)<br/><sub>Personel/Yönetici için CRM,<br/>AJANDA ve ekip takibi<br/>entegrasyonu tamamlandı</sub>")
-
-        %% @ultimate_goal [end, opened, 2026-03-17, nam]
-        goal("Büyük Hedef")
-
-        %% @env_setup [ai-task, opened, 2026-03-18, antigravity]
-        env_setup("Android Ortamı<br/><sub>Android Studio (3GB+) ve<br/>JDK 17 kurulumu devam ediyor.<br/>APK derlemesi için ön koşul</sub>")
-
-        %% @feature_extension_mvp [ai-task, closed, 2026-03-18, antigravity]
-        extension_mvp("Eklenti MVP (Faz 23)<br/><sub>Manifest V3, Popup UI ve<br/>temel scraping mantığı kuruldu.<br/>Geliştirme süreci tamamlandı</sub>")
-
-        %% @feature_extension_sync [ai-task, closed, 2026-03-18, antigravity]
-        extension_sync("Eklenti Senkronizasyonu<br/><sub>Shadow Mode verilerinin Flask<br/>backend ile anlık senkronizasyonu<br/>altyapısı (API+DB) kuruldu</sub>")
-
-    %% @imza_lens_merkezi [ai-task, closed, 2026-03-18, antigravity]
-    imza_lens_merkezi("İmza Lens Merkezi Panel (Faz 24)<br/><sub>Shadow ve L-Metrics sekmeleri<br/>birleştirildi. Port 8000 ve canlı<br/>sunucu (API) optimizasyonu yapıldı.</sub>")
-
-    %% @feature_deep_scraping [ai-task, closed, 2026-03-18, antigravity]
-    deep_scraping("Derin Veri Kazıma (Faz 25)<br/><sub>İl, İlçe, Mahalle ve Koordinat<br/>bazlı scraping mantığı kuruldu.<br/>Portalda harita entegrasyonu aktif.</sub>")
-
-    %% @feature_roi_analysis [ai-task, closed, 2026-03-18, antigravity]
-    roi_analysis("Bölgesel ROI (Faz 26)<br/><sub>Veritabanında biriken kiralık<br/>ilan verileriyle satış ilanlarına<br/>gerçekçi amortisman analizi yapıldı.</sub>")
-
-        %% @extension_ui_overhaul [ai-task, closed, 2026-03-18, antigravity]
-        extension_ui_overhaul("Eklenti UI & Scraping (Faz 27)<br/><sub>Popup UI yenileme, Manual Override<br/>ve detaylı m2 (Net/Brüt) tespiti<br/>ile scraping mantığı güçlendirildi</sub>")
-
-        start --> refactor --> mobile_web --> l_metrics --> geo_seo --> shadow_bridge --> campaign --> admin_fix --> mobile_ops --> extensions
-        extensions --> extension_mvp --> extension_sync --> imza_lens_merkezi --> deep_scraping --> roi_analysis
-        roi_analysis --> extension_ui_overhaul --> env_setup
-        env_setup -.-> goal
-    end
+    %% === CONNECTIONS ===
+    start --> lmetrics
+    lmetrics --> kanban
+    kanban --> automation
+    automation --> ux_fix
+    ux_fix --> concierge_ui
+    ux_fix --> route_playback
+    concierge_ui --> appointment_service
+    appointment_service --> health_whatsapp
+    health_whatsapp --> mulk_yonetim
+    route_playback --> mulk_yonetim
+    mulk_yonetim -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
-    subgraph recent [SON ÇALIŞMA]
+    subgraph recent [RECENT]
+        appointment_service
+        health_whatsapp
     end
 
     %% === STYLES ===
-    %% Closed tasks
+    %% Closed tasks (soft purple)
     style start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style refactor fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style mobile_web fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style l_metrics fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style lmetrics fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style kanban fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style automation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style ux_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style concierge_ui fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style route_playback fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
-    %% Recent nodes
-    style geo_seo fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style shadow_bridge fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style campaign fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style admin_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style mobile_ops fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style env_setup fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style extensions fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style extension_mvp fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style extension_sync fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style imza_lens_merkezi fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style deep_scraping fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style roi_analysis fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style extension_ui_overhaul fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    %% Recent node (highlighted purple)
+    style appointment_service fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style health_whatsapp fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+
+    %% Recent subgraph (dashed border)
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
-    %% Open tasks
-    style goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    %% Open tasks (soft green)
+    style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style mulk_yonetim fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

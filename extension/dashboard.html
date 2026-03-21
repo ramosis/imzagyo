@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Karşılaştırma Masası | İmzalı ROI</title>
     <style>
         body { font-family: sans-serif; background: #0f172a; color: white; padding: 40px; }
         .container { max-width: 1200px; margin: 0 auto; }
-        h1 { border-bottom: 2px solid #f59e0b; padding-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f59e0b; padding-bottom: 10px; margin-bottom: 20px; }
+        h1 { margin: 0; display: flex; align-items: center; gap: 15px; font-size: 24px; }
         table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #1e293b; border-radius: 12px; overflow: hidden; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #334155; }
         th { background: #334155; color: #94a3b8; font-size: 12px; text-transform: uppercase; }
@@ -14,54 +15,66 @@
         .roi-tag { background: #10b981; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
         .delete-btn { color: #f87171; cursor: pointer; background: none; border: 1px solid #f87171; padding: 5px 10px; border-radius: 4px; }
         .link-btn { color: #38bdf8; text-decoration: none; font-size: 12px; }
+        .btn-export { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        .btn-google { background: #4285f4; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        select, input { background: #334155; color: white; border: 1px solid #475569; padding: 8px; border-radius: 4px; }
     </style>
+    <!-- SheetJS CDN -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1><span>🖥️</span> Karşılaştırma Masası (Yerel)</h1>
-        <p style="color: #94a3b8;">Bu listedeki veriler sadece sizin bilgisayarınızda (chrome.storage.local) saklanır.</p>
+        <div class="header-row">
+            <h1 id="msg-comparisonTable"><span>🖥️</span> Karşılaştırma Masası (Yerel)</h1>
+            <div>
+                <button id="exportExcelBtn" class="btn-export">📥 Excel'e Aktar</button>
+                <button id="exportGoogleBtn" class="btn-google">📊 Google Tablolara Aktar</button>
+            </div>
+        </div>
+        
+        <p id="msg-localDataWarning" style="color: #94a3b8;">Bu listedeki veriler sadece sizin bilgisayarınızda (chrome.storage.local) saklanır.</p>
         
         <!-- Filtreleme Alanı -->
-        <div style="margin: 20px 0; display: flex; gap: 15px; flex-wrap: wrap;">
+        <div style="margin: 20px 0; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
             <div>
-                <label for="filterType" style="display: block; margin-bottom: 5px; color: #94a3b8;">İlan Türü:</label>
-                <select id="filterType" class="border rounded px-2 py-1" style="background: #334155; color: white; border: 1px solid #475569; padding: 8px;">
-                    <option value="">Tümü</option>
-                    <option value="Satılık">Satılık</option>
-                    <option value="Kiralık">Kiralık</option>
+                <label for="filterType" id="msg-filterType" style="display: block; margin-bottom: 5px; color: #94a3b8;">İlan Türü:</label>
+                <select id="filterType">
+                    <option value="" id="msg-all">Tümü</option>
+                    <option value="Satılık" id="msg-forSale">Satılık</option>
+                    <option value="Kiralık" id="msg-forRent">Kiralık</option>
                 </select>
             </div>
             
             <div>
-                <label for="filterCategory" style="display: block; margin-bottom: 5px; color: #94a3b8;">Kategori:</label>
-                <select id="filterCategory" class="border rounded px-2 py-1" style="background: #334155; color: white; border: 1px solid #475569; padding: 8px;">
-                    <option value="">Tümü</option>
-                    <option value="konut">Konut</option>
-                    <option value="isyeri">İş Yeri</option>
-                    <option value="arsa">Arsa</option>
-                    <option value="devremulk">Devremülk</option>
+                <label for="filterCategory" id="msg-filterCategory" style="display: block; margin-bottom: 5px; color: #94a3b8;">Kategori:</label>
+                <select id="filterCategory">
+                    <option value="" id="msg-all2">Tümü</option>
+                    <option value="Konut" id="msg-residential">Konut</option>
+                    <option value="Dükkan" id="msg-commercial">Dükkan</option>
+                    <option value="Arsa" id="msg-land">Arsa</option>
+                    <option value="Tarla" id="msg-field">Tarla</option>
                 </select>
             </div>
             
             <div>
-                <label for="filterSearch" style="display: block; margin-bottom: 5px; color: #94a3b8;">Ara:</label>
-                <input type="text" id="filterSearch" placeholder="Konum, ilan no..." style="background: #334155; color: white; border: 1px solid #475569; padding: 8px; border-radius: 4px;">
+                <label for="filterSearch" id="msg-search" style="display: block; margin-bottom: 5px; color: #94a3b8;">Ara:</label>
+                <input type="text" id="filterSearch" placeholder="...">
             </div>
             
-            <button id="clearFilters" style="align-self: flex-end; background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Filtreleri Temizle</button>
+            <button id="clearFilters" style="background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Filtreleri Temizle</button>
         </div>
         
         <table id="comparisonTable">
             <thead>
                 <tr>
-                    <th>Tarih</th>
-                    <th>Tür / Kategori</th>
-                    <th>İlan / Konum</th>
-                    <th>Fiyat</th>
-                    <th>m2 (Brüt/Net)</th>
-                    <th>Tahmini Kira</th>
+                    <th id="msg-date">Tarih</th>
+                    <th id="msg-category">Tür / Kategori</th>
+                    <th id="msg-listingLocation">İlan / Konum</th>
+                    <th id="msg-price">Fiyat</th>
+                    <th id="msg-brutM2">m2 (Brüt/Net)</th>
+                    <th id="msg-monthlyRent">Tahmini Kira</th>
                     <th>ROI</th>
-                    <th>İşlem</th>
+                    <th id="msg-action">İşlem</th>
                 </tr>
             </thead>
             <tbody id="tableBody">

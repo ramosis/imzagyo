@@ -39,30 +39,25 @@ from api.campaigns import campaigns_bp
 from api.hr import hr_bp
 from api.contacts import contacts_bp
 from api.tracking import tracking_bp
+from api.lmetrics import lmetrics_bp
+from api.notifications import notifications_bp
 from api.ai import ai_bp
 from api.neighborhood import neighborhood_bp
 from api.projects import projects_bp
+from api.pipeline import pipeline_bp
+from api.automation import automation_bp
 app = Flask(__name__, static_folder=None)
 
 # Rate Limiter Yapılandırması
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=["10000 per day", "2000 per hour"],
     storage_uri="memory://",
 )
 
 # --- VERİ DOĞRULAMA ŞEMALARI (MARSHMALLOW) ---
 # Şemalar merkezi olarak api/schemas.py dosyasına taşındı.
-
-UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -78,6 +73,7 @@ app.register_blueprint(users_bp)
 app.register_blueprint(contracts_bp)
 app.register_blueprint(taxes_bp)
 app.register_blueprint(maintenance_bp)
+app.register_blueprint(notifications_bp)
 app.register_blueprint(ai_bp)
 app.register_blueprint(appointments_bp)
 app.register_blueprint(auth_bp)
@@ -95,8 +91,11 @@ app.register_blueprint(campaigns_bp)
 app.register_blueprint(hr_bp)
 app.register_blueprint(contacts_bp)
 app.register_blueprint(tracking_bp)
+app.register_blueprint(lmetrics_bp)
 app.register_blueprint(neighborhood_bp)
 app.register_blueprint(projects_bp)
+app.register_blueprint(pipeline_bp)
+app.register_blueprint(automation_bp)
 
 @app.after_request
 def add_header(r):
@@ -121,6 +120,18 @@ doldur_ornek_veriler()
 @app.route('/')
 def index():
     return send_from_directory('pages', 'anasayfa.html')
+
+@app.route('/portal')
+def portal():
+    return send_from_directory('pages', 'portal.html')
+
+@app.route('/pipeline')
+def pipeline():
+    return send_from_directory('pages', 'pipeline.html')
+
+@app.route('/mahalle')
+def mahalle():
+    return send_from_directory('pages', 'mahalle.html')
 
 @app.route('/<path:path>')
 def serve_file(path):

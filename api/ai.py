@@ -1,7 +1,8 @@
 import os
+import datetime
 from flask import Blueprint, request, jsonify
 import google.generativeai as genai
-from api.auth import require_inner_circle
+from .auth import require_inner_circle
 
 ai_bp = Blueprint('ai', __name__)
 
@@ -98,7 +99,7 @@ def analyze_investor():
             scores[choice] += 1
             
     # Kazanan profili bul
-    winning_profile = max(scores, key=scores.get)
+    winning_profile = max(scores, key=lambda k: scores[k])
     
     # Stratejik Veri Sözlüğü (SADECE BACKEND)
     profiles = {
@@ -143,3 +144,73 @@ def analyze_investor():
             "agent": result["assigned_agent_type"]
         }
     }), 200
+
+@ai_bp.route('/api/ai/lead-insights/<int:id>', methods=['GET'])
+@require_inner_circle
+def lead_insights(id):
+    """
+    Belirli bir lead'in dijital ayak izlerini analiz eder ve AI özeti oluşturur.
+    """
+    from database import get_db_connection
+    import json
+
+    conn = get_db_connection()
+    try:
+        # 1. Lead bilgilerini ve etkileşimlerini al
+        lead = conn.execute('SELECT * FROM leads WHERE id = ?', (id,)).fetchone()
+        if not lead:
+            return jsonify({"error": "Lead bulunamadı"}), 404
+
+        interactions = conn.execute('''
+            SELECT * FROM lead_interactions 
+            WHERE lead_id = ? 
+            ORDER BY created_at DESC 
+            LIMIT 20
+        ''', (id,)).fetchall()
+
+        if not interactions:
+            return jsonify({"insight": "Henüz yeterli etkileşim verisi yok."}), 200
+
+        # 2. Etkileşim verilerini metinleştir
+        interaction_log = ""
+        for i in interactions:
+            data = json.loads(i['data_json']) if i['data_json'] else {}
+            interaction_log += f"- {i['created_at']}: {i['tool_name']} ({data.get('url', 'N/A')})\n"
+
+        # 3. Gemini Prompt Hazırla
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            return jsonify({"insight": "AI servisi şu an devre dışı (API Anahtarı eksik)."}), 200
+
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+
+        prompt = f"""
+Sen bir gayrimenkul danışmanı asistanısın. Aşağıdaki verileri analiz ederek danışmana bu aday (lead) hakkında stratejik bir niyet özeti yazar mısın?
+
+Aday İsmi: {lead['name']}
+Mevcut Durumu: {lead['status']}
+Etkileşim Geçmişi (Son 20 İşlem):
+{interaction_log}
+
+İstediğim özellikler:
+1. Müşterinin şu anki niyetini (Alıcı mı, Kiracı mı, Yatırımcı mı?) tahmin et.
+2. Hangi mülk tipi veya bölgeye ilgi gösterdiğini öne çıkar.
+3. Maksimum 3 cümlelik, danışmana taktik veren profesyonel bir not yaz.
+
+Lütfen sadece oluşturduğun notu döndür.
+"""
+        response = model.generate_content(prompt)
+        insight_text = response.text.strip()
+
+        return jsonify({
+            "lead_id": id,
+            "ai_score": lead['ai_score'],
+            "insight": insight_text,
+            "generated_at": datetime.datetime.now().isoformat()
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()

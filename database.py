@@ -32,6 +32,20 @@ def init_db():
     except:
         pass # Zaten varsa hata verme
 
+    # Örnek Tesisler
+    cursor.execute('INSERT OR IGNORE INTO neighborhood_facilities (id, name, category, icon, description) VALUES (?, ?, ?, ?, ?)',
+                   ('gym', 'Fitness Center', 'Sport', 'fa-dumbbell', 'Modern ekipmanlarla donatılmış spor salonu.'))
+    cursor.execute('INSERT OR IGNORE INTO neighborhood_facilities (id, name, category, icon, description) VALUES (?, ?, ?, ?, ?)',
+                   ('pool', 'Açık Havuz', 'Sport', 'fa-person-swimming', 'Yaz aylarında kullanıma açık vadi manzaralı havuz.'))
+    cursor.execute('INSERT OR IGNORE INTO neighborhood_facilities (id, name, category, icon, description) VALUES (?, ?, ?, ?, ?)',
+                   ('cinema', 'Cep Sineması', 'Entertainment', 'fa-film', 'Ailenizle film keyfi yapabileceğiniz özel salon.'))
+
+    # Örnek Shuttle
+    cursor.execute('INSERT OR IGNORE INTO shuttle_schedule (route_name, departure_time, estimated_arrival) VALUES (?, ?, ?)',
+                   ('Maslak Metro - Site', '08:30', '08:45'))
+    cursor.execute('INSERT OR IGNORE INTO shuttle_schedule (route_name, departure_time, estimated_arrival) VALUES (?, ?, ?)',
+                   ('Site - Maslak Metro', '09:00', '09:15'))
+
     # Portföyler Tablosu (Tam olarak portfoy-data.js'deki alanlarla eşleşecek)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS portfoyler (
@@ -59,7 +73,8 @@ def init_db():
             danisman_resim TEXT,
             mulk_tipi TEXT DEFAULT 'Konut',
             alt_tip TEXT, -- Daire, Villa, Ofis, Arsa vb.
-            denetim_notlari TEXT
+            denetim_notlari TEXT,
+            mahalle_id TEXT -- İmza Mahalle eşleşmesi için
         )
     ''')
 
@@ -154,7 +169,8 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id),
             FOREIGN KEY(property_id) REFERENCES portfoyler(id),
-            FOREIGN KEY(assigned_user_id) REFERENCES users(id)
+            FOREIGN KEY(assigned_user_id) REFERENCES users(id),
+            FOREIGN KEY(pipeline_stage_id) REFERENCES pipeline_stages(id)
         )
     ''')
 
@@ -243,7 +259,8 @@ def init_db():
             interest_property_id TEXT, -- İlgilendiği portföy ID (Opsiyonel)
             campaign_id TEXT, -- Aktif kampanya ID
             assigned_user_id INTEGER, -- Atanan Danışman
-            status TEXT DEFAULT 'new', -- new, contacted, qualified, lost, converted
+            status TEXT DEFAULT 'new',
+            pipeline_stage_id INTEGER, -- new, contacted, qualified, lost, converted
             ai_score INTEGER DEFAULT 0, -- Yapay zeka öncelik puanı (0-100)
             segment TEXT, -- 'yatirimci', 'butce_odakli', 'yasam_tarzi', 'acil', 'buyuk_balik'
             score_x INTEGER DEFAULT 50, -- Alım Gücü (0-100)
@@ -254,9 +271,51 @@ def init_db():
             notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(interest_property_id) REFERENCES portfoyler(id),
-            FOREIGN KEY(assigned_user_id) REFERENCES users(id)
+            FOREIGN KEY(assigned_user_id) REFERENCES users(id),
+            FOREIGN KEY(pipeline_stage_id) REFERENCES pipeline_stages(id)
         )
     ''')
+    
+    # 1. Yeni Tablo: pipeline_stages (Aşamalar)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pipeline_stages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            order_index INTEGER DEFAULT 0,
+            color TEXT, -- Frontend'de sütun başlığı rengi için
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # 2. Yeni Tablo: pipeline_history (Geçiş Tarihçesi)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pipeline_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lead_id INTEGER NOT NULL,
+            old_stage_id INTEGER,
+            new_stage_id INTEGER NOT NULL,
+            user_id INTEGER,
+            reason TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(lead_id) REFERENCES leads(id),
+            FOREIGN KEY(old_stage_id) REFERENCES pipeline_stages(id),
+            FOREIGN KEY(new_stage_id) REFERENCES pipeline_stages(id),
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+
+    # Varsayılan Aşamaları Ekle (Eğer tablo boşsa)
+    cursor.execute('SELECT COUNT(*) FROM pipeline_stages')
+    if cursor.fetchone()[0] == 0:
+        default_stages = [
+            ('Yeni Aday', 1, '#60a5fa'),      # Mavi
+            ('İletişim Kuruldu', 2, '#fbbf24'), # Kehribar
+            ('Sunum / Randevu', 3, '#a78bfa'),   # Mor
+            ('Teklif Verildi', 4, '#fb923c'),    # Turuncu
+            ('Sözleşme / Satış', 5, '#34d399'),  # Yeşil
+            ('Kaybedildi', 6, '#f87171')        # Kırmızı
+        ]
+        cursor.executemany('INSERT INTO pipeline_stages (name, order_index, color) VALUES (?, ?, ?)', default_stages)
     
     # --- TODO: SATIŞ HUNİSİ VE MOBİL UYGULAMA İÇİN VERİTABANI PLANLAMASI ---
     # 1. Yeni Tablo: pipeline_stages
@@ -320,6 +379,21 @@ def init_db():
         )
     ''')
     
+    # --- Plan 5: 360 Degree Customer View (L-Metrics) ---
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_interactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT,
+            url TEXT,
+            event_type TEXT, -- scroll, click, focus, stay
+            element_id TEXT,
+            value TEXT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_interactions_session ON user_interactions(session_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_interactions_type ON user_interactions(event_type)')
+
     # 6. Yeni Tablo: staff_locations (Personel Konum Takibi)
     #    - Amaç: Saha ekibinin konum bilgilerini ve check-in/out sürelerini takip etmek.
     cursor.execute('''
@@ -386,6 +460,71 @@ def init_db():
             cursor.execute(f'ALTER TABLE listings_shadow ADD COLUMN {col_name} {col_type}')
         except sqlite3.OperationalError:
             pass # Kolon zaten varsa hata verir, görmezden gel
+
+    # --- LEADS TABLOSUNA PIPELINE_STAGE_ID EKLE (Migration) ---
+    try:
+        cursor.execute('ALTER TABLE leads ADD COLUMN pipeline_stage_id INTEGER REFERENCES pipeline_stages(id)')
+    except sqlite3.OperationalError:
+        pass
+
+    # --- PAZARLAMA OTOMASYONU VE KAMPANYA TABLOLARI (Plan 2) ---
+
+    # 8. Otomasyon Kuralları (Plant 2: Scheduler Desteğiyle)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS automation_rules (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            trigger_type TEXT NOT NULL, -- 'time_based', 'status_based', 'new_lead'
+            condition_json TEXT,         -- Örn: {"days_inactive": 3, "segment": "investor"}
+            action_type TEXT DEFAULT 'email',
+            action_template_id INTEGER,
+            last_run DATETIME,          -- Scheduler için kritik
+            is_active BOOLEAN DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # 9. Otomasyon Kayıtları
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS automation_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            rule_id INTEGER,
+            lead_id INTEGER,
+            action_taken TEXT,
+            status TEXT DEFAULT 'success',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(rule_id) REFERENCES automation_rules(id),
+            FOREIGN KEY(lead_id) REFERENCES leads(id)
+        )
+    ''')
+
+    # 10. Kampanyalar (Marketing Automation)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS campaigns (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            content_html TEXT NOT NULL,
+            target_audience TEXT NOT NULL, -- 'all', 'vip', 'leads'
+            campaign_type TEXT DEFAULT 'newsletter',
+            created_by INTEGER,
+            status TEXT DEFAULT 'draft',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(created_by) REFERENCES users(id)
+        )
+    ''')
+
+    # 11. Kampanya Gönderim Kayıtları
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS campaign_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            campaign_id INTEGER,
+            recipient_email TEXT NOT NULL,
+            status TEXT DEFAULT 'sent', -- sent, failed, opened
+            sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(campaign_id) REFERENCES campaigns(id)
+        )
+    ''')
 
     # -----------------------------------------------------------------------
 
@@ -477,7 +616,8 @@ def init_db():
             file_path TEXT, -- Varsa dosya yolu
             file_type TEXT, -- 'pdf', 'image', 'text'
             content TEXT, -- Mesaj içeriği veya not
-            status TEXT DEFAULT 'new', -- new, reviewed, archived
+            status TEXT DEFAULT 'new',
+            pipeline_stage_id INTEGER, -- new, reviewed, archived
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -499,36 +639,6 @@ def init_db():
 
     # --- E-Posta Pazarlama ve İletişim Merkezi (Madde 6) ---
     
-    # Kampanyalar ve Bültenler
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS campaigns (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            subject TEXT NOT NULL,
-            content_html TEXT NOT NULL,
-            target_audience TEXT NOT NULL, -- 'all', 'vip', 'tenants', 'leads'
-            campaign_type TEXT DEFAULT 'newsletter', -- newsletter, portfolio_presentation, collection_reminder
-            created_by INTEGER,
-            status TEXT DEFAULT 'draft', -- draft, sending, completed, failed
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(created_by) REFERENCES users(id)
-        )
-    ''')
-
-    # Gönderim Geçmişi (Log / Inbox)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS campaign_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            campaign_id INTEGER,
-            recipient_email TEXT NOT NULL,
-            recipient_name TEXT,
-            status TEXT DEFAULT 'pending', -- pending, sent, failed, opened
-            error_message TEXT,
-            sent_at TIMESTAMP,
-            FOREIGN KEY(campaign_id) REFERENCES campaigns(id)
-        )
-    ''')
-
     # İmza Mahalle / Esnaf Modülü
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS businesses (
@@ -550,11 +660,24 @@ def init_db():
         CREATE TABLE IF NOT EXISTS neighborhood_posts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
-            type TEXT NOT NULL, -- 'duyuru' (Yönetim), 'ulasim' (Servis/Carpool), 'paylasim' (Eşya), 'yardim'
+            type TEXT NOT NULL, -- 'duyuru', 'ulasim', 'paylasim', 'yardim'
             content TEXT NOT NULL,
             image_url TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+
+    # Mahalle Talepleri (Neighborhood Demands)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS neighborhood_demands (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL, -- 'Gayrimenkul', 'Hizmet', 'Organizasyon', 'Diger'
+            content TEXT NOT NULL,
+            user_name TEXT,
+            user_phone TEXT,
+            status TEXT DEFAULT 'open', -- 'open', 'in_progress', 'resolved'
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
@@ -584,12 +707,41 @@ def init_db():
             phone TEXT NOT NULL,
             email TEXT,
             message TEXT,
-            status TEXT DEFAULT 'new', -- 'new', 'contacted', 'closed'
+            status TEXT DEFAULT 'new',
+            pipeline_stage_id INTEGER, -- 'new', 'contacted', 'closed'
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(project_id) REFERENCES projects(id)
         )
     ''')
     
+    
+    # --- AKILLI PAZARLAMA OTOMASYONU TABLOLARI ---
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS automation_rules (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            trigger_type TEXT NOT NULL, -- 'time_based', 'status_based'
+            condition_json TEXT, -- Örn: {"days_inactive": 3, "segment": "investor"}
+            action_type TEXT DEFAULT 'email', -- 'email', 'sms', 'notification'
+            action_template_id INTEGER, -- message_templates tablosuna referans
+            is_active BOOLEAN DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            type TEXT NOT NULL, -- 'pipeline', 'ai_alert', 'automation', 'system'
+            title TEXT NOT NULL,
+            message TEXT NOT NULL,
+            status TEXT DEFAULT 'unread', -- 'unread', 'read'
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+
     conn.commit()
     
     # Hash the admin password before inserting
@@ -631,7 +783,102 @@ def doldur_ornek_veriler():
     cursor.execute('INSERT OR IGNORE INTO contracts (property_id, user_id, start_date, end_date, type) VALUES (?, ?, ?, ?, ?)', 
                    ('bogaz-villa', 5, '2024-01-01', '2025-01-01', 'Kira Sözleşmesi'))
 
-    # Varsayılan Mesaj Şablonları
+    # Imza Mahalle - Tesisler (Facilities)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS neighborhood_facilities (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            category TEXT, -- Sport, Entertainment, Health
+            icon TEXT,
+            description TEXT
+        )
+    ''')
+
+    # Imza Mahalle - Rezervasyonlar (Reservations)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS neighborhood_reservations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        facility_id INTEGER,
+        user_name TEXT,
+        user_phone TEXT,
+        reservation_date DATE,
+        time_slot TEXT,
+        status TEXT DEFAULT 'Pending',
+        FOREIGN KEY (facility_id) REFERENCES neighborhood_facilities(id)
+    )''')
+
+    # --- PLAN 4: STAFF TRACKING ---
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS staff_locations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            staff_id INTEGER,
+            staff_name TEXT,
+            lat REAL,
+            lng REAL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            status TEXT -- 'active', 'check-in', 'check-out'
+        )
+    ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_staff_locations_id ON staff_locations(staff_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_staff_locations_time ON staff_locations(timestamp)')
+
+    # --- PLAN 3.1: PROPERTY & APARTMENT MANAGEMENT ---
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS property_units (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        mahalle_id INTEGER,
+        block TEXT,
+        unit_number TEXT,
+        owner_name TEXT,
+        tenant_name TEXT,
+        dues_amount REAL
+    )''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS dues_payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        unit_id INTEGER,
+        amount REAL,
+        payment_date DATE,
+        period TEXT, -- E.g., '2026-03'
+        status TEXT DEFAULT 'Paid'
+    )''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS apartment_expenses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        mahalle_id INTEGER,
+        title TEXT,
+        amount REAL,
+        expense_date DATE,
+        receipt_url TEXT,
+        description TEXT
+    )''')
+
+    # Sample data for tracking (mock)
+    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (1, 1, 'Ahmet Yilmaz', 41.1123, 29.0234, 'Active')")
+    cursor.execute("INSERT OR IGNORE INTO staff_locations (id, staff_id, staff_name, lat, lng, status) VALUES (2, 2, 'Ayse Kaya', 41.1150, 29.0210, 'Active')")
+
+    # Sample data for Property Units
+    cursor.execute("INSERT OR IGNORE INTO property_units (id, mahalle_id, block, unit_number, owner_name, dues_amount) VALUES (1, 1, 'A', '12', 'Selim Bey', 1250.0)")
+    
+    # Sample dues payments
+    cursor.execute("INSERT OR IGNORE INTO dues_payments (unit_id, amount, payment_date, period) VALUES (1, 1250.0, '2026-03-01', 'Mart 2026')")
+    cursor.execute("INSERT OR IGNORE INTO dues_payments (unit_id, amount, payment_date, period) VALUES (1, 1250.0, '2026-02-02', 'Şubat 2026')")
+
+    # Sample apartment expenses
+    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (mahalle_id, title, amount, expense_date, description) VALUES (1, 'Asansör Bakımı', 4500.0, '2026-03-10', 'A Blok asansör halat değişimi ve periyodik bakım.')")
+    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (mahalle_id, title, amount, expense_date, description) VALUES (1, 'Bahçe Düzenleme', 2200.0, '2026-03-05', 'Bahar bakımı ve yeni çiçek ekimi.')")
+
+    # Imza Mahalle - Shuttle Saatleri (Demo verisi için tabloya gerek yok, kodda dönebiliriz ama buraya ekleyelim)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS shuttle_schedule (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            route_name TEXT,
+            departure_time TEXT,
+            estimated_arrival TEXT
+        )
+    ''')
     print("Mesaj şablonları kontrol ediliyor...")
     cursor.execute('SELECT COUNT(*) FROM message_templates')
     if cursor.fetchone()[0] == 0:
@@ -697,6 +944,7 @@ def doldur_ornek_veriler():
             "lokasyon": "İstanbul, Sarıyer",
             "refNo": "IMZ-992",
             "fiyat": "₺35.000.000",
+            "mahalle_id": "maslak",
             "oda": "6+2",
             "alan": "450 m²",
             "kat": "Müstakil",

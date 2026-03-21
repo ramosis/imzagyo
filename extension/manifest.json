@@ -1,8 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Evrensel ROI ve İlan Karşılaştırma Asistanı",
-  "version": "1.0.0",
-  "description": "Gizlilik odaklı, yerel ilan karşılaştırma ve ROI hesaplama asistanı.",
+  "name": "__MSG_extensionName__",
+  "version": "1.1.0",
+  "description": "__MSG_extensionDesc__",
+  "default_locale": "tr",
+>>>>+++ REPLACE
+
   "permissions": [
     "storage",
     "activeTab",
