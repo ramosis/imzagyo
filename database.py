@@ -67,6 +67,36 @@ def init_db():
     except:
         pass
 
+    try:
+        cursor.execute("ALTER TABLE property_units ADD COLUMN mahalle_id INTEGER")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE property_units ADD COLUMN block TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE property_units ADD COLUMN unit_number TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE property_units ADD COLUMN owner_name TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE property_units ADD COLUMN tenant_name TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE property_units ADD COLUMN dues_amount REAL")
+    except:
+        pass
+
     # --- Neighborhood & Facilities (Mahalle Özellikleri) ---
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS neighborhood_facilities (
