@@ -12,3 +12,5 @@ cloudinary
 Authlib
 bcrypt==4.1.2
 Pillow
+sentry-sdk[flask]
+gunicorn

@@ -58,10 +58,6 @@ from api.mls import mls_bp
 app = Flask(__name__, static_folder=None)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "imza-super-secret-session-key")
 
-# Blueprint Registration
-app.register_blueprint(inspection_bp)
-app.register_blueprint(mls_bp)
-
 # OAuth bileşenini ana uygulamaya bağla
 setup_oauth(app)
 # Initialize Sentry
@@ -147,6 +143,8 @@ app.register_blueprint(automation_bp)
 app.register_blueprint(media_bp)
 app.register_blueprint(appraisal_bp)
 app.register_blueprint(inspection_bp)
+app.register_blueprint(mls_bp)
+app.register_blueprint(compass_bp)
 
 @app.route('/inspection')
 def inspection_page():

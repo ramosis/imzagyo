@@ -4,7 +4,7 @@ import datetime
 import os
 import requests
 
-DB_NAME = 'imza_emlak.db'
+DB_NAME = 'data/imza_database.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)

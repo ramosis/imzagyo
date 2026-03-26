@@ -75,7 +75,8 @@ def init_db():
             denetim_notlari TEXT,
             mahalle_id TEXT, -- İmza Mahalle eşleşmesi için
             cephe TEXT, -- Kuzey, Güney, Doğu, Batı, vb.
-            gunes_bilgisi TEXT -- Metinsel güneş analizi
+            gunes_bilgisi TEXT, -- Metinsel güneş analizi
+            owner_id INTEGER REFERENCES users(id)
         )
     ''')
     
@@ -83,6 +84,7 @@ def init_db():
     try:
         cursor.execute('ALTER TABLE portfoyler ADD COLUMN cephe TEXT')
         cursor.execute('ALTER TABLE portfoyler ADD COLUMN gunes_bilgisi TEXT')
+        cursor.execute('ALTER TABLE portfoyler ADD COLUMN owner_id INTEGER REFERENCES users(id)')
     except sqlite3.OperationalError:
         pass # Kolonlar zaten eklenmişse hatayı yoksay
 
@@ -142,6 +144,19 @@ def init_db():
             longitude REAL NOT NULL,
             location_type TEXT, -- 'checkin', 'periodic', 'assigned'
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+
+    # Şifre Sıfırlama (HATA-002)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS password_resets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            token TEXT NOT NULL,
+            expiry TIMESTAMP NOT NULL,
+            used BOOLEAN DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
@@ -668,17 +683,14 @@ def init_db():
 
     # --- PAZARLAMA OTOMASYONU VE KAMPANYA TABLOLARI (Plan 2) ---
 
-    # 8. Otomasyon Kuralları (Plant 2: Scheduler Desteğiyle)
+    # 8. Otomasyon Kuralları (HATA-003)
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS automation_rules (
+        CREATE TABLE IF NOT EXISTS automations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            trigger_type TEXT NOT NULL, -- 'time_based', 'status_based', 'new_lead'
-            condition_json TEXT,         -- Örn: {"days_inactive": 3, "segment": "investor"}
-            action_type TEXT DEFAULT 'email',
-            action_template_id INTEGER,
-            last_run DATETIME,          -- Scheduler için kritik
+            trigger_event TEXT NOT NULL,
             is_active BOOLEAN DEFAULT 1,
+            last_run TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
