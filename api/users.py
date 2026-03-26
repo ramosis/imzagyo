@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from database import get_db_connection
 import json
+from .auth import hash_password
 
 users_bp = Blueprint('users', __name__)
 
@@ -18,8 +19,10 @@ def create_user():
     conn = get_db_connection()
     try:
         cur = conn.cursor()
+        raw_password = data.get('password') or data.get('password_hash') # Frontend'den gelen ham şifre
+        pwd_hash = hash_password(raw_password)
         cur.execute('INSERT INTO users (username, password_hash, role) VALUES (?,?,?)',
-                    (data.get('username'), data.get('password_hash'), data.get('role')))
+                    (data.get('username'), pwd_hash, data.get('role')))
         user_id = cur.lastrowid
         role = data.get('role')
 
@@ -50,9 +53,11 @@ def update_user(id):
     data = request.json
     conn = get_db_connection()
     cur = conn.cursor()
-    if data.get('password_hash'):
+    raw_password = data.get('password') or data.get('password_hash')
+    if raw_password:
+        pwd_hash = hash_password(raw_password)
         cur.execute('UPDATE users SET username=?, password_hash=?, role=? WHERE id=?',
-                    (data.get('username'), data.get('password_hash'), data.get('role'), id))
+                    (data.get('username'), pwd_hash, data.get('role'), id))
     else:
         cur.execute('UPDATE users SET username=?, role=? WHERE id=?',
                     (data.get('username'), data.get('role'), id))

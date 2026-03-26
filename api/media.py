@@ -28,6 +28,13 @@ def upload_media():
     if not portfolio_id or not category or not file:
         return jsonify({'error': 'Missing required fields'}), 400
         
+    # Boyut Kontrolü (Max 5MB)
+    file.seek(0, os.SEEK_END)
+    size = file.tell()
+    file.seek(0) # Başa sar
+    if size > 5 * 1024 * 1024:
+        return jsonify({'error': 'File too large (Max 5MB)'}), 400
+
     if not allowed_file(file.filename):
         return jsonify({'error': 'File type not allowed'}), 400
         

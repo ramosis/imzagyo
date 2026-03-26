@@ -6,6 +6,7 @@ from flask import Flask, send_from_directory, jsonify, request
 import sqlite3
 import json
 import os
+import secrets
 import time
 import urllib.parse
 from dotenv import load_dotenv
@@ -54,9 +55,15 @@ from api.social_auth import social_auth_bp, setup_oauth
 from api.compass import compass_bp
 from api.inspection import inspection_bp
 from api.mls import mls_bp
+from api.seo import seo_bp
 
+# Uygulama Ayarları
 app = Flask(__name__, static_folder=None)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "imza-super-secret-session-key")
+# Güvenli Secret Key: Env'den al, yoksa geçici güvenli bir tane oluştur (Prod'da mutlaka set edilmeli!)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex(32))
+
+# CORS Ayarları (Tüm API'ler için)
+CORS(app)
 
 # OAuth bileşenini ana uygulamaya bağla
 setup_oauth(app)
@@ -145,6 +152,7 @@ app.register_blueprint(appraisal_bp)
 app.register_blueprint(inspection_bp)
 app.register_blueprint(mls_bp)
 app.register_blueprint(compass_bp)
+app.register_blueprint(seo_bp)
 
 @app.route('/inspection')
 def inspection_page():
@@ -672,4 +680,6 @@ def get_whatsapp_template(id):
 if __name__ == '__main__':
     # Flask sunucusunu başlat
     # Flask sunucusunu başlat (Docker için 0.0.0.0'a bağlamak şart)
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    # Üretim ortamında DEBUG=False olmalı. Env'den kontrol et.
+    is_debug = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+    app.run(debug=is_debug, host='0.0.0.0', port=8000)
