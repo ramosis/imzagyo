@@ -1,11 +1,63 @@
 /* İmza Emlak Asistanı - Sayfa Enjeksiyon Stilleri */
-.imza-analiz-box {
-    border: 2px solid #D4AF37 !important;
-    background: #0F0F13 !important;
-    color: white !important;
-    padding: 15px !important;
-    border-radius: 12px !important;
-    margin: 10px 0 !important;
-    font-family: 'Montserrat', sans-serif !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+.imza-hud-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 260px;
+    background: #0F172A;
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1.5px solid #F59E0B;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    z-index: 99999999;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.imza-hud-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 8px;
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.imza-hud-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.imza-hud-label {
+    color: #94A3B8;
+}
+
+.imza-hud-value {
+    color: #F59E0B;
+    font-weight: 700;
+}
+
+.imza-roi-badge {
+    background: #10B981;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.imza-hud-btn {
+    width: 100%;
+    background: #F59E0B;
+    color: #0F172A;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
 }

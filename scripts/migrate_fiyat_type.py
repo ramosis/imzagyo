@@ -11,10 +11,10 @@ def migrate():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
-    print("Starting migration: portfoyler.fiyat TEXT -> REAL")
+    print("Starting corrected migration: portfoyler.fiyat TEXT -> REAL")
 
     try:
-        # 1. Create a temporary table with the new schema
+        # 1. Create a temporary table with the new schema (including all Phase 8 columns)
         cursor.execute("DROP TABLE IF EXISTS portfoyler_new")
         cursor.execute('''
             CREATE TABLE portfoyler_new (
@@ -24,7 +24,7 @@ def migrate():
                 baslik2 TEXT,
                 lokasyon TEXT,
                 refNo TEXT,
-                fiyat REAL, -- CHANGED TO REAL
+                fiyat REAL,
                 oda TEXT,
                 alan TEXT,
                 kat TEXT,
@@ -42,32 +42,39 @@ def migrate():
                 mulk_tipi TEXT DEFAULT 'Konut',
                 alt_tip TEXT,
                 denetim_notlari TEXT,
-                mahalle_id TEXT,
+                mahalle_id TEXT, -- New Phase 8
                 cephe TEXT,
                 gunes_bilgisi TEXT,
-                owner_id INTEGER REFERENCES users(id)
+                owner_id INTEGER REFERENCES users(id) -- New Phase 8
             )
         ''')
 
-        # 2. Copy data from old to new (using CAST for fiyat)
+        # 2. Copy data from old to new (matching ONLY current 26 columns)
+        # Current columns in source: id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat,
+        # ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler,
+        # danisman_isim, danisman_unvan, danisman_resim, mulk_tipi, alt_tip, denetim_notlari, cephe, gunes_bilgisi
+        
         cursor.execute('''
             INSERT INTO portfoyler_new 
+            (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat,
+             ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler,
+             danisman_isim, danisman_unvan, danisman_resim, mulk_tipi, alt_tip, denetim_notlari,
+             cephe, gunes_bilgisi)
             SELECT id, koleksiyon, baslik1, baslik2, lokasyon, refNo, 
-                   CAST(REPLACE(REPLACE(fiyat, '.', ''), ',', '.') AS REAL), -- Clean and cast
+                   CAST(REPLACE(REPLACE(fiyat, '.', ''), ',', '.') AS REAL),
                    oda, alan, kat, ozellik_renk, bg_renk, btn_renk, icon_renk, 
                    resim_hero, resim_hikaye, hikaye, ozellikler, danisman_isim, 
                    danisman_unvan, danisman_resim, mulk_tipi, alt_tip, 
-                   denetim_notlari, mahalle_id, cephe, gunes_bilgisi, owner_id
+                   denetim_notlari, cephe, gunes_bilgisi
             FROM portfoyler
         ''')
 
         # 3. Drop old table and rename new
-        # We need to drop dependent foreign key constraints first if any, but SQLite doesn't enforce this during Drop
         cursor.execute("DROP TABLE portfoyler")
         cursor.execute("ALTER TABLE portfoyler_new RENAME TO portfoyler")
 
         conn.commit()
-        print("Migration successful: portfoyler.fiyat is now REAL.")
+        print("Migration successful: portfoyler.fiyat is now REAL and Phase 8 columns added.")
 
     except Exception as e:
         conn.rollback()

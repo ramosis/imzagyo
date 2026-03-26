@@ -7,6 +7,8 @@ let currentData = {
     listing_type: 'Satılık'
 };
 
+const API_BASE = "http://127.0.0.1:5000";
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Dil ayarını yükle ve uygula
     const { user_lang = 'tr' } = await chrome.storage.local.get('user_lang');
@@ -17,30 +19,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
     // Content script'ten veri iste
->>>>+++ REPLACE
-
     chrome.tabs.sendMessage(tab.id, { action: "GET_LISTING_DATA" }, (response) => {
         if (chrome.runtime.lastError) {
             console.error("Mesaj gönderme hatası:", chrome.runtime.lastError.message);
             document.getElementById('listingTitle').value = "İletişim hatası. Sayfa script'i aktif mi?";
-            updateUI(currentData); // Fallback to default data
+            updateUI(currentData); 
             return;
         }
         
         if (response) {
-            // Gelen veriyi mevcut veriyle birleştir
             Object.assign(currentData, response);
             updateUI(currentData);
         } else {
             document.getElementById('listingTitle').value = "Veri okunamadı. Sayfayı yenileyin.";
-            updateUI(currentData); // Fallback to default data
+            updateUI(currentData);
         }
     });
 
     // Olay Dinleyicileri
     document.getElementById('rentInput').addEventListener('input', (e) => calculateROI(e.target.value));
     document.getElementById('addToListBtn').addEventListener('click', saveToLocal);
+    document.getElementById('syncToPortalBtn').addEventListener('click', syncToPortal);
     document.getElementById('openDashboardBtn').addEventListener('click', () => chrome.tabs.create({ url: 'dashboard.html' }));
+    
+    // Auth Olayları
+    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+    // İlk Auth Kontrolü
+    checkAuth();
 
     // Buton Grubu Dinleyicileri
     document.getElementById('ilan-tipi-group').addEventListener('click', (e) => {
@@ -57,66 +64,59 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Dil değiştirme
+    // Tab Mantığı
+    document.getElementById('tab-portal').addEventListener('click', () => switchTab('portal'));
+    document.getElementById('tab-research').addEventListener('click', () => {
+        switchTab('research');
+        loadSavedParcels();
+    });
+
     document.getElementById('langSelect').addEventListener('change', async (e) => {
         const lang = e.target.value;
         await chrome.storage.local.set({ user_lang: lang });
-        location.reload(); // Arayüzü tazelemek için en temiz yol
+        location.reload();
     });
 });
 
 function applyLanguage(lang) {
-    // i18n anahtarlarına sahip elementleri güncelle
     document.querySelectorAll('[id^="msg-"]').forEach(el => {
         const key = el.id.replace('msg-', '');
         const message = chrome.i18n.getMessage(key);
         if (message) el.innerText = message;
     });
 
-    // Buton metinlerini güncelle
-    document.getElementById('addToListBtn').innerText = chrome.i18n.getMessage('addToList');
-    document.getElementById('openDashboardBtn').innerText = chrome.i18n.getMessage('openDashboard');
+    document.getElementById('addToListBtn').innerText = chrome.i18n.getMessage('addToList') || "Listeye Ekle";
+    document.getElementById('openDashboardBtn').innerText = chrome.i18n.getMessage('openDashboard') || "Paneli Aç";
     
-    // Placeholderları güncelle
-    document.getElementById('rentInput').placeholder = chrome.i18n.getMessage('monthlyRent').replace(' (₺)', '');
-    
-    // RTL Desteği (Arapça için)
-    if (lang === 'ar') {
-        document.body.style.direction = 'rtl';
-    } else {
-        document.body.style.direction = 'ltr';
+    if (document.getElementById('rentInput')) {
+        document.getElementById('rentInput').placeholder = (chrome.i18n.getMessage('monthlyRent') || "Aylık Kira").replace(' (₺)', '');
     }
+    
+    document.body.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
 }
->>>>+++ REPLACE
-
 
 function handleCategoryChange(value) {
     currentData.category = value;
-    
-    // Buton aktif durumunu güncelle
     updateButtonGroup('ilan-tipi-group', value);
 
-    // Alanların görünürlüğünü yönet
     const m2Fields = document.getElementById('m2-fields');
     const arsaFields = document.getElementById('arsa-fields');
     const tarlaFields = document.getElementById('tarla-fields');
 
-    // Önce hepsini gizle
-    m2Fields.classList.add('hidden');
-    arsaFields.classList.add('hidden');
-    tarlaFields.classList.add('hidden');
+    if (m2Fields) m2Fields.classList.add('hidden');
+    if (arsaFields) arsaFields.classList.add('hidden');
+    if (tarlaFields) tarlaFields.classList.add('hidden');
 
-    // Seçime göre göster
     switch(value) {
         case 'Konut':
         case 'Dükkan':
-            m2Fields.classList.remove('hidden');
+            if (m2Fields) m2Fields.classList.remove('hidden');
             break;
         case 'Arsa':
-            arsaFields.classList.remove('hidden');
+            if (arsaFields) arsaFields.classList.remove('hidden');
             break;
         case 'Tarla':
-            tarlaFields.classList.remove('hidden');
+            if (tarlaFields) tarlaFields.classList.remove('hidden');
             break;
     }
 }
@@ -124,12 +124,12 @@ function handleCategoryChange(value) {
 function handleListingTypeChange(value) {
     currentData.listing_type = value;
     updateButtonGroup('islem-tipi-group', value);
-    // ROI'yi yeniden hesapla çünkü işlem tipi değişti
     calculateROI(document.getElementById('rentInput').value);
 }
 
 function updateButtonGroup(groupId, activeValue) {
     const group = document.getElementById(groupId);
+    if (!group) return;
     group.querySelectorAll('.option-button').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.value === activeValue) {
@@ -139,39 +139,23 @@ function updateButtonGroup(groupId, activeValue) {
 }
 
 function updateUI(data) {
-    // Buton gruplarını ayarla
     handleCategoryChange(data.category || 'Konut');
     handleListingTypeChange(data.listing_type || 'Satılık');
     
-    // Diğer alanların güncellenmesi
     document.getElementById('listingTitle').value = data.title || '';
-    document.getElementById('listingPrice').value = data.price || 'Bilinmiyor';
+    document.getElementById('listingPrice').value = data.price || '0';
     document.getElementById('listingM2Brut').value = data.m2_brut || 0;
     document.getElementById('listingM2Net').value = data.m2_net || 0;
     document.getElementById('listingRooms').value = data.rooms || '0+0';
-    
-    // Değişiklikleri dinle (Override)
-    const fields = ['listingTitle', 'listingPrice', 'listingRooms', 'listingM2Brut', 'listingM2Net'];
-    fields.forEach(id => {
-        document.getElementById(id).addEventListener('input', () => {
-            // JS'de bu alanlar için özel bir key-mapping yapmaya gerek yok, saveToLocal'de doğrudan okunuyor.
-        });
-    });
 }
 
 function calculateROI(monthlyRent) {
-    const listingType = currentData.listing_type;
-    
-    // Sadece satılık ilanlarda ROI hesapla
-    if (listingType !== 'Satılık') {
+    if (currentData.listing_type !== 'Satılık') {
         document.getElementById('roiValue').innerText = "N/A";
-        document.getElementById('roiValue').style.background = "#64748b";
         document.getElementById('amortizationYears').innerText = "-";
         document.getElementById('resultArea').style.display = "block";
         return;
     }
-
-    if (!currentData || !monthlyRent) return;
 
     const priceRaw = document.getElementById('listingPrice').value;
     const priceNumeric = parseFloat(priceRaw.toString().replace(/\./g, '').replace(/[^\d]/g, ''));
@@ -183,20 +167,125 @@ function calculateROI(monthlyRent) {
         const amortization = priceNumeric / annualRent;
 
         document.getElementById('roiValue').innerText = `%${roi.toFixed(2)}`;
-        document.getElementById('roiValue').style.background = "#10b981";
         document.getElementById('amortizationYears').innerText = amortization.toFixed(1);
         document.getElementById('resultArea').style.display = "block";
+    }
+}
 
-        chrome.runtime.sendMessage({
-            action: "LOG_STATS",
-            data: {
-                city: currentData.city,
-                district: currentData.district,
-                neighborhood: currentData.neighborhood,
-                m2: document.getElementById('listingM2Brut').value,
-                price: priceNumeric
-            }
+async function checkAuth() {
+    const { token, username } = await chrome.storage.local.get(['token', 'username']);
+    const loginSection = document.getElementById('loginSection');
+    const mainSection = document.getElementById('mainSection');
+    const userBadge = document.getElementById('userBadge');
+
+    if (token) {
+        if (loginSection) loginSection.classList.add('hidden');
+        if (mainSection) mainSection.classList.remove('hidden');
+        if (userBadge) userBadge.innerText = `👤 ${username}`;
+    } else {
+        if (loginSection) loginSection.classList.remove('hidden');
+        if (mainSection) mainSection.classList.add('hidden');
+    }
+}
+
+async function handleLogin() {
+    const userInput = document.getElementById('username').value;
+    const passInput = document.getElementById('password').value;
+    const errorDiv = document.getElementById('loginError');
+
+    if (!userInput || !passInput) {
+        errorDiv.innerText = "Lütfen alanları doldurun.";
+        return;
+    }
+
+    errorDiv.innerText = "Giriş yapılıyor...";
+
+    try {
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: userInput, password: passInput })
         });
+
+        const data = await response.json();
+
+        if (response.ok && data.access_token) {
+            await chrome.storage.local.set({ 
+                token: data.access_token, 
+                username: data.user.username,
+                is_admin: data.user.is_admin
+            });
+            errorDiv.innerText = "";
+            checkAuth();
+        } else {
+            errorDiv.innerText = data.error || "Giriş başarısız.";
+        }
+    } catch (e) {
+        errorDiv.innerText = "Sunucuya bağlanılamadı.";
+        console.error(e);
+    }
+}
+
+async function handleLogout() {
+    await chrome.storage.local.remove(['token', 'username', 'is_admin']);
+    checkAuth();
+}
+
+async function syncToPortal() {
+    const { token } = await chrome.storage.local.get('token');
+    if (!token) {
+        alert("Lütfen önce giriş yapın.");
+        return;
+    }
+
+    const btn = document.getElementById('syncToPortalBtn');
+    const originalText = btn.innerText;
+    btn.innerText = "⏳ Gönderiliyor...";
+    btn.disabled = true;
+
+    const portfolioData = {
+        title: document.getElementById('listingTitle').value,
+        price: parseFloat(document.getElementById('listingPrice').value.toString().replace(/\./g, '').replace(/[^\d]/g, '')) || 0,
+        m2_brut: parseInt(document.getElementById('listingM2Brut').value) || 0,
+        m2_net: parseInt(document.getElementById('listingM2Net').value) || 0,
+        rooms: document.getElementById('listingRooms').value,
+        category: currentData.category,
+        listing_type: currentData.listing_type,
+        city: currentData.city,
+        district: currentData.district,
+        neighborhood: currentData.neighborhood,
+        external_url: currentData.url,
+        estimated_rent: parseFloat(document.getElementById('rentInput').value) || 0
+    };
+
+    try {
+        const response = await fetch(`${API_BASE}/api/v1/portfolios`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(portfolioData)
+        });
+
+        if (response.ok) {
+            btn.innerText = "✅ Portala Eklendi!";
+            btn.style.background = "#059669";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#10b981";
+                btn.disabled = false;
+            }, 3000);
+        } else {
+            const err = await response.json();
+            alert(`Hata: ${err.error || 'Gönderilemedi'}`);
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    } catch (e) {
+        alert("Sunucu hatası: " + e.message);
+        btn.innerText = originalText;
+        btn.disabled = false;
     }
 }
 
@@ -209,8 +298,8 @@ async function saveToLocal() {
         rooms: document.getElementById('listingRooms').value,
         m2_brut: document.getElementById('listingM2Brut').value,
         m2_net: document.getElementById('listingM2Net').value,
-        listing_type: currentData.listing_type, // Değişiklik
-        category: currentData.category,       // Değişiklik
+        listing_type: currentData.listing_type,
+        category: currentData.category,
         estimated_rent: document.getElementById('rentInput').value,
         url: currentData.url,
         city: currentData.city,
@@ -219,7 +308,6 @@ async function saveToLocal() {
         saved_at: new Date().toLocaleString()
     };
     
-    // Arsa ve Tarla için ek veriler
     if(currentData.category === 'Arsa'){
         itemToSave.emsal = document.getElementById('listingEmsal').value;
         itemToSave.kat_sayisi = document.getElementById('listingKatSayisi').value;
@@ -229,22 +317,77 @@ async function saveToLocal() {
         itemToSave.gese_uygun = document.getElementById('checkGeseUygun').checked;
     }
 
-
     const { my_listings = [] } = await chrome.storage.local.get('my_listings');
     my_listings.push(itemToSave);
-    
     await chrome.storage.local.set({ my_listings });
     
     const btn = document.getElementById('addToListBtn');
-    const originalText = chrome.i18n.getMessage('addToList');
-    const addedText = chrome.i18n.getMessage('added');
-
-    btn.innerText = addedText;
+    btn.innerText = "✅ Eklendi";
     btn.style.background = "#10b981";
     setTimeout(() => {
-        btn.innerText = originalText;
+        btn.innerText = "🌟 Karşılaştırma Listeme Ekle";
         btn.style.background = "#f59e0b";
     }, 2000);
 }
->>>>+++ REPLACE
 
+function switchTab(tab) {
+    const portalBtn = document.getElementById('tab-portal');
+    const researchBtn = document.getElementById('tab-research');
+    const portalView = document.getElementById('view-portal');
+    const researchView = document.getElementById('view-research');
+
+    if (tab === 'portal') {
+        portalBtn.classList.add('active');
+        researchBtn.classList.remove('active');
+        portalView.classList.remove('hidden');
+        researchView.classList.add('hidden');
+    } else {
+        portalBtn.classList.remove('active');
+        researchBtn.classList.add('active');
+        portalView.classList.add('hidden');
+        researchView.classList.remove('hidden');
+    }
+}
+
+async function loadSavedParcels() {
+    const { savedParcels = [] } = await chrome.storage.local.get('savedParcels');
+    const list = document.getElementById('parcel-list');
+    list.innerHTML = '';
+
+    if (savedParcels.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#64748b; font-size:12px;">Henüz kaydedilmiş parsel yok.</div>';
+        return;
+    }
+
+    savedParcels.reverse().forEach((p, index) => {
+        const item = document.createElement('div');
+        item.className = 'card';
+        item.style.marginBottom = '8px';
+        item.style.padding = '10px';
+        item.innerHTML = `
+            <div style="font-weight:bold; font-size:13px; color:var(--gold);">${p.province} / ${p.district}</div>
+            <div style="font-size:11px; color:#94a3b8; margin:4px 0;">Ada: ${p.island} | Parsel: ${p.parcel}</div>
+            <div style="font-size:10px; color:#64748b;">${p.neighborhood}</div>
+            <div style="display:flex; gap:5px; margin-top:8px;">
+                <button class="imza-hud-btn" style="padding:4px; font-size:10px;" onclick="window.openEimar('${p.province}','${p.district}')">E-İmar Sorgula</button>
+                <button class="imza-hud-btn" style="padding:4px; font-size:10px; background:#334155; color:white;" onclick="window.deleteParcel(${savedParcels.length - 1 - index})">Sil</button>
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+window.openEimar = (prov, dist) => {
+    if (dist.toLowerCase().includes("kütahya") || prov.toLowerCase().includes("kütahya")) {
+        chrome.runtime.sendMessage({ action: "OPEN_KUTAHYA_EIMAR" });
+    } else {
+        alert("Bu ilçe için otomatik E-İmar entegrasyonu henüz aktif değil. Lütfen belediye sitesini kontrol edin.");
+    }
+};
+
+window.deleteParcel = async (index) => {
+    const { savedParcels = [] } = await chrome.storage.local.get('savedParcels');
+    savedParcels.splice(index, 1);
+    await chrome.storage.local.set({ savedParcels });
+    loadSavedParcels();
+};

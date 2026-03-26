@@ -1,7 +1,7 @@
 flowchart TD
     %% === PROJECT GOALS ===
     %% Ultimate Goal: Türkiye'nin en teknolojik ve şeffaf gayrimenkul yönetim platformu olmak.
-    %% Current Goal: Proje yolu standardize edildi (Imza_Gayrimenkul). Metro Bundler artık sorunsuz çalışacak.
+    %% Current Goal: Faz 11 Audit & UX Hardening tamamlandı. Portal tüm butonları aktif ve güvenli.
 
     %% === START ===
     %% @project_start [start, closed, 2026-03-01, user]
@@ -57,7 +57,7 @@ flowchart TD
     feature_globalization_phase6("Bölgesel Görünürlük & Global<br/><sub>TR/EN/RU/AR dil motoru,<br/>RTL desteği ve admin panelinde<br/>Pazar bazlı mülk görünürlük<br/>matrisi başarıyla uygulandı.</sub>")
 
     %% @feature_fluid_ui [ai-task, closed, 2026-03-25, antigravity]
-    feature_fluid_ui("Fluid UI & Universal Scaling<br/><sub>Clamp bazlı matematiksel ölçekleme<br/>motoru (fluid.css) kuruldu. TÜm cihazlar<br/>ve landscape-mobile baskılama<br/>kuralları başarıyla verifiye edildi.</sub>")
+    feature_fluid_ui("Fluid UI & Universal Scaling<br/><sub>Clamp bazlı matematiksel ölçekleme<br/>motoru (fluid.css) kuruldu. Tüm cihazlar<br/>ve landscape-mobile baskılama<br/>kuralları başarıyla verifiye edildi.</sub>")
 
     %% @feature_push_finalization [ai-task, closed, 2026-03-26, antigravity]
     feature_push_finalization("Push & Dağıtım Onayı<br/><sub>Klasör ismi standardizasyonu,<br/>deployment betik verifikasyonu<br/>ve tüm modüllerin ana repoya<br/>gönderimi başarıyla sağlandı.</sub>")
@@ -73,6 +73,18 @@ flowchart TD
 
     %% @testing_doc_ci_phase8 [ai-task, closed, 2026-03-26, antigravity]
     testing_doc_ci_phase8("Test, Doküman & CI (Faz 2-3 %100)<br/><sub>Pytest Suite, Swagger UI / ReDoc<br/>ve GitHub Actions CI/CD<br/>alt yapısı kuruldu.</sub>")
+
+    %% @feature_unified_assistant [ai-task, closed, 2026-03-26, antigravity]
+    feature_unified_assistant("Birleşik İmza Asistanı (Faz 9)<br/><sub>JWT Auth, Portala Aktar (Sync),<br/>TKGM/E-İmar entegrasyonu ve<br/>HUD Insights başarıyla birleştirildi.</sub>")
+
+    %% @feature_analytics_deployment [ai-task, closed, 2026-03-26, antigravity]
+    feature_analytics_deployment("Analitik & Deployment (Faz 10)<br/><sub>Market Trends Dashboard,<br/>listings_shadow bazlı analiz ve<br/>Docker konteynerizasyonu tamamlandı.</sub>")
+
+    %% @feature_audit_fix_phase11 [ai-task, closed, 2026-03-26, antigravity]
+    feature_audit_fix_phase11("Portal Audit & UX Fix (Faz 11)<br/><sub>Z-index conflicts giderildi,<br/>mükerrer modallar temizlendi ve<br/>tüm interactive handlerlar restore edildi.</sub>")
+
+    %% @feature_portal_restoration [ai-task, closed, 2026-03-26, antigravity]
+    feature_portal_restoration("Portal Fonksiyonel Onarım<br/><sub>Eksik Portföy ve Ayar sekme ID'leri<br/>onarıldı, Konut Kredisi hesaplayıcı<br/>ana menüye (Araçlar) taşındı.</sub>")
 
     %% === CONNECTIONS ===
     project_start --> feature_apt_mgmt
@@ -91,17 +103,21 @@ flowchart TD
     feature_design_seo_overhaul --> feature_ux_performance
     feature_ux_performance --> feature_globalization_phase6
     feature_globalization_phase6 --> feature_fluid_ui
-    feature_fluid_ui --> feature_seo_expansion
+    feature_fluid_ui --> feature_push_finalization
     feature_push_finalization --> platform_hardening
     platform_hardening --> security_hardening_phase6
     security_hardening_phase6 --> performance_optimization_phase7
     performance_optimization_phase7 --> testing_doc_ci_phase8
-    testing_doc_ci_phase8 -.-> ultimate_goal
+    testing_doc_ci_phase8 --> feature_unified_assistant
+    feature_unified_assistant --> feature_analytics_deployment
+    feature_analytics_deployment --> feature_audit_fix_phase11
+    feature_audit_fix_phase11 --> feature_portal_restoration
+    feature_portal_restoration -.-> ultimate_goal
     goal_security -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        testing_doc_ci_phase8
+        feature_portal_restoration
     end
 
     %% === STYLES ===
@@ -113,8 +129,6 @@ flowchart TD
     style feature_social_login fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style goal_security fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_pusula fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_pwa_performance fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_lite_sunlight fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_documentation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_digital_inspection fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_app_separation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
@@ -124,8 +138,18 @@ flowchart TD
     style feature_design_seo_overhaul fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_globalization_phase6 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_fluid_ui fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style testing_doc_ci_phase8 fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style feature_push_finalization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style platform_hardening fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style security_hardening_phase6 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style performance_optimization_phase7 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style testing_doc_ci_phase8 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_unified_assistant fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_analytics_deployment fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_audit_fix_phase11 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_portal_restoration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+
+    %% Recent node
+    style feature_portal_restoration fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

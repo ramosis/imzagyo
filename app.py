@@ -61,6 +61,7 @@ from api.contacts import contacts_bp
 from api.tracking import tracking_bp
 from api.lmetrics import lmetrics_bp
 from api.notifications import notifications_bp
+from api.analytics import analytics_bp
 from api.ai import ai_bp
 from api.neighborhood import neighborhood_bp
 from api.projects import projects_bp
@@ -230,6 +231,7 @@ app.register_blueprint(mls_bp, url_prefix='/api/v1')
 app.register_blueprint(compass_bp, url_prefix='/api/v1')
 app.register_blueprint(seo_bp, url_prefix='/api/v1')
 app.register_blueprint(verification_bp, url_prefix='/api/v1')
+app.register_blueprint(analytics_bp, url_prefix='/api/v1/analytics')
 app.register_blueprint(valuation_bp, url_prefix='/api/v1')
 
 @app.route('/inspection')

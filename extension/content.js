@@ -1,13 +1,31 @@
 /**
  * Evrensel ROI Asistanı - Content Script
- * NO-INJECT: DOM'a müdahale etmez, sadece veri okur.
  */
 
-console.log("Evrensel ROI Asistanı Aktif 🥂");
+console.log("Imza Insights HUD Aktif 🥂");
+
+let hudContainer = null;
 
 /**
- * Sayfadaki verileri okur ve bir JSON objesi döner.
+ * Sayfayı analiz et ve HUD'ı başlat
  */
+async function init() {
+    const data = scrapeListingData();
+    if (data && data.price !== "Bilinmiyor") {
+        injectHUD();
+        updateHUDWithLoading();
+        
+        // Background script aracılığıyla değerleme iste
+        chrome.runtime.sendMessage({ action: "GET_VALUATION", data: data }, (response) => {
+            if (response && !response.error) {
+                renderHUDData(data, response);
+            } else {
+                renderHUDError(response?.error || "Bağlantı Hatası");
+            }
+        });
+    }
+}
+
 function scrapeListingData() {
     const data = {
         title: document.title,
@@ -18,14 +36,14 @@ function scrapeListingData() {
         city: "",
         district: "",
         neighborhood: "",
-        listing_type: "Satılık", // Varsayılan
-        category: "Daire",      // Varsayılan
+        listing_type: "Satılık",
+        category: "Daire",
         url: window.location.href 
     };
 
     const bodyText = document.body.innerText;
 
-    // 1. JSON-LD (Schema.org) Analizi
+    // JSON-LD Analizi
     try {
         const scripts = document.querySelectorAll('script[type="application/ld+json"]');
         scripts.forEach(s => {
@@ -45,66 +63,17 @@ function scrapeListingData() {
         });
     } catch (e) {}
 
-    // 2. Fiyat Tespiti 
+    // Fiyat Tespiti 
     if (data.price === "Bilinmiyor") {
         const pm = bodyText.match(/(\d{1,3}(\.\d{3})*|(\d+))(\s*)(TL|₺|USD|€)/i);
         if (pm) data.price = pm[0];
     }
 
-    // 3. m2 Tespiti (Net / Brüt Ayrımı)
-    const m2Keywords = [
-        { key: 'm2_brut', regex: /(Brüt|Toplam)\s*(Alan|m2|Metrekare)?\s*[:\s]*(\d+)/i },
-        { key: 'm2_net', regex: /(Net|Kullanım)\s*(Alan|m2|Metrekare)?\s*[:\s]*(\d+)/i }
-    ];
+    // m2 Tespiti
+    const m2Match = bodyText.match(/(\d+)\s*(m2|metrekare)/i);
+    if (m2Match) data.m2_brut = parseInt(m2Match[1]);
 
-    m2Keywords.forEach(mk => {
-        const match = bodyText.match(mk.regex);
-        if (match) data[mk.key] = parseInt(match[3]);
-    });
-
-    // Eğer Brüt/Net bulunamadıysa jenerik m2 
-    if (!data.m2_brut && !data.m2_net) {
-        const genericM2 = bodyText.match(/(\d+)\s*(m2|metrekare)/i);
-        if (genericM2) data.m2_brut = parseInt(genericM2[1]);
-    }
-
-    // 4. İlan Tipi (Satılık / Kiralık)
-    if (bodyText.match(/Kiralık/i) || window.location.href.includes('kiralik')) {
-        data.listing_type = "Kiralık";
-    }
-
-    // 5. Kategori Tespiti - Genişletilmiş liste
-    const categories = [
-        "Arsa", "Tarla", "Villa", "İşyeri", "Prefabrik", "Daire", "Rezidans",
-        "Bahçe", "Çiftlik", "Ofis", "Depo", "Fabrika", "Dükkan", "Kompleks",
-        "Yalı", "Köşk", "Bina", "Plaza", "Site", "Köyüstü", "Yatırımlık",
-        "Turistik Tesis", "Otel", "Restoran", "Kafe", "Mağaza", "Salon",
-        "Tesis", "Loft", "Penthouse", "Stüdyo", "Atölye", "Kültür Merkezi"
-    ];
-    
-    // Önce başlıktan kontrol et
-    for (const cat of categories) {
-        if (data.title.includes(cat)) {
-            data.category = cat;
-            break;
-        }
-    }
-    
-    // Bulamadıysak body içeriğinden kontrol et
-    if (data.category === "Daire") { // Varsayılan değerse
-        for (const cat of categories) {
-            if (bodyText.includes(cat)) {
-                data.category = cat;
-                break;
-            }
-        }
-    }
-
-    // 4. Jenerik Oda Sayısı (Örn: 3+1, 2+1)
-    const roomMatch = document.body.innerText.match(/(\d\+\d)/);
-    if (roomMatch) data.rooms = roomMatch[1];
-
-    // 5. Konum Tespiti (İpucu: Emlak siteleri genelde hiyerarşik adres kullanır)
+    // Konum Tespiti (Basit Breadcrumb asilimi)
     const breadcrumbs = Array.from(document.querySelectorAll('.breadcrumb li, .location-path li, .location a'))
                             .map(el => el.innerText.trim())
                             .filter(t => t.length > 2);
@@ -116,6 +85,69 @@ function scrapeListingData() {
     }
 
     return data;
+}
+
+function injectHUD() {
+    if (document.getElementById('imza-hud')) return;
+
+    hudContainer = document.createElement('div');
+    hudContainer.id = 'imza-hud';
+    hudContainer.className = 'imza-hud-container';
+    document.body.appendChild(hudContainer);
+}
+
+function updateHUDWithLoading() {
+    hudContainer.innerHTML = `
+        <div class="imza-hud-header">🥂 Imza Insights</div>
+        <div style="text-align: center; padding: 10px; font-size: 12px; color: #94A3B8;">
+            AI Değerlemesi Yapılıyor...
+        </div>
+    `;
+}
+
+function renderHUDData(scraped, response) {
+    const roiClass = response.roi_score > 5 ? 'success' : 'warning';
+    
+    hudContainer.innerHTML = `
+        <div class="imza-hud-header">🥂 Imza Insights</div>
+        <div class="imza-hud-row">
+            <span class="imza-hud-label">AI Tahmini:</span>
+            <span class="imza-hud-value">₺${response.predicted_price?.toLocaleString() || '---'}</span>
+        </div>
+        <div class="imza-hud-row">
+            <span class="imza-hud-label">ROI Skoru:</span>
+            <span class="imza-roi-badge">%${response.roi_score?.toFixed(2) || '0.00'}</span>
+        </div>
+        <div class="imza-hud-row">
+            <span class="imza-hud-label">Piyasa Durumu:</span>
+            <span class="imza-hud-value">${response.market_status || 'Dengeli'}</span>
+        </div>
+        <div class="imza-hud-row">
+            <span class="imza-hud-label">Amortisman:</span>
+            <span class="imza-hud-value">${response.amortization_years?.toFixed(1) || '---'} Yıl</span>
+        </div>
+        <button id="imza-hud-sync-btn" class="imza-hud-btn">Portala Aktar 🚀</button>
+    `;
+
+    document.getElementById('imza-hud-sync-btn').onclick = () => {
+        chrome.runtime.sendMessage({action: "OPEN_POPUP"}); 
+        // Not: Popup'ı programatik açmak zordur, genelde kullanıcıya "Popup'ı açın" mesajı verilir
+        alert("Lütfen sağ üstteki eklenti ikonuna tıklayarak 'İmza Portala Gönder' butonuna basın.");
+    };
+}
+
+function renderHUDError(error) {
+    hudContainer.innerHTML = `
+        <div class="imza-hud-header">🥂 Imza Insights</div>
+        <div style="color: #F87171; font-size: 11px;">Hata: ${error}</div>
+    `;
+}
+
+// Başlat
+if (document.readyState === 'complete') {
+    init();
+} else {
+    window.addEventListener('load', init);
 }
 
 // Mesaj dinleyici (Popup'tan tetiklenir)

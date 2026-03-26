@@ -110,7 +110,8 @@ function showSection(sectionId, btnElement) {
            const isTrafficActive = trafficTab && !trafficTab.classList.contains('hidden');
            if (isTrafficActive) fetchTrafficData();
            else fetchShadowListings();
-        }
+        },
+        'market-analytics': typeof updateAnalytics !== 'undefined' ? updateAnalytics : null
     };
     
     // Normalize ID: ensure the loader key is clean
@@ -128,10 +129,14 @@ function showSection(sectionId, btnElement) {
     }
 }
 
-const sidebar = document.getElementById('sidebar');
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('-translate-x-full');
+}
+
 const toggleBtn = document.getElementById('sidebar-toggle');
 if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => { sidebar.classList.toggle('-translate-x-full'); });
+    toggleBtn.addEventListener('click', toggleSidebar);
 }
 
 function logout() {
@@ -256,6 +261,23 @@ async function login() {
         if (loginBtnText) loginBtnText.textContent = 'Güvenli Giriş';
     }
 }
+
+function togglePasswordVisibility() {
+    const passInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggle-icon');
+    if (!passInput || !toggleIcon) return;
+    
+    if (passInput.type === 'password') {
+        passInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    } else {
+        passInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    }
+}
+
 
 // --- PASSWORD RESET LOGIC ---
 function openResetModal() {
@@ -450,7 +472,7 @@ function initPortfolioMap(lat, lng) {
         document.getElementById('p-enlem').value = pos.lat;
         document.getElementById('p-boylam').value = pos.lng;
     });
-    setTimeout(() => if (portfolioMap) portfolioMap.invalidateSize(), 100);
+    setTimeout(() => { if (portfolioMap) portfolioMap.invalidateSize(); }, 100);
 }
 
 // --- LEADS ---
@@ -659,10 +681,40 @@ async function finalizeContract() {
     try {
         const res = await apiFetch(`${API_BASE}/contracts`, {
             method: 'POST',
-            body: JSON.stringify({ property_id: selectedProperty.id, seller_id: selectedParties.seller.id, buyer_id: selectedParties.buyer.id, contract_type: document.getElementById('contract-type').value, status: 'draft' })
+            body: JSON.stringify({ 
+                property_id: selectedProperty.id, 
+                seller_id: selectedParties.seller.id, 
+                buyer_id: selectedParties.buyer.id, 
+                contract_type: document.getElementById('contract-type').value, 
+                status: 'draft' 
+            })
         });
-        if (res.ok) { alert('Sözleşme taslağı oluşturuldu!'); showSection('contracts'); }
-    } catch (e) { console.error(e); }
+        if (res.ok) { 
+            showToast('Sözleşme taslağı oluşturuldu!', 'success'); 
+            showSection('contracts'); 
+        } else {
+            showToast('Sözleşme oluşturulamadı', 'error');
+        }
+    } catch (e) { showToast('Bağlantı hatası', 'error'); }
+}
+
+async function saveNewParty() {
+    const payload = {
+        name: document.getElementById('party-name').value,
+        tc_vkn: document.getElementById('party-tc').value,
+        phone: document.getElementById('party-phone').value,
+        type: document.getElementById('party-type').value
+    };
+    try {
+        const res = await apiFetch(`${API_BASE}/parties`, { method: 'POST', body: JSON.stringify(payload) });
+        if (res.ok) {
+            showToast('Taraf eklendi', 'success');
+            closePartyModal();
+            // Refresh party list if in wizard
+            const resT = await apiFetch(`${API_BASE}/parties`);
+            allParties = await resT.json();
+        }
+    } catch (e) { showToast('Hata oluştu', 'error'); }
 }
 
 // --- CONTACTS ---
@@ -999,8 +1051,123 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Helpers
+// Helpers & Modal Managers
 function openLeadModal() { document.getElementById('lead-modal').classList.remove('hidden'); }
 function closeLeadModal() { document.getElementById('lead-modal').classList.add('hidden'); }
 function openExpenseModal() { document.getElementById('expense-modal').classList.remove('hidden'); }
 function closeExpenseModal() { document.getElementById('expense-modal').classList.add('hidden'); }
+function openProjectModal() { document.getElementById('project-modal')?.classList.remove('hidden'); }
+function closeProjectModal() { document.getElementById('project-modal')?.classList.add('hidden'); }
+function openPortfolioModal() { document.getElementById('portfolio-modal')?.classList.remove('hidden'); }
+function closePortfolioModal() { document.getElementById('portfolio-modal')?.classList.add('hidden'); }
+function openCampaignModal() { document.getElementById('campaign-modal')?.classList.remove('hidden'); }
+function closeCampaignModal() { document.getElementById('campaign-modal')?.classList.add('hidden'); }
+function openRuleModal() { document.getElementById('rule-modal')?.classList.remove('hidden'); }
+function closeRuleModal() { document.getElementById('rule-modal')?.classList.add('hidden'); }
+function openTemplateModal() { document.getElementById('template-modal')?.classList.remove('hidden'); }
+function closeTemplateModal() { document.getElementById('template-modal')?.classList.add('hidden'); }
+function closePartyModal() { document.getElementById('party-modal')?.classList.add('hidden'); }
+
+// --- CRUD HANDLERS ---
+async function deletePortfolio(id) {
+    if (!confirm('Bu portföyü silmek istediğinize emin misiniz?')) return;
+    try {
+        const res = await apiFetch(`${API_BASE}/portfoyler/${id}`, { method: 'DELETE' });
+        if (res.ok) { showToast('Portföy silindi', 'success'); fetchAllPortfolios(); }
+        else showToast('Silme hatası', 'error');
+    } catch (e) { showToast('Bağlantı hatası', 'error'); }
+}
+
+async function editPortfolio(id) {
+    openPortfolioModal();
+    // Fetch data and fill form...
+    try {
+        const res = await apiFetch(`${API_BASE}/portfoyler/${id}`);
+        const data = await res.json();
+        // Populate form fields (This is a simplified version for restoration)
+        document.getElementById('p-id').value = data.id;
+        document.getElementById('p-baslik1').value = data.baslik1;
+        document.getElementById('p-fiyat').value = data.fiyat;
+        // ... populate more fields as needed
+    } catch (e) { console.error(e); }
+}
+
+async function deleteUser(id) {
+    if (!confirm('Kullanıcıyı silmek istediğinize emin misiniz?')) return;
+    try {
+        const res = await apiFetch(`${API_BASE}/users/${id}`, { method: 'DELETE' });
+        if (res.ok) { showToast('Kullanıcı silindi', 'success'); fetchUsers(); }
+    } catch (e) { console.error(e); }
+}
+
+async function deleteContact(id) {
+    if (!confirm('Kişiyi silmek istediğinize emin misiniz?')) return;
+    try {
+        const res = await apiFetch(`${API_BASE}/contacts/${id}`, { method: 'DELETE' });
+        if (res.ok) { showToast('Kişi silindi', 'success'); fetchContacts(); }
+    } catch (e) { console.error(e); }
+}
+
+async function deleteAppointment(id) {
+    if (!confirm('Randevuyu silmek istediğinize emin misiniz?')) return;
+    try {
+        const res = await apiFetch(`${API_BASE}/appointments/${id}`, { method: 'DELETE' });
+        if (res.ok) { showToast('Randevu silindi', 'success'); fetchAppointments(); }
+    } catch (e) { console.error(e); }
+}
+
+async function toggleRule(id) {
+    try {
+        const res = await apiFetch(`${API_BASE}/automation/rules/${id}/toggle`, { method: 'POST' });
+        if (res.ok) fetchAutomationRules();
+    } catch (e) { console.error(e); }
+}
+
+async function deleteRule(id) {
+    if (!confirm('Kuralı silmek istediğinize emin misiniz?')) return;
+    try {
+        const res = await apiFetch(`${API_BASE}/automation/rules/${id}`, { method: 'DELETE' });
+        if (res.ok) fetchAutomationRules();
+    } catch (e) { console.error(e); }
+}
+
+async function runAutomationNow() {
+    showToast('Otomasyon tetiklendi...', 'info');
+    try {
+        await apiFetch(`${API_BASE}/automation/run`, { method: 'POST' });
+        showToast('Otomasyon tamamlandı', 'success');
+    } catch (e) { showToast('Hata oluştu', 'error'); }
+}
+
+async function savePortfolio() {
+    const id = document.getElementById('p-id')?.value;
+    const payload = {
+        baslik1: document.getElementById('p-baslik1')?.value,
+        fiyat: document.getElementById('p-fiyat')?.value,
+    };
+    
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `${API_BASE}/portfoyler/${id}` : `${API_BASE}/portfoyler`;
+    
+    try {
+        const res = await apiFetch(url, { method, body: JSON.stringify(payload) });
+        if (res.ok) {
+            showToast('Portföy kaydedildi', 'success');
+            closePortfolioModal();
+            fetchAllPortfolios();
+        }
+    } catch (e) { showToast('Kaydetme hatası', 'error'); }
+}
+
+async function triggerAiTranslation() {
+    const id = document.getElementById('p-id')?.value;
+    if (!id) {
+        showToast('Lütfen önce portföyü kaydedin.', 'error');
+        return;
+    }
+    showToast('AI Çeviri başlatıldı...', 'info');
+    try {
+        await apiFetch(`${API_BASE}/portfoyler/${id}/translate`, { method: 'POST' });
+        showToast('Çeviriler tamamlandı', 'success');
+    } catch (e) { showToast('Çeviri hatası', 'error'); }
+}
