@@ -1,0 +1,55 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "İmza Gayrimenkul API",
+    "description": "Lüks gayrimenkul yönetim ve CRM API'si",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local Development"
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "summary": "User login",
+        "tags": ["Auth"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/api/portfoyler": {
+      "get": {
+        "summary": "List portfolios",
+        "tags": ["Portfolio"],
+        "responses": {
+          "200": { "description": "List of properties" }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "System health check",
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    }
+  }
+}

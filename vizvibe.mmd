@@ -62,6 +62,18 @@ flowchart TD
     %% @feature_push_finalization [ai-task, closed, 2026-03-26, antigravity]
     feature_push_finalization("Push & Dağıtım Onayı<br/><sub>Klasör ismi standardizasyonu,<br/>deployment betik verifikasyonu<br/>ve tüm modüllerin ana repoya<br/>gönderimi başarıyla sağlandı.</sub>")
 
+    %% @platform_hardening [ai-task, closed, 2026-03-26, antigravity]
+    platform_hardening("Platform Sertleştirme & Hardening<br/><sub>JWT RBAC, Service/Repo Pattern,<br/>Audit Log, Resim Optimizasyonu<br/>ve Güvenlik Headerları eklendi.</sub>")
+
+    %% @security_hardening_phase6 [ai-task, closed, 2026-03-26, antigravity]
+    security_hardening_phase6("Güvenlik Sıkılaştırma (Faz 6)<br/><sub>CSRF Koruması, Global XSS<br/>Sanitizasyonu, Hız Sınırlandırma<br/>ve Mimari Refactoring yapıldı.</sub>")
+
+    %% @performance_optimization_phase7 [ai-task, closed, 2026-03-26, antigravity]
+    performance_optimization_phase7("Performans Optimizasyonu (Faz 7)<br/><sub>Gzip Sıkıştırma, DB İndeksleme,<br/>API Memoization ve Bağımlılık<br/>Güncellemeleri tamamlandı.</sub>")
+
+    %% @testing_doc_ci_phase8 [ai-task, closed, 2026-03-26, antigravity]
+    testing_doc_ci_phase8("Test, Doküman & CI (Faz 2-3 %100)<br/><sub>Pytest Suite, Swagger UI / ReDoc<br/>ve GitHub Actions CI/CD<br/>alt yapısı kuruldu.</sub>")
+
     %% === CONNECTIONS ===
     project_start --> feature_apt_mgmt
     feature_apt_mgmt --> feature_lmetrics_intent
@@ -80,13 +92,16 @@ flowchart TD
     feature_ux_performance --> feature_globalization_phase6
     feature_globalization_phase6 --> feature_fluid_ui
     feature_fluid_ui --> feature_seo_expansion
-    feature_seo_expansion --> feature_push_finalization
-    feature_push_finalization -.-> ultimate_goal
+    feature_push_finalization --> platform_hardening
+    platform_hardening --> security_hardening_phase6
+    security_hardening_phase6 --> performance_optimization_phase7
+    performance_optimization_phase7 --> testing_doc_ci_phase8
+    testing_doc_ci_phase8 -.-> ultimate_goal
     goal_security -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        feature_push_finalization
+        testing_doc_ci_phase8
     end
 
     %% === STYLES ===
@@ -109,7 +124,8 @@ flowchart TD
     style feature_design_seo_overhaul fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_globalization_phase6 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_fluid_ui fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_seo_expansion fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style testing_doc_ci_phase8 fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style performance_optimization_phase7 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

@@ -1,4 +1,6 @@
 import os
+import io
+from PIL import Image
 from flask import Blueprint, request, jsonify, current_app
 from database import get_db_connection
 from api.upload_service import upload_image_to_cloudinary
@@ -55,12 +57,30 @@ def upload_media():
     prop_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'properties', str(portfolio_id), subdir)
     os.makedirs(prop_folder, exist_ok=True)
     
-    # 3. Dosyayı Kalıcı Olarak Kaydet
-    # Çakışmayı önlemek için timestamp ekle
-    import time
+    # 3. Görsel Optimizasyonu (Sadece fotoğraflar için)
+    is_image = category in ['İç Mekan', 'Dış Mekan', 'Drone', 'Plan']
     safe_filename = f"{int(time.time())}_{filename}"
     local_path = os.path.join(prop_folder, safe_filename)
-    file.save(local_path)
+
+    if is_image:
+        try:
+            img = Image.open(file)
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+            
+            # Max Genişlik 1920px (ÖNERİ-009)
+            if img.width > 1920:
+                ratio = 1920 / float(img.width)
+                new_height = int(float(img.height) * ratio)
+                img = img.resize((1920, new_height), Image.Resampling.LANCZOS)
+            
+            img.save(local_path, format='JPEG', quality=85, optimize=True)
+        except Exception as e:
+            # Optimizasyon hatası (video vb olabilir), normal kaydet
+            file.seek(0)
+            file.save(local_path)
+    else:
+        file.save(local_path)
     
     # 4. Buluta (Cloudinary) Yükle (Yedek ve CDN için)
     # Not: Bazı belgeler (sözleşme vb.) sadece yerelde kalabilir, ama şimdilik her şeyi yüklüyoruz.

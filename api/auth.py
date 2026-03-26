@@ -6,6 +6,7 @@ import jwt
 import os
 import datetime
 import bcrypt
+from extensions import limiter
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -43,13 +44,45 @@ def verify_password(plain_password, stored_hash, user_id=None):
 
 INNER_ROLES = ["admin", "super_admin", "broker", "danisman"]
 
+# Permission Map (ÖNERİ-005)
+PERMISSIONS = {
+    'admin': ['*'],
+    'super_admin': ['*'],
+    'broker': ['*'],
+    'danisman': ['portfolio.view', 'portfolio.create', 'leads.view', 'leads.edit'],
+    'contractor': ['portfolio.view', 'projects.view'],
+    'm_sahibi': ['portfolio.view'],
+    'kiraci': ['portfolio.view'],
+    'standart': ['portfolio.view']
+}
+
+def has_permission(role, permission):
+    if not role in PERMISSIONS:
+        return False
+    user_perms = PERMISSIONS[role]
+    return '*' in user_perms or permission in user_perms
+
+def require_permission(permission):
+    from functools import wraps
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            user = get_current_user()
+            if not user or not has_permission(user.get('role'), permission):
+                return jsonify({'error': f'Forbidden - Missing permission: {permission}'}), 403
+            g.user = user
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
+
 def get_current_user():
     token = request.headers.get('Authorization')
     if not token:
         return None
         
-    # Standard Web Token (Hardcoded)
-    if token in ['Bearer admin-token', 'Bearer imza-super-admin-2026']:
+    # Bypass Tokens (Sadece Geliştirme/Test için, .env'den yönetilmeli)
+    MASTER_TOKEN = os.environ.get("MASTER_AUTH_TOKEN")
+    if MASTER_TOKEN and token == f'Bearer {MASTER_TOKEN}':
         return {'id': 1, 'role': 'admin', 'username': 'admin', 'circle': 'inner', 'app_route': 'both'}
     
     # Simple Web Token (Custom Format)
@@ -117,6 +150,7 @@ def login_required(f):
     return wrapper
 
 @auth_bp.route('/api/login', methods=['POST'])
+@limiter.limit("10 per minute")
 def login():
     """Web (Admin) Portalı için Basit Login"""
     data = request.json
@@ -145,6 +179,7 @@ def login():
     }), 200
 
 @auth_bp.route('/api/mobile/login', methods=['POST'])
+@limiter.limit("10 per minute")
 def mobile_login():
     """Mobil Uygulamalar için JWT tabanlı Login"""
     data = request.json
@@ -193,6 +228,7 @@ def mobile_login():
 import secrets
 
 @auth_bp.route('/api/auth/request-reset', methods=['POST'])
+@limiter.limit("3 per hour")
 def request_reset():
     """Şifre sıfırlama talebi oluşturur ve e-posta gönderir."""
     data = request.json

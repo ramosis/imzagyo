@@ -48,6 +48,8 @@ Lütfen sadece oluşturduğun metni (başka bir açıklama eklemeden) markdown f
 def translate_content(text, target_lang):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
+        import logging
+        logging.warning("AI_SERVICE: GEMINI_API_KEY NOT FOUND. Echoing original text.")
         return text # Anahtar yoksa orijinali dön
 
     try:

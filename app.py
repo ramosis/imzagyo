@@ -14,11 +14,28 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from werkzeug.utils import secure_filename
-from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from marshmallow import Schema, fields, validate, ValidationError
 from database import init_db, doldur_ornek_veriler, DB_NAME, get_db_connection
+from extensions import db, limiter, cache, babel, csrf, socketio
+from flask_compress import Compress
+from flasgger import Swagger
+import structlog
+
+# Initialize Compress for Gzip/Brotly support (Audit Section 7.2)
+compress = Compress()
+
+# Structured Logging Configuration (EKSİKLİK-004)
+structlog.configure(
+    processors=[
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.JSONRenderer()
+    ],
+    context_class=dict,
+    logger_factory=structlog.PrintLoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+struct_logger = structlog.get_logger()
+
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from api.portfolio import portfolio_bp
@@ -59,15 +76,41 @@ from api.seo import seo_bp
 
 # Uygulama Ayarları
 app = Flask(__name__, static_folder=None)
-# Güvenli Secret Key: Env'den al, yoksa geçici güvenli bir tane oluştur (Prod'da mutlaka set edilmeli!)
+# Güvenli Secret Key: Env'den al, yoksa geçici güvenli bir tane oluştur
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex(32))
 
-# CORS Ayarları (Tüm API'ler için)
-CORS(app)
+# --- GÜVENLİK YAPILANDIRMASI (Section 6) ---
+from flask_cors import CORS
+CORS(app, resources={r"/api/*": {"origins": ["https://imzagyo.com", "http://localhost:3000"]}})
+csrf.init_app(app)
+limiter.init_app(app)
+cache.init_app(app)
+babel.init_app(app)
+compress.init_app(app)
+socketio.init_app(app)
 
-# OAuth bileşenini ana uygulamaya bağla
-setup_oauth(app)
-# Initialize Sentry
+# --- API DOCUMENTATION (Phase 3) ---
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": 'apispec_1',
+            "route": '/apispec_1.json',
+            "rule_filter": lambda rule: True,  # all in
+            "model_filter": lambda tag: True,  # all in
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/api/docs"
+}
+app.config['SWAGGER'] = {
+    'title': 'Imza GYO API',
+    'uiversion': 3
+}
+swagger = Swagger(app, config=swagger_config)
+
+# --- SENTRY & OBSERVABILITY ---
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN"),
     integrations=[FlaskIntegration()],
@@ -75,7 +118,7 @@ sentry_sdk.init(
     environment="production" if not app.debug else "development",
 )
 
-# Configure logging
+# Configure rotating logs
 import logging
 from logging.handlers import RotatingFileHandler
 log_dir = os.path.join(app.root_path, "logs")
@@ -87,24 +130,55 @@ logger = logging.getLogger()
 logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 logger.addHandler(handler)
 
-# Middleware to log each request
+# API uç noktalarını CSRF'den muaf tut (JWT kullanılıyor)
+@app.before_request
+def exempt_api_from_csrf():
+    if request.path.startswith('/api/'):
+        return # JWT handle ediliyor
+
 @app.after_request
-def log_request(response):
-    logger.info("%s %s %s %s", request.remote_addr, request.method, request.path, response.status_code)
+def final_headers_and_logs(response):
+    """Unified after_request for security headers and logging (Section 6.2)."""
+    # 1. Logging
+    struct_logger.info("request_finished", 
+                       addr=request.remote_addr, 
+                       method=request.method, 
+                       path=request.path, 
+                       status=response.status_code)
+    
+    # 2. Security Headers
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com;"
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    # 3. Cache Control for Dev
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    
     return response
 
-# Debug endpoint to trigger an error for testing
+# Debug & Health Routes
 @app.route('/api/debug/error')
 def trigger_error():
     raise RuntimeError('Intentional error for Sentry testing')
 
-# Rate Limiter Yapılandırması
-limiter = Limiter(
-    key_func=get_remote_address,
-    app=app,
-    default_limits=["10000 per day", "2000 per hour"],
-    storage_uri="memory://",
-)
+@app.route('/health')
+def health_check():
+    import datetime
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.datetime.now().isoformat(),
+        'service': 'imza-backend'
+    }), 200
+
+# DB Ayarları (SQLite)
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 # --- VERİ DOĞRULAMA ŞEMALARI (MARSHMALLOW) ---
 # Şemalar merkezi olarak api/schemas.py dosyasına taşındı.
@@ -117,42 +191,42 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Register API blueprints
-app.register_blueprint(portfolio_bp)
-app.register_blueprint(users_bp)
-app.register_blueprint(contracts_bp)
-app.register_blueprint(taxes_bp)
-app.register_blueprint(maintenance_bp)
-app.register_blueprint(notifications_bp)
-app.register_blueprint(ai_bp)
-app.register_blueprint(appointments_bp)
-app.register_blueprint(auth_bp)
-app.register_blueprint(finance_bp)
-app.register_blueprint(hero_bp)
-app.register_blueprint(contract_templates_bp)
-app.register_blueprint(parties_bp)
-app.register_blueprint(leads_bp)
-app.register_blueprint(expenses_bp)
-app.register_blueprint(social_auth_bp)
-app.register_blueprint(integrations_bp)
-app.register_blueprint(documents_bp)
-app.register_blueprint(purchasing_power_bp)
-app.register_blueprint(settings_bp)
-app.register_blueprint(campaigns_bp)
-app.register_blueprint(hr_bp)
-app.register_blueprint(contacts_bp)
-app.register_blueprint(tracking_bp)
-app.register_blueprint(lmetrics_bp)
-app.register_blueprint(neighborhood_bp)
-app.register_blueprint(projects_bp)
-app.register_blueprint(pipeline_bp)
-app.register_blueprint(automation_bp)
-app.register_blueprint(media_bp)
-app.register_blueprint(appraisal_bp)
-app.register_blueprint(inspection_bp)
-app.register_blueprint(mls_bp)
-app.register_blueprint(compass_bp)
-app.register_blueprint(seo_bp)
+# Register API blueprints (v1 Versioning)
+app.register_blueprint(portfolio_bp, url_prefix='/api/v1')
+app.register_blueprint(users_bp, url_prefix='/api/v1')
+app.register_blueprint(contracts_bp, url_prefix='/api/v1')
+app.register_blueprint(taxes_bp, url_prefix='/api/v1')
+app.register_blueprint(maintenance_bp, url_prefix='/api/v1')
+app.register_blueprint(notifications_bp, url_prefix='/api/v1')
+app.register_blueprint(ai_bp, url_prefix='/api/v1')
+app.register_blueprint(appointments_bp, url_prefix='/api/v1')
+app.register_blueprint(auth_bp, url_prefix='/api/v1')
+app.register_blueprint(finance_bp, url_prefix='/api/v1')
+app.register_blueprint(hero_bp, url_prefix='/api/v1')
+app.register_blueprint(contract_templates_bp, url_prefix='/api/v1')
+app.register_blueprint(parties_bp, url_prefix='/api/v1')
+app.register_blueprint(leads_bp, url_prefix='/api/v1')
+app.register_blueprint(expenses_bp, url_prefix='/api/v1')
+app.register_blueprint(social_auth_bp, url_prefix='/api/v1')
+app.register_blueprint(integrations_bp, url_prefix='/api/v1')
+app.register_blueprint(documents_bp, url_prefix='/api/v1')
+app.register_blueprint(purchasing_power_bp, url_prefix='/api/v1')
+app.register_blueprint(settings_bp, url_prefix='/api/v1')
+app.register_blueprint(campaigns_bp, url_prefix='/api/v1')
+app.register_blueprint(hr_bp, url_prefix='/api/v1')
+app.register_blueprint(contacts_bp, url_prefix='/api/v1')
+app.register_blueprint(tracking_bp, url_prefix='/api/v1')
+app.register_blueprint(lmetrics_bp, url_prefix='/api/v1')
+app.register_blueprint(neighborhood_bp, url_prefix='/api/v1')
+app.register_blueprint(projects_bp, url_prefix='/api/v1')
+app.register_blueprint(pipeline_bp, url_prefix='/api/v1')
+app.register_blueprint(automation_bp, url_prefix='/api/v1')
+app.register_blueprint(media_bp, url_prefix='/api/v1')
+app.register_blueprint(appraisal_bp, url_prefix='/api/v1')
+app.register_blueprint(inspection_bp, url_prefix='/api/v1')
+app.register_blueprint(mls_bp, url_prefix='/api/v1')
+app.register_blueprint(compass_bp, url_prefix='/api/v1')
+app.register_blueprint(seo_bp, url_prefix='/api/v1')
 
 @app.route('/inspection')
 def inspection_page():
@@ -161,17 +235,6 @@ def inspection_page():
 @app.route('/mls')
 def mls_page():
     return send_file_from_pages('mls.html')
-
-@app.after_request
-def add_header(r):
-    # Geliştirme sürecinde tüm cache'i kapatıyoruz
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    return r
-
-# CORS Ayarları
-CORS(app)
 
 # İlk çalışmada DB oluştur
 init_db()
@@ -682,4 +745,4 @@ if __name__ == '__main__':
     # Flask sunucusunu başlat (Docker için 0.0.0.0'a bağlamak şart)
     # Üretim ortamında DEBUG=False olmalı. Env'den kontrol et.
     is_debug = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
-    app.run(debug=is_debug, host='0.0.0.0', port=8000)
+    socketio.run(app, debug=is_debug, host='0.0.0.0', port=8000)

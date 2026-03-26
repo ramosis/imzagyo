@@ -30,11 +30,21 @@ class PortfolioSchema(Schema):
     hikaye = fields.Str(required=False)
     resim_hero = fields.Str(required=False)
     resim_hikaye = fields.Str(required=False)
-    ozellikler_arr = fields.Str(required=False)
+    ozellikler_arr = fields.List(fields.Str(), required=False)
     status = fields.Str(dump_default="active")
+
+class UserSchema(Schema):
+    id = fields.Int(dump_only=True)
+    username = fields.Str(required=True, validate=validate.Length(min=3))
+    password = fields.Str(load_only=True, required=False) # update'lerde boş olabilir
+    role = fields.Str(required=False, dump_default="standart")
+    email = fields.Email(required=False, allow_none=True)
+    is_active = fields.Bool(dump_default=True)
 
 # Instances for easy access
 lead_schema = LeadSchema()
 leads_schema = LeadSchema(many=True)
 portfolio_schema = PortfolioSchema()
 portfolios_schema = PortfolioSchema(many=True)
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)

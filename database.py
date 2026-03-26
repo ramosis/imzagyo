@@ -5,7 +5,8 @@ Handles SQLite database initialization, connection management, and sample data p
 import sqlite3
 import json
 import os
-import hashlib
+from passlib.hash import bcrypt
+from contextlib import contextmanager
 
 DB_NAME = "data/imza_database.db"
 
@@ -15,6 +16,18 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
+
+@contextmanager
+def get_db():
+    """Context manager for database connections (Section 5.3)."""
+    conn = get_db_connection()
+    try:
+        yield conn
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
 
 def init_db():
     """Initializes the database, creates tables, and inserts a default admin user."""
@@ -56,7 +69,7 @@ def init_db():
             baslik2 TEXT,
             lokasyon TEXT,
             refNo TEXT,
-            fiyat TEXT,
+            fiyat REAL,
             oda TEXT,
             alan TEXT,
             kat TEXT,
@@ -941,15 +954,41 @@ def init_db():
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
+    
+    # --- PERFORMANS INDEKSLERI (ÖNERİ-007) ---
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_portfoyler_koleksiyon ON portfoyler(koleksiyon)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_portfoyler_fiyat ON portfoyler(fiyat)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_portfoyler_owner ON portfoyler(owner_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_leads_segment ON leads(segment)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_leads_assigned_user ON leads(assigned_user_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at)')
+
+    # --- Audit Logs (ÖNERİ-006) ---
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            action TEXT NOT NULL,
+            entity_type TEXT NOT NULL,
+            entity_id TEXT,
+            user_id INTEGER,
+            old_data JSON,
+            new_data JSON,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
 
     conn.commit()
     
-    # Hash the admin password before inserting
-    admin_password = 'admin123'
-    password_hash = hashlib.sha256(admin_password.encode('utf-8')).hexdigest()
+    # Use bcrypt for passwords (Modern Security Standard)
+    admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
+    hashed_pw = bcrypt.hash(admin_password)
     
     # Insert default admin user if not exists
-    cursor.execute('INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?,?,?)', ('admin', password_hash, 'admin'))
+    cursor.execute('INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?,?,?)', ('admin', hashed_pw, 'admin'))
     conn.commit()
     conn.close()
     print("Veritabanı ve tablolar başarıyla oluşturuldu.")
@@ -1323,6 +1362,22 @@ def doldur_ornek_veriler():
 
     conn.commit()
     conn.close()
+
+class AuditLogger:
+    @staticmethod
+    def log(action, entity_type, entity_id, user_id, old_data=None, new_data=None):
+        try:
+            conn = sqlite3.connect(DB_NAME)
+            conn.execute('''
+                INSERT INTO audit_logs (action, entity_type, entity_id, user_id, old_data, new_data)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (action, entity_type, entity_id, user_id, 
+                  json.dumps(old_data) if old_data else None, 
+                  json.dumps(new_data) if new_data else None))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"Audit Log Hatası: {e}")
 
 if __name__ == "__main__":
     init_db()

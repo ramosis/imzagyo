@@ -1,200 +1,173 @@
-from flask import Blueprint, request, jsonify
-from database import get_db_connection
+from typing import Optional, List, Dict, Any
+from flask import Blueprint, request, jsonify, g
+from database import get_db
 import json
+from api.utils import sanitize_input
 from .schemas import lead_schema, ValidationError
+from .auth import get_current_user, require_permission
+from extensions import socketio
 
 leads_bp = Blueprint('leads', __name__)
 
+class LeadRepository:
+    """Handles low-level SQL operations for Leads (Section 5.3)."""
+    
+    @staticmethod
+    def get_leads_for_user(user_id: int, role: str, circle: str) -> List[Dict[str, Any]]:
+        with get_db() as conn:
+            if circle == 'outer':
+                query = '''
+                    SELECT l.*, p.baslik1 as property_title, u.username as assigned_to
+                    FROM leads l
+                    JOIN portfoyler p ON l.interest_property_id = p.id
+                    LEFT JOIN users u ON l.assigned_user_id = u.id
+                    WHERE p.owner_id = ?
+                    ORDER BY l.ai_score DESC, l.created_at DESC
+                '''
+                rows = conn.execute(query, (user_id,)).fetchall()
+            elif role in ['admin', 'super_admin']:
+                query = '''
+                    SELECT l.*, p.baslik1 as property_title, u.username as assigned_to
+                    FROM leads l
+                    LEFT JOIN portfoyler p ON l.interest_property_id = p.id
+                    LEFT JOIN users u ON l.assigned_user_id = u.id
+                    ORDER BY l.ai_score DESC, l.created_at DESC
+                '''
+                rows = conn.execute(query).fetchall()
+            else:
+                query = '''
+                    SELECT l.*, p.baslik1 as property_title, u.username as assigned_to
+                    FROM leads l
+                    LEFT JOIN portfoyler p ON l.interest_property_id = p.id
+                    LEFT JOIN users u ON l.assigned_user_id = u.id
+                    WHERE l.assigned_user_id = ?
+                    ORDER BY l.ai_score DESC, l.created_at DESC
+                '''
+                rows = conn.execute(query, (user_id,)).fetchall()
+            return [dict(r) for r in rows]
 
-@leads_bp.route('/api/leads', methods=['GET'])
-def get_leads():
-    from .auth import get_current_user
-    user = get_current_user()
-    if not user:
-        return jsonify([]), 401
+    @staticmethod
+    def get_by_id(lead_id: int) -> Optional[Dict[str, Any]]:
+        with get_db() as conn:
+            query = '''
+                SELECT l.*, p.baslik1 as property_title, u.username as assigned_to
+                FROM leads l
+                LEFT JOIN portfoyler p ON l.interest_property_id = p.id
+                LEFT JOIN users u ON l.assigned_user_id = u.id
+                WHERE l.id = ?
+            '''
+            row = conn.execute(query, (lead_id,)).fetchone()
+            return dict(row) if row else None
+
+    @staticmethod
+    def create(data: Dict[str, Any]) -> int:
+        with get_db() as conn:
+            columns = ', '.join(data.keys())
+            placeholders = ', '.join(['?' for _ in data])
+            query = f"INSERT INTO leads ({columns}) VALUES ({placeholders})"
+            cursor = conn.execute(query, list(data.values()))
+            conn.commit()
+            return cursor.lastrowid
+
+    @staticmethod
+    def update(lead_id: int, data: Dict[str, Any]) -> bool:
+        with get_db() as conn:
+            fields = [f"{k}=?" for k in data.keys()]
+            if not fields: return False
+            values = list(data.values()) + [lead_id]
+            cursor = conn.execute(f'UPDATE leads SET {", ".join(fields)} WHERE id=?', values)
+            conn.commit()
+            return cursor.rowcount > 0
+
+    @staticmethod
+    def delete(lead_id: int) -> bool:
+        with get_db() as conn:
+            cursor = conn.execute('DELETE FROM leads WHERE id=?', (lead_id,))
+            conn.commit()
+            return cursor.rowcount > 0
+
+class LeadService:
+    """Handles business logic, AI scoring, and notifications for Leads (Section 5.3)."""
+
+    @staticmethod
+    def calculate_and_create(data: Dict[str, Any]) -> Dict[str, Any]:
+        # 1. Sanitization & Validation (Audit Section 6.2)
+        sanitized_data = sanitize_input(data)
+        validated_data = lead_schema.load(sanitized_data)
         
-    conn = get_db_connection()
-    
-    if user.get('circle') == 'outer':
-        # Outer circle: Sadece kendi mülküne ait lead'leri görsün
-        query = '''
-            SELECT l.*, p.baslik1 as property_title, u.username as assigned_to
-            FROM leads l
-            JOIN portfoyler p ON l.interest_property_id = p.id
-            LEFT JOIN users u ON l.assigned_user_id = u.id
-            WHERE p.owner_id = ?
-            ORDER BY l.ai_score DESC, l.created_at DESC
-        '''
-        leads = conn.execute(query, (user['id'],)).fetchall()
-    else:
-        # Inner circle
-        if user['role'] in ['admin', 'super_admin']:
-            query = '''
-                SELECT l.*, p.baslik1 as property_title, u.username as assigned_to
-                FROM leads l
-                LEFT JOIN portfoyler p ON l.interest_property_id = p.id
-                LEFT JOIN users u ON l.assigned_user_id = u.id
-                ORDER BY l.ai_score DESC, l.created_at DESC
-            '''
-            leads = conn.execute(query).fetchall()
-        else:
-            query = '''
-                SELECT l.*, p.baslik1 as property_title, u.username as assigned_to
-                FROM leads l
-                LEFT JOIN portfoyler p ON l.interest_property_id = p.id
-                LEFT JOIN users u ON l.assigned_user_id = u.id
-                WHERE l.assigned_user_id = ?
-                ORDER BY l.ai_score DESC, l.created_at DESC
-            '''
-            leads = conn.execute(query, (user['id'],)).fetchall()
+        # 2. AI Intent Scoring
+        from .lmetrics import calculate_intent_score
+        session_id = data.get('session_id')
+        behavior_score = 0
+        if session_id:
+            behavior_score, _ = calculate_intent_score(session_id)
 
-    conn.close()
-    return jsonify([dict(l) for l in leads]), 200
+        ai_score = 10
+        if validated_data.get('phone'): ai_score += 20
+        if validated_data.get('email'): ai_score += 15
+        if validated_data.get('interest_property_id'): ai_score += 25
+        if validated_data.get('source') == 'referans': ai_score += 10
+        ai_score = min(100, ai_score + behavior_score)
+        
+        validated_data['ai_score'] = ai_score
 
-@leads_bp.route('/api/leads/<int:id>', methods=['GET'])
-def get_lead(id):
-    conn = get_db_connection()
-    # Join ile detaylı bilgi çekelim
-    query = '''
-        SELECT l.*, p.baslik1 as property_title, u.username as assigned_to
-        FROM leads l
-        LEFT JOIN portfoyler p ON l.interest_property_id = p.id
-        LEFT JOIN users u ON l.assigned_user_id = u.id
-        WHERE l.id = ?
-    '''
-    lead = conn.execute(query, (id,)).fetchone()
-    conn.close()
-    
-    if lead:
-        return jsonify(dict(lead))
-    else:
-        return jsonify({'error': 'Lead not found'}), 404
-
-@leads_bp.route('/api/leads', methods=['POST'])
-def add_lead():
-    data = request.json
-    
-    # --- VERİ DOĞRULAMA (Faz 1) ---
-    try:
-        validated_data = lead_schema.load(data)
-    except ValidationError as err:
-        return jsonify({"error": "Geçersiz veri", "details": err.messages}), 400
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    # --- AKILLI PUANLAMA (LMetrics Entegrasyonu) ---
-    from .lmetrics import calculate_intent_score
-    
-    session_id = data.get('session_id')
-    behavior_score = 0
-    if session_id:
-        behavior_score, _ = calculate_intent_score(session_id)
-
-    ai_score = 10  # Temel skor
-    if data.get('phone'):
-        ai_score += 20
-    if data.get('email'):
-        ai_score += 15
-    if data.get('interest_property_id'):
-        ai_score += 25
-    if data.get('source') == 'referans':
-        ai_score += 10
-    
-    # Davranış puanını ekle (Ağırlıklı)
-    ai_score = min(100, ai_score + behavior_score)
-
-    try:
-        cur.execute('''
-            INSERT INTO leads (name, phone, email, source, interest_property_id, campaign_id, assigned_user_id, status, ai_score, notes, tags)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?)
-        ''', (
-            validated_data.get('name'),
-            validated_data.get('phone'),
-            validated_data.get('email'),
-            validated_data.get('source', 'portal'),
-            validated_data.get('interest_property_id'),
-            validated_data.get('campaign_id'),
-            validated_data.get('assigned_user_id'),
-            validated_data.get('status', 'new'),
-            ai_score,
-            validated_data.get('notes'),
-            validated_data.get('tags')
-        ))
-        lead_id = cur.lastrowid
-
-        # --- Akıllı Bildirim: Danışmana Bilgi Ver ---
+        # 3. Persistence
+        lead_id = LeadRepository.create(validated_data)
+        
+        # 4. Notifications & Side Effects
         assigned_user_id = validated_data.get('assigned_user_id')
         if assigned_user_id:
             from .notifications import create_notification
-            try:
-                msg_title = '🔥 SICAK FIRSAT!' if ai_score >= 70 else 'Yeni Aday Atandı'
-                create_notification(
-                    assigned_user_id,
-                    'ai_alert' if ai_score >= 70 else 'system',
-                    msg_title,
-                    f"{validated_data.get('name')} adlı aday %{ai_score} ilgi puanı ile size atandı."
-                )
-            except: pass
-
-        # --- DİJİTAL AYAK İZİ EŞLEŞTİRME ---
-        # Kullanıcının anonim iken yaptığı işlemleri (session_id) bu yeni lead'e bağla
-        session_id = validated_data.get('session_id')
-        if session_id:
-            cur.execute('UPDATE lead_interactions SET lead_id = ? WHERE session_id = ?', (lead_id, session_id))
-
-        # --- REHBERE (CONTACTS) SENKRONİZE ET ---
+            msg_title = '🔥 SICAK FIRSAT!' if ai_score >= 70 else 'Yeni Aday Atandı'
+            create_notification(assigned_user_id, 'system', msg_title, f"{validated_data.get('name')} aday (%{ai_score}) size atandı.")
+        
+        # 5. Real-Time Notification (Phase 4)
         try:
-            notes_for_contact = f"Potansiyel müşteri formundan geldi. Kaynak: {data.get('source', 'portal')}. Not: {data.get('notes', '')}"
-            cur.execute('''
-                INSERT INTO contacts (name, phone, email, category, source_table, source_id, tags, notes)
-                VALUES (?, ?, ?, 'lead', 'leads', ?, ?, ?)
-            ''', (
-                data.get('name'), data.get('phone'), data.get('email'),
-                lead_id, data.get('tags'), notes_for_contact.strip()
-            ))
-        except cur.IntegrityError:
-            # Zaten varsa, belki notları güncelleyebiliriz ama şimdilik geçiyoruz.
-            pass
+            socketio.emit('new_lead', {
+                'id': lead_id,
+                'name': validated_data.get('name'),
+                'ai_score': validated_data.get('ai_score'),
+                'source': validated_data.get('source')
+            }, namespace='/')
+        except Exception as e:
+            print(f"WebSocket Error: {e}")
 
-        conn.commit()
-        return jsonify({'id': lead_id, 'ai_score': ai_score}), 201
+        return LeadRepository.get_by_id(lead_id)
+
+@leads_bp.route('/api/leads', methods=['GET'])
+def get_leads():
+    user = get_current_user()
+    if not user: return jsonify([]), 401
+    return jsonify(LeadRepository.get_leads_for_user(user['id'], user['role'], user.get('circle', 'outer'))), 200
+
+@leads_bp.route('/api/leads/<int:id>', methods=['GET'])
+def get_lead(id):
+    lead = LeadRepository.get_by_id(id)
+    return jsonify(lead) if lead else (jsonify({'error': 'Lead not found'}), 404)
+
+@leads_bp.route('/api/leads', methods=['POST'])
+def add_lead():
+    try:
+        lead = LeadService.calculate_and_create(request.json)
+        return jsonify(lead), 201
+    except ValidationError as err:
+        return jsonify({"error": "Geçersiz veri", "details": err.messages}), 400
     except Exception as e:
-        conn.rollback()
-        return jsonify({'error': str(e)}), 500
-    finally:
-        conn.close()
+        return jsonify({"error": str(e)}), 500
 
 @leads_bp.route('/api/leads/<int:id>', methods=['PUT'])
+@require_permission('leads.edit')
 def update_lead(id):
-    data = request.json
-    conn = get_db_connection()
-    
-    # Dinamik güncelleme sorgusu oluştur
-    fields = []
-    values = []
-    allowed_cols = ['name', 'phone', 'email', 'source', 'interest_property_id', 'assigned_user_id', 'status', 'notes', 'tags', 'ai_score']
-    
-    for col in allowed_cols:
-        if col in data:
-            fields.append(f"{col}=?")
-            values.append(data[col])
-            
-    if fields:
-        values.append(id)
-        conn.execute(f'UPDATE leads SET {", ".join(fields)} WHERE id=?', tuple(values))
-        
-    conn.commit()
-    conn.close()
-    return jsonify({'status': 'updated'}), 200
+    if LeadRepository.update(id, request.json):
+        return jsonify({'status': 'updated'}), 200
+    return jsonify({'error': 'Lead not found'}), 404
 
 @leads_bp.route('/api/leads/<int:id>', methods=['DELETE'])
+@require_permission('leads.delete')
 def delete_lead(id):
-    conn = get_db_connection()
-    conn.execute('DELETE FROM leads WHERE id=?', (id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'status': 'deleted'}), 200
+    if LeadRepository.delete(id):
+        return jsonify({'status': 'deleted'}), 200
+    return jsonify({'error': 'Lead not found'}), 404
 
 @leads_bp.route('/api/leads/<int:id>/interactions', methods=['GET'])
 def get_lead_interactions(id):

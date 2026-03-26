@@ -30,6 +30,9 @@
     --space-fluid-l: clamp(2.5rem, 2rem + 2.5vw, 5rem);
     --space-fluid-xl: clamp(4rem, 3.5rem + 4vw, 8rem);
     --space-fluid-screen: clamp(1.5rem, 1.2rem + 5vw, 4rem); /* Container side padding */
+
+    /* Header & Layout */
+    --header-height: clamp(5rem, 4rem + 2vh, 6rem);
 }
 
 /* 1600px Üstü İçin Sabitleme (Excessive scaling protection) */
@@ -86,6 +89,10 @@
 .py-fluid-m { padding-top: var(--space-fluid-m); padding-bottom: var(--space-fluid-m); }
 .py-fluid-l { padding-top: var(--space-fluid-l); padding-bottom: var(--space-fluid-l); }
 .py-fluid-xl { padding-top: var(--space-fluid-xl); padding-bottom: var(--space-fluid-xl); }
+
+/* Layout Protection */
+.pt-header { padding-top: var(--header-height) !important; }
+.mt-header { margin-top: var(--header-height) !important; }
 
 /* Margin Utilities */
 .m-fluid-m { margin: var(--space-fluid-m); }
