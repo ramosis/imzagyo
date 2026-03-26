@@ -10,6 +10,42 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/fluid.css">
+
+    <!-- Geo Targeting -->
+    <meta name="geo.region" content="TR-43" />
+    <meta name="geo.placename" content="Kütahya" />
+    <meta name="geo.position" content="39.4200;29.9857" />
+    <meta name="ICBM" content="39.4200, 29.9857" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="business.business">
+    <meta property="og:url" content="https://www.imzaemlak.com/ekip">
+    <meta property="og:title" content="İmza Kadrosu | İmza Gayrimenkul">
+    <meta property="og:description" content="Lüks gayrimenkul ve yatırım danışmanlığında uzman profesyonellerimizle tanışın.">
+    <meta property="og:image" content="https://www.imzaemlak.com/og-image.jpg">
+    <meta property="og:locale" content="tr_TR">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="İmza Kadrosu | İmza Gayrimenkul">
+    <meta name="twitter:description" content="Her biri kendi alanında birer maestro olan profesyonel kadromuzla tanışın.">
+    
+    <link rel="canonical" href="https://www.imzaemlak.com/ekip">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "İmza Emlak Ekibi",
+      "url": "https://www.imzaemlak.com/ekip",
+      "worksFor": {
+        "@type": "RealEstateAgent",
+        "name": "İmza Emlak"
+      }
+    }
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -182,10 +218,10 @@
 
     <!-- Header / Navigasyon -->
     <header class="fixed w-full z-50 transition-all duration-500 bg-transparent header-animate">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
+        <nav class="max-w-7xl mx-auto px-fluid-screen py-fluid-xs">
             <div class="flex justify-between items-center">
                 <!-- Logo -->
-                <a href="anasayfa.html" class="flex items-center group">
+                <a href="anasayfa.html" class="flex items-center group" aria-label="İmza Gayrimenkul Ana Sayfa">
                     <span class="text-2xl font-serif font-bold text-white tracking-widest relative">
                         İMZA
                         <span
@@ -211,7 +247,7 @@
                         class="text-sm font-medium text-white hover:text-gold transition-colors tracking-widest"><i
                             class="fas fa-search"></i> Portföy Ara</a>
                     <a href="portal.html"
-                        class="bg-gold text-navy px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-white transition-colors">Portal</a>
+                        class="bg-gold text-navy px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-white transition-colors" role="button">Portal</a>
                 </div>
             </div>
         </nav>
@@ -219,15 +255,15 @@
 
     <div class="main-wrapper" id="mainWrapper">
         <!-- Hero Section -->
-        <section class="relative pt-40 pb-20 md:pt-56 md:pb-32 bg-navy overflow-hidden">
+        <section class="relative pt-fluid-xl pb-fluid-l bg-navy overflow-hidden">
             <div class="absolute inset-0 brand-pattern"></div>
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center animate-up"
+            <div class="max-w-7xl mx-auto px-fluid-screen relative z-10 text-center animate-up"
                 style="animation-delay: 0.2s;">
                 <h1
-                    class="text-5xl md:text-7xl font-serif font-bold text-white mb-6 tracking-tighter uppercase relative inline-block">
+                    class="text-fluid-7xl font-serif font-bold text-white mb-fluid-s tracking-tighter uppercase relative inline-block">
                     İmza <span class="text-gold italic">Kadrosu</span>
                     <!-- Dekoratif İkon -->
-                    <div class="absolute -right-12 -top-8 text-gold opacity-20 hidden md:block">
+                    <div class="absolute -right-12 -top-8 text-gold opacity-20 hidden md:block" aria-hidden="true">
                         <i class="fas fa-chess-knight text-6xl shadow-2xl"></i>
                     </div>
                 </h1>
@@ -237,7 +273,7 @@
                 </p>
                 <div class="mt-8 flex justify-center gap-12 text-center text-white">
                     <div>
-                        <div class="text-4xl font-serif font-bold text-gold">25+</div>
+                        <div class="text-fluid-4xl font-serif font-bold text-gold">25+</div>
                         <div class="text-[10px] uppercase tracking-widest text-gray-400 mt-1">Yıllık Toplam Deneyim
                         </div>
                     </div>
@@ -246,7 +282,7 @@
         </section>
 
         <!-- Ekip Grid Section -->
-        <section class="py-20 md:py-32 bg-soft">
+        <section class="py-fluid-l bg-soft">
             <!-- Ekip Gridleri Dinamik JS İle Buraya Basilacak -->
 
             <!-- Direktörler (Yöneticiler) -->
@@ -269,10 +305,10 @@
         <div class="absolute inset-0 brand-pattern"></div>
         <div class="max-w-3xl mx-auto px-4 relative z-10">
             <i class="fas fa-handshake text-4xl text-gold mb-6"></i>
-            <h2 class="text-3xl md:text-5xl font-serif font-bold mb-6">Sizin İçin Buradayız</h2>
+            <h2 class="text-fluid-4xl font-serif font-bold mb-fluid-s">Sizin İçin Buradayız</h2>
             <p class="text-gray-400 font-light mb-10">Hayalinizdeki yaşama veya bir sonraki büyük yatırımınıza giden
                 yolda profesyonel ekibimiz size eşlik etmeye hazır.</p>
-            <button
+            <button type="button"
                 class="bg-gold hover:bg-yellow-600 text-navy px-10 py-4 rounded-full font-bold transition-colors uppercase tracking-widest text-sm shadow-xl shadow-gold/20">
                 Bizimle İletişime Geçin
             </button>
@@ -404,7 +440,7 @@
                                         <div class="flex justify-between items-end">
                                             <div>
                                                 <div class="text-gold font-serif italic text-sm mb-1">${kisi.unvan.split(' ')[0]}</div>
-                                                <h3 class="text-2xl font-bold text-white uppercase tracking-wider">${kisi.isim.replace(' ', '<br>')}</h3>
+                                                <h3 class="text-fluid-xl font-bold text-white uppercase tracking-wider">${kisi.isim.replace(' ', '<br>')}</h3>
                                             </div>
                                             <a href="mailto:${kisi.email}" class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy shadow-lg transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                                                 <i class="fas fa-envelope"></i>
@@ -416,7 +452,7 @@
                                 <p class="text-[11px] font-black uppercase tracking-widest text-navy mb-2 flex items-center gap-2">
                                     <i class="fas fa-crown text-gold"></i> ${kisi.unvan}
                                 </p>
-                                <p class="text-sm text-gray-500 font-light leading-relaxed">${Array.isArray(kisi.detaylar) ? kisi.detaylar.join(', ') : kisi.detaylar}</p>
+                                <p class="text-fluid-xs text-gray-500 font-light leading-relaxed">${Array.isArray(kisi.detaylar) ? kisi.detaylar.join(', ') : kisi.detaylar}</p>
                             </div>
                         `;
                         yoneticiGrid.innerHTML += html;
@@ -431,9 +467,9 @@
                                         <a href="tel:${kisi.telefon.replace(/\s+/g, '')}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy hover:bg-gold hover:text-white transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 delay-200"><i class="fas fa-phone"></i></a>
                                     </div>
                                 </div>
-                                <h3 class="text-xl font-bold text-navy uppercase tracking-wide">${kisi.isim}</h3>
+                                <h3 class="text-fluid-l font-bold text-navy uppercase tracking-wide">${kisi.isim}</h3>
                                 <p class="text-[10px] font-black uppercase tracking-widest text-gold mt-1 mb-2">${kisi.unvan}</p>
-                                <p class="text-sm text-gray-500 font-light">${Array.isArray(kisi.uzmanlikAlanlari) ? kisi.uzmanlikAlanlari.join(', ') : kisi.uzmanlikAlanlari}</p>
+                                <p class="text-fluid-xs text-gray-500 font-light">${Array.isArray(kisi.uzmanlikAlanlari) ? kisi.uzmanlikAlanlari.join(', ') : kisi.uzmanlikAlanlari}</p>
                             </div>
                         `;
                         danismanGrid.innerHTML += html;

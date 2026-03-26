@@ -1,0 +1,9 @@
+pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+plugins { id("com.facebook.react.settings") }
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+rootProject.name = 'mobile'
+
+include ':app'
+
+// Kütüphaneleri otomatik dahil etmesi için bazen bu gereklidir
+includeBuild('../node_modules/@react-native/gradle-plugin')

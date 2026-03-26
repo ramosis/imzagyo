@@ -5,11 +5,12 @@ import datetime
 
 pipeline_bp = Blueprint('pipeline', __name__)
 
-@pipeline_bp.route('/api/pipeline', methods=['GET'])
+@pipeline_bp.route('/api/pipeline/leads', methods=['GET'])
 @require_inner_circle
-def get_pipeline():
+def get_pipeline_leads():
     """
     Tüm aşamaları ve içindeki adayları Kanban formatında döndürür.
+    Real-time AI Score entegrasyonu ile.
     """
     conn = get_db_connection()
     
@@ -20,19 +21,60 @@ def get_pipeline():
     # 2. Adayları al
     leads = conn.execute('''
         SELECT l.id, l.name, l.phone, l.email, l.pipeline_stage_id, l.ai_score, l.status,
-               p.baslik1 as property_title, u.username as assigned_to
+               l.interest_property_id, p.baslik1 as property_title, u.username as assigned_to
         FROM leads l
         LEFT JOIN portfoyler p ON l.interest_property_id = p.id
         LEFT JOIN users u ON l.assigned_user_id = u.id
         ORDER BY l.ai_score DESC
     ''').fetchall()
     
+    # 3. LMetrics Entegrasyonu (Real-time scoring)
+    from .lmetrics import calculate_intent_score
+    
+    processed_leads = []
+    for l in leads:
+        lead_dict = dict(l)
+        # Session eşleşmesi üzerinden anlık skor çekmeyi dene
+        session_row = conn.execute('SELECT session_id FROM lead_interactions WHERE lead_id = ? LIMIT 1', (lead_dict['id'],)).fetchone()
+        if session_row:
+            score, interest = calculate_intent_score(session_row['session_id'])
+            lead_dict['ai_score'] = score
+            lead_dict['intent_category'] = interest
+        else:
+            lead_dict['intent_category'] = "Genel"
+            
+        processed_leads.append(lead_dict)
+
     # Gruplama
     for stage in stages_list:
-        stage['leads'] = [dict(l) for l in leads if l['pipeline_stage_id'] == stage['id']]
+        # DB status vs id eşleşmesi (pipeline.html status stringi bekliyor olabilir)
+        # pipeline.html'de renderLeads columns[lead.status] kullanıyor.
+        # Bizim leads tablomuzdaki status 'new', 'contacted' vb.
+        # pipeline.html'deki data-status değerleri: 'New', 'Contacted', 'Proposal', 'Closed'
+        # Bu mapping'i backend'de yapalım.
+        status_map = {
+            1: 'New',
+            2: 'Contacted',
+            3: 'Proposal',
+            4: 'Proposal', # Genişletilebilir
+            5: 'Closed'
+        }
+        stage['leads'] = []
+        for l in processed_leads:
+            mapped_status = status_map.get(l['pipeline_stage_id'], 'New')
+            if mapped_status.lower() == stage['name'].lower() or \
+               (stage['id'] == l['pipeline_stage_id']):
+                l['status_label'] = mapped_status
+                stage['leads'].append(l)
     
     conn.close()
-    return jsonify(stages_list)
+    return jsonify(processed_leads), 200
+
+# Eski endpoint'i de uyumluluk için tutuyoruz
+@pipeline_bp.route('/api/pipeline', methods=['GET'])
+@require_inner_circle
+def get_pipeline_legacy():
+    return get_pipeline_leads()
 
 @pipeline_bp.route('/api/pipeline/stages', methods=['GET'])
 @require_inner_circle
@@ -42,6 +84,30 @@ def get_stages():
     stages = conn.execute('SELECT * FROM pipeline_stages ORDER BY order_index').fetchall()
     conn.close()
     return jsonify([dict(s) for s in stages])
+
+@pipeline_bp.route('/api/pipeline/leads/<int:lead_id>', methods=['PUT'])
+@login_required
+def update_lead_status_route(lead_id):
+    """pipeline.html tarafından kullanılan put rotası."""
+    data = request.json
+    new_status_str = data.get('status') # 'New', 'Contacted' vb.
+    
+    status_to_id = {
+        'New': 1,
+        'Contacted': 2,
+        'Proposal': 3,
+        'Closed': 5
+    }
+    
+    target_stage_id = status_to_id.get(new_status_str, 1)
+    
+    # move_lead fonksiyonunu manuel çağırmak yerine iç mantığı buraya koyabiliriz veya onu refaktör edebiliriz.
+    # Şimdilik direkt güncelleme yapalım.
+    conn = get_db_connection()
+    conn.execute('UPDATE leads SET pipeline_stage_id = ? WHERE id = ?', (target_stage_id, lead_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'status': 'success'})
 
 @pipeline_bp.route('/api/leads/<int:lead_id>/move', methods=['PUT'])
 @login_required

@@ -5,6 +5,7 @@ import hashlib
 import jwt
 import os
 import datetime
+import bcrypt
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -12,7 +13,33 @@ auth_bp = Blueprint('auth', __name__)
 JWT_SECRET = os.environ.get("JWT_SECRET", "imza-super-secret-key-2026")
 
 def hash_password(password):
-    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+    """Yeni oluşturulan şifreler için bcrypt kullanır."""
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def verify_password(plain_password, stored_hash, user_id=None):
+    """Şifre doğrulaması yapar ve eski tip SHA256 şifreleri anında bcrypt'e günceller."""
+    if stored_hash.startswith('$2b$') or stored_hash.startswith('$2a$') or stored_hash.startswith('$2y$'):
+        try:
+            return bcrypt.checkpw(plain_password.encode('utf-8'), stored_hash.encode('utf-8'))
+        except ValueError:
+            return False
+    else:
+        # Legacy SHA256 Fallback
+        legacy_hash = hashlib.sha256(plain_password.encode('utf-8')).hexdigest()
+        if legacy_hash == stored_hash:
+            # Seamless Migration: Bcrypt ile re-hash ve DB update
+            if user_id:
+                new_hash = hash_password(plain_password)
+                conn = get_db_connection()
+                try:
+                    conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (new_hash, user_id))
+                    conn.commit()
+                finally:
+                    conn.close()
+            return True
+        return False
 
 INNER_ROLES = ["admin", "super_admin", "broker", "danisman"]
 
@@ -102,8 +129,8 @@ def login():
     conn.close()
     if user is None:
         return jsonify({'error': 'Invalid username or password'}), 401
-    stored_hash = user['password_hash']
-    if stored_hash != hash_password(password):
+    
+    if not verify_password(password, user['password_hash'], user['id']):
         return jsonify({'error': 'Invalid username or password'}), 401
     
     user_role = user['role']
@@ -132,7 +159,7 @@ def mobile_login():
     user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
     conn.close()
     
-    if user is None or user['password_hash'] != hash_password(password):
+    if user is None or not verify_password(password, user['password_hash'], user['id']):
         return jsonify({'error': 'Invalid username or password'}), 401
         
     user_role = user['role']

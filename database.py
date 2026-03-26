@@ -37,7 +37,15 @@ def init_db():
             role TEXT NOT NULL CHECK(role IN ("admin","super_admin","broker","danisman","vip","kiraci","muteahhit","standart","employee","owner","tenant","partner"))
         )
     ''')
-
+    
+    # Social Login alanlarını ekle (Mevcut veritabanını bozmamak için try-except kullanıyoruz)
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN email TEXT UNIQUE')
+        cursor.execute('ALTER TABLE users ADD COLUMN social_provider TEXT')
+        cursor.execute('ALTER TABLE users ADD COLUMN social_id TEXT')
+        cursor.execute('ALTER TABLE users ADD COLUMN profile_pic TEXT')
+    except sqlite3.OperationalError:
+        pass # Kolonlar zaten eklenmişse hatayı yoksay
     # Portföyler (Mülkler)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS portfoyler (
@@ -65,9 +73,18 @@ def init_db():
             mulk_tipi TEXT DEFAULT 'Konut',
             alt_tip TEXT, -- Daire, Villa, Ofis, Arsa vb.
             denetim_notlari TEXT,
-            mahalle_id TEXT -- İmza Mahalle eşleşmesi için
+            mahalle_id TEXT, -- İmza Mahalle eşleşmesi için
+            cephe TEXT, -- Kuzey, Güney, Doğu, Batı, vb.
+            gunes_bilgisi TEXT -- Metinsel güneş analizi
         )
     ''')
+    
+    # Yeni sütunları mevcut tabloya ekleme (Upgrade logic)
+    try:
+        cursor.execute('ALTER TABLE portfoyler ADD COLUMN cephe TEXT')
+        cursor.execute('ALTER TABLE portfoyler ADD COLUMN gunes_bilgisi TEXT')
+    except sqlite3.OperationalError:
+        pass # Kolonlar zaten eklenmişse hatayı yoksay
 
     # Pipeline Aşamaları
     cursor.execute('''
@@ -129,18 +146,45 @@ def init_db():
         )
     ''')
 
-    # --- Bağımlı Tablolar (Foreign Key Kullananlar) ---
-
     # --- Neighborhood & Facilities (Mahalle Özellikleri) ---
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS neighborhood_facilities (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             category TEXT,
-            icon TEXT,
+            icon TEXT, -- Eksik olan icon kolonu eklendi
+            receipt_url TEXT,
             description TEXT
         )
     ''')
+
+    # Eğer tablo daha önce yaratıldıysa icon kolonunu eklemeyi dene
+    try:
+        cursor.execute('ALTER TABLE neighborhood_facilities ADD COLUMN icon TEXT')
+    except sqlite3.OperationalError:
+        pass
+
+    # --- PLAN 3.2: COMMUNITY & POLLS ---
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS apartment_polls (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        mahalle_id INTEGER,
+        title TEXT NOT NULL,
+        description TEXT,
+        options TEXT, -- JSON list: ["Seçenek 1", "Seçenek 2"]
+        expires_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS poll_votes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        poll_id INTEGER,
+        user_name TEXT,
+        selected_option TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (poll_id) REFERENCES apartment_polls(id)
+    )''')
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS shuttle_schedule (
@@ -202,6 +246,56 @@ def init_db():
 
     # New tables for expanded functionality
     # (users table moved to top)
+    # --- Plan 12: Dijital Konut Denetim & Ekspertiz Formu ---
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS property_inspections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            portfolio_id TEXT NOT NULL,
+            staff_id TEXT,
+            inspection_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            category TEXT, -- Konut, Ticari, Arazi
+            data_json TEXT, -- Tüm kontrol listesi verileri (JSON)
+            score_summary TEXT, -- Puan özeti (Yeşil/Sarı/Kırmızı sayıları)
+            overall_score REAL,
+            notes TEXT,
+            FOREIGN KEY(portfolio_id) REFERENCES portfoyler(id)
+        )
+    ''')
+
+    # --- Plan 13: MLS (Multiple Listing Service) ---
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS mls_listings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            portfolio_id TEXT NOT NULL,
+            sharing_status TEXT DEFAULT 'private', -- private, inner, outer
+            commission_split REAL DEFAULT 50.0, -- Yüzde (%50 paylaşımlı)
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(portfolio_id) REFERENCES portfoyler(id)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS mls_demands (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL, -- Talep sahibi danışman/ofis
+            category TEXT, -- Konut, Ticari vb.
+            region TEXT,
+            budget_max REAL,
+            features_json TEXT,
+            status TEXT DEFAULT 'open', -- open, matched, closed
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS mls_trust_scores (
+            office_id TEXT PRIMARY KEY,
+            score REAL DEFAULT 5.0,
+            review_count INTEGER DEFAULT 0,
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS contracts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -894,12 +988,16 @@ def doldur_ornek_veriler():
     # Sample apartment expenses (Using property_id from portfoyler)
     # Schema: (id, property_id, expense_type, amount, expense_date, description)
     cursor.execute("INSERT OR IGNORE INTO apartment_expenses (property_id, expense_type, amount, expense_date, description) VALUES ('bogaz-villa', 'Asansör Bakımı', 4500.0, '2026-03-10', 'A Blok asansör halat değişimi ve periyodik bakım.')")
-    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (property_id, expense_type, amount, expense_date, description) VALUES ('bogaz-villa', 'Bahçe Düzenleme', 2200.0, '2026-03-05', 'Bahar bakımı ve yeni çiçek ekimi.')")
+    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (property_id, expense_type, amount, expense_date, description, invoice_file) VALUES ('bogaz-villa', 'Bahçe Düzenleme', 2200.0, '2026-03-05', 'Bahar bakımı ve yeni çiçek ekimi.', 'https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?q=80&w=400')")
+    cursor.execute("INSERT OR IGNORE INTO apartment_expenses (property_id, expense_type, amount, expense_date, description, invoice_file) VALUES ('bogaz-villa', 'Aydınlatma Onarımı', 850.0, '2026-03-12', 'Binas giriş armatür değişimi.', 'https://images.unsplash.com/photo-1590216087343-c2229b352576?q=80&w=400')")
+
+    # Sample Polls
+    cursor.execute("INSERT OR IGNORE INTO apartment_polls (id, mahalle_id, title, description, options, expires_at) VALUES (1, 1, 'Dış Cephe Boyası', 'Binamızın dış cephesinin bu yaz boyanmasını istiyor musunuz?', '[\"Evet, boyansın\", \"Hayır, seneye kalsın\", \"Sadece balkonlar\"]', '2026-04-15 00:00:00')")
+    cursor.execute("INSERT OR IGNORE INTO apartment_polls (id, mahalle_id, title, description, options, expires_at) VALUES (2, 1, 'Otopark Düzenlemesi', 'Misafir araçları için ayrılan alanın genişletilmesi hakkında ne düşünüyorsunuz?', '[\"Genişletilsin\", \"Mevcut kalsın\", \"Ücretli olsun\"]', '2026-04-10 00:00:00')")
     print("Mesaj şablonları kontrol ediliyor...")
     cursor.execute('SELECT COUNT(*) FROM message_templates')
     if cursor.fetchone()[0] == 0:
         templates = [
-            ('yatirimci', 'property', "Selamlar {name} Bey/Hanım, geçen konuştuğumuz ROI oranlarını yakalayan bir fırsat düştü. {property_title} portföyünü incelemenizi öneririm, kira çarpanı bölge ortalamasının altında."),
             ('yatirimci', 'general', "Selamlar {name} Bey/Hanım, piyasada şu an nakit alımlarda ciddi fırsatlar oluşmaya başladı. Sizin yatırım kriterlerinize uyan 2-3 yer var, ne zaman müsait olursunuz?"),
             ('butce_odakli', 'property', "Merhaba {name}, bütçe planlamanızı konuşmuştuk. Bu portföy ({property_price}) krediye uygun ve pazarlık payı var. Görmek ister misiniz?"),
             ('butce_odakli', 'general', "Merhaba {name}, faiz oranlarıyla ilgili yeni bir kampanya duyumu aldık. Ev sahibi olma planınızı tekrar değerlendirmek isterseniz detayları paylaşabilirim."),

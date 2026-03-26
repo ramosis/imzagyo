@@ -1,7 +1,32 @@
+# İmza Emlak robots.txt
 User-agent: *
 Allow: /
-Allow: /pages/
-Disallow: /api/
-Disallow: /uploads/
 
+# Genişleme stratejisi için şehir bazlı izinler
+Allow: /satilik/
+Allow: /kiralik/
+Allow: /projeler/
+Allow: /semtler/
+
+# Gelişim aşamasındaki şehir sayfaları (açıldıkça Allow yapın)
+# Disallow: /yeni-sehir-adı/
+
+# Admin ve özel alanlar
+Disallow: /admin/
+Disallow: /panel/
+Disallow: /api/
+Disallow: /test/
+Disallow: /staging/
+
+# URL parametrelerini temizle
+Disallow: /*?*
+Allow: /*?page=
+Allow: /*?il=
+Allow: /*?ilce=
+Allow: /*?semt=
+
+# Sitemap lokasyonları
 Sitemap: https://imzaemlak.com/sitemap.xml
+Sitemap: https://imzaemlak.com/sitemap-ilanlar.xml
+Sitemap: https://imzaemlak.com/sitemap-sehirler.xml
+Sitemap: https://imzaemlak.com/sitemap-blog.xml

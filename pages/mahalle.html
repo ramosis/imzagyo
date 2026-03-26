@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script src="/static/js/lmetrics.js"></script>
     <script src="/static/js/appointment-service.js"></script>
+    <link rel="stylesheet" href="../static/css/fluid.css">
     <style>
         :root {
             --navy: #1a1a2e;
@@ -44,7 +45,7 @@
             <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-house-chimney-window text-gold text-xl"></i>
             </div>
-            <span class="text-xl font-serif font-bold tracking-tight">İmza <span class="text-sage">Mahalle</span></span>
+            <span class="text-fluid-xl font-serif font-bold tracking-tight">İmza <span class="text-sage">Mahalle</span></span>
         </div>
         <div class="hidden md:flex gap-8 text-sm font-semibold uppercase tracking-wider">
             <a href="#about" class="hover:text-gold transition-colors">Mahallemiz</a>
@@ -143,7 +144,7 @@
     <!-- HERO SECTION -->
     <section class="min-h-screen hero-gradient flex items-center justify-center pt-20 px-4">
         <div class="max-w-4xl text-center text-white animate-fade-in">
-            <h1 class="text-5xl md:text-7xl font-serif mb-6 leading-tight">Mahallenizin Dijital Kalbi <span class="text-gold italic">Burada Atıyor.</span></h1>
+            <h1 class="text-fluid-7xl font-serif mb-fluid-s leading-tight">Mahallenizin Dijital Kalbi <span class="text-gold italic">Burada Atıyor.</span></h1>
             <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">Sadece binaları değil, komşuluğu ve yerel değerleri önemsiyoruz. İmza Mahalle ile yaşamınızı kolaylaştırın, mahallenizle bütünleşin.</p>
             <div class="flex flex-wrap justify-center gap-4">
                 <a href="#demands" class="bg-gold text-navy px-8 py-4 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-white transition-colors">Bir Talep Bırak</a>
@@ -203,6 +204,52 @@
             <div id="pharmacy-list" class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Dynamic Pharmacies -->
                 <div class="animate-pulse col-span-3 h-32 bg-gray-50 rounded-[2.5rem]"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSPARENT SAFE (ŞEFFAF KASA) -->
+    <section id="transparency" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div class="space-y-2">
+                    <h2 class="text-xs font-bold text-sage uppercase tracking-[0.3em] font-sans">Yönetim Şeffaflığı</h2>
+                    <h3 class="text-4xl font-serif text-navy">Şeffaf Kasa</h3>
+                    <p class="text-gray-400 max-w-lg">Apartman harcamalarını, faturaları ve bakım giderlerini anlık olarak takip edin.</p>
+                </div>
+                <div class="flex gap-4">
+                    <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-sage/10 text-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Dönem Gideri</p>
+                        <p class="text-lg font-serif text-navy" id="total-expense">0 ₺</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="expense-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamic Expenses -->
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMUNITY POLLS (TOPLULUK OYLAMASI) -->
+    <section id="polls" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="glass-card p-12 rounded-[3rem] bg-navy text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-1/4 h-full bg-gold/5 -skew-x-12 transform translate-x-10"></div>
+                <div class="relative z-10 flex flex-col lg:flex-row gap-16">
+                    <div class="lg:w-1/3">
+                        <h2 class="text-xs font-bold text-gold uppercase tracking-[0.3em] mb-4">Mahalle Kararları</h2>
+                        <h3 class="text-4xl font-serif mb-8 text-white">Topluluk Oylaması</h3>
+                        <p class="text-gray-400 mb-8 leading-relaxed">Ortak alan kullanımı, etkinlikler ve yönetim kararları için tercihinizi belirtin, mahalleye yön verin.</p>
+                        <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+                            <p class="text-[10px] font-bold text-gold uppercase tracking-wider mb-2">Aktif Oylamalar</p>
+                            <p class="text-2xl font-serif" id="active-poll-count">0</p>
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 space-y-6" id="poll-container">
+                        <!-- Dynamic Polls -->
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -428,6 +475,28 @@
             </div>
         </div>
     </footer>
+
+    <!-- DUES HISTORY MODAL -->
+    <div id="dues-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-navy/80 backdrop-blur-sm px-4">
+        <div class="glass-card w-full max-w-2xl bg-white rounded-[2.5rem] overflow-hidden shadow-2xl animate-fade-in">
+            <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div>
+                    <h3 class="text-2xl font-serif text-navy">Ödeme Geçmişi</h3>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Tüm aidat ve ek ödeme kayıtlarınız</p>
+                </div>
+                <button onclick="closeDuesModal()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 hover:text-navy transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-8 max-h-[60vh] overflow-y-auto" id="dues-full-list">
+                <!-- Detailed List -->
+            </div>
+            <div class="p-8 bg-gray-50 flex justify-end gap-4 border-t border-gray-100">
+                <button onclick="closeDuesModal()" class="px-6 py-3 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">Kapat</button>
+                <button class="px-8 py-3 rounded-xl bg-navy text-gold text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform">Makbuzları İndir (Zip)</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         async function submitDemand() {
@@ -671,6 +740,134 @@
         window.imzaAppService.init();
         fetchPharmacies();
 
+        // --- DUES MODAL LOGIC ---
+        let allDues = [];
+        function openDuesModal() {
+            document.getElementById('dues-modal').classList.remove('hidden');
+            const list = document.getElementById('dues-full-list');
+            list.innerHTML = allDues.map(p => `
+                <div class="flex items-center justify-between p-6 bg-gray-50 rounded-3xl mb-4 border border-transparent hover:border-gold/20 transition-all">
+                    <div class="flex items-center gap-6">
+                        <div class="w-12 h-12 rounded-2xl ${p.status === 'Paid' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} flex items-center justify-center">
+                            <i class="fa-solid ${p.status === 'Paid' ? 'fa-check' : 'fa-clock'}"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-navy uppercase tracking-wider">${p.period} Aidat Ödemesi</p>
+                            <p class="text-[10px] text-gray-400 mt-1">Ödeme Tarihi: ${p.payment_date || '-'}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-navy">${p.amount} ₺</p>
+                        <p class="text-[8px] font-bold ${p.status === 'Paid' ? 'text-green-500' : 'text-red-500'} uppercase tracking-widest mt-1">${p.status === 'Paid' ? 'Tahsil Edildi' : 'Bekliyor'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function closeDuesModal() {
+            document.getElementById('dues-modal').classList.add('hidden');
+        }
+
+        // --- EXPENSES (ŞEFFAF KASA) ---
+        async function fetchExpenses() {
+            try {
+                const res = await fetch('/api/neighborhood/expenses');
+                const data = await res.json();
+                const container = document.getElementById('expense-list');
+                const totalEl = document.getElementById('total-expense');
+                
+                let total = 0;
+                container.innerHTML = data.map(e => {
+                    total += e.amount;
+                    return `
+                        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-navy/5 hover:shadow-xl transition-all group">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="w-12 h-12 rounded-2xl bg-sage/10 text-sage flex items-center justify-center">
+                                    <i class="fa-solid fa-receipt text-xl"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${e.expense_date}</span>
+                            </div>
+                            <h4 class="text-xl font-serif text-navy mb-2">${e.title}</h4>
+                            <p class="text-xs text-gray-500 mb-6 leading-relaxed">${e.description}</p>
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Tutar</p>
+                                    <p class="text-lg font-serif text-navy">${e.amount} ₺</p>
+                                </div>
+                                ${e.receipt_url ? `
+                                    <a href="${e.receipt_url}" target="_blank" class="w-10 h-10 rounded-full bg-navy text-gold flex items-center justify-center hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-camera"></i>
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                totalEl.innerText = `${total.toLocaleString('tr-TR')} ₺`;
+            } catch (err) { console.error(err); }
+        }
+
+        // --- POLLS (OYLAMA) ---
+        async function fetchPolls() {
+            try {
+                const res = await fetch('/api/neighborhood/polls');
+                const data = await res.json();
+                const container = document.getElementById('poll-container');
+                document.getElementById('active-poll-count').innerText = data.length;
+                
+                container.innerHTML = data.map(p => {
+                    const options = JSON.parse(p.options);
+                    return `
+                        <div class="p-8 bg-white/5 rounded-[2.5rem] border border-white/10 hover:border-gold/30 transition-all">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h4 class="text-xl font-serif text-gold mb-2">${p.title}</h4>
+                                    <p class="text-xs text-gray-400 mb-6 leading-relaxed">${p.description}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Kalan Süre</p>
+                                    <p class="text-xs font-bold text-white">2 Gün</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${options.map(opt => {
+                                    const count = p.stats[opt] || 0;
+                                    const percent = p.total_votes > 0 ? Math.round((count / p.total_votes) * 100) : 0;
+                                    return `
+                                        <button onclick="castVote(${p.id}, '${opt}')" class="relative overflow-hidden p-4 rounded-2xl bg-white/5 border border-white/10 text-left group hover:bg-white/10 transition-all">
+                                            <div class="absolute top-0 left-0 h-full bg-gold/10 transition-all" style="width: ${percent}%"></div>
+                                            <div class="relative z-10 flex justify-between items-center text-xs">
+                                                <span class="font-bold text-white group-hover:text-gold transition-colors">${opt}</span>
+                                                <span class="text-gray-500 font-mono">%${percent}</span>
+                                            </div>
+                                        </button>
+                                    `;
+                                }).join('')}
+                            </div>
+                            <p class="text-[10px] text-gray-500 mt-6 italic">Toplam ${p.total_votes} oy kullanıldı.</p>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        async function castVote(pollId, option) {
+            try {
+                const res = await fetch('/api/neighborhood/polls/vote', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ poll_id: pollId, option: option })
+                });
+                if (res.ok) {
+                    alert('Oyunuz kaydedildi!');
+                    fetchPolls();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Oylama yapılamadı.');
+                }
+            } catch (err) { console.error(err); }
+        }
+
         // Relocation Guide Logic
         async function fetchRelocationGuide() {
             try {
@@ -723,6 +920,7 @@
                 const unitContainer = document.getElementById('unit-info');
                 
                 if (unitData.unit) {
+                    allDues = unitData.payments; // Save for modal
                     unitContainer.innerHTML = `
                         <div class="flex justify-between items-center p-6 bg-white rounded-3xl border border-navy/5 shadow-sm">
                             <div>
@@ -735,8 +933,11 @@
                             </div>
                         </div>
                         <div class="space-y-3">
-                            <p class="text-[10px] font-bold text-navy uppercase tracking-widest pl-2">Son Ödemeler</p>
-                            ${unitData.payments.map(p => `
+                            <div class="flex justify-between items-center px-2">
+                                <p class="text-[10px] font-bold text-navy uppercase tracking-widest">Son Ödemeler</p>
+                                <button onclick="openDuesModal()" class="text-[10px] font-bold text-gold uppercase tracking-widest hover:underline">Tüm Kayıtlar</button>
+                            </div>
+                            ${unitData.payments.slice(0, 2).map(p => `
                                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gold/20 transition-all">
                                     <div class="flex items-center">
                                         <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-4">
@@ -772,6 +973,8 @@
         fetchRelocationGuide();
         fetchConciergeData();
         fetchManagementData();
+        fetchExpenses();
+        fetchPolls();
 
         async function calculatePropertyValuation() {
             const data = {

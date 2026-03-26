@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Ana Sayfa (Home) -->
+  <url>
+    <loc>https://imzaemlak.com/</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://imzaemlak.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://imzaemlak.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://imzaemlak.com/?lang=ru"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://imzaemlak.com/?lang=ar"/>
+    <lastmod>2026-03-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Kurumsal (Corporate) -->
+  <url>
+    <loc>https://imzaemlak.com/kurumsal</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://imzaemlak.com/kurumsal"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://imzaemlak.com/kurumsal?lang=en"/>
+    <lastmod>2026-03-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Ekibimiz (Team) -->
+  <url>
+    <loc>https://imzaemlak.com/ekip</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://imzaemlak.com/ekip"/>
+    <lastmod>2026-03-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>

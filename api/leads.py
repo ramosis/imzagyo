@@ -83,8 +83,15 @@ def add_lead():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # Basit bir AI skoru hesaplama (demo amaçlı)
-    ai_score = 30  # Temel skor
+    # --- AKILLI PUANLAMA (LMetrics Entegrasyonu) ---
+    from .lmetrics import calculate_intent_score
+    
+    session_id = data.get('session_id')
+    behavior_score = 0
+    if session_id:
+        behavior_score, _ = calculate_intent_score(session_id)
+
+    ai_score = 10  # Temel skor
     if data.get('phone'):
         ai_score += 20
     if data.get('email'):
@@ -93,6 +100,9 @@ def add_lead():
         ai_score += 25
     if data.get('source') == 'referans':
         ai_score += 10
+    
+    # Davranış puanını ekle (Ağırlıklı)
+    ai_score = min(100, ai_score + behavior_score)
 
     try:
         cur.execute('''
@@ -212,32 +222,93 @@ def get_lead_interactions(id):
 @leads_bp.route('/api/leads/<int:id>/footprint', methods=['GET'])
 def get_lead_footprint(id):
     """
-    Adayın tüm dijital yolculuğunu kronolojik olarak döner.
+    Adayın tüm dijital yolculuğunu (CRM + L-Metrics + Pipeline Geçmişi) kronolojik döner. (Unified Timeline)
     """
     conn = get_db_connection()
     try:
         # 1. Lead bilgilerini doğrula
-        lead = conn.execute('SELECT name, ai_score FROM leads WHERE id = ?', (id,)).fetchone()
+        lead = conn.execute('SELECT name, ai_score, created_at, notes FROM leads WHERE id = ?', (id,)).fetchone()
         if not lead:
             return jsonify({'error': 'Lead not found'}), 404
 
-        # 2. Tüm etkileşimleri çek
-        interactions = conn.execute('''
-            SELECT * FROM lead_interactions 
-            WHERE lead_id = ? 
-            ORDER BY created_at ASC
+        timeline = []
+
+        # 1.1 Lead Oluşturulması ve Notlar
+        timeline.append({
+            'type': 'system',
+            'timestamp': lead['created_at'],
+            'title': 'Aday Sisteme Eklendi',
+            'description': lead['notes'] if lead['notes'] else 'Sisteme yeni aday kaydı oluşturuldu.'
+        })
+
+        # 2. Pipeline Geçmişi
+        ph_rows = conn.execute('''
+            SELECT ph.created_at, ps.name as stage_name, u.username as user_name, ph.reason
+            FROM pipeline_history ph
+            JOIN pipeline_stages ps ON ph.new_stage_id = ps.id
+            LEFT JOIN users u ON ph.user_id = u.id
+            WHERE ph.lead_id = ?
         ''', (id,)).fetchall()
         
-        # 3. Veriyi formatla
-        timeline = []
+        for row in ph_rows:
+            timeline.append({
+                'type': 'pipeline',
+                'timestamp': row['created_at'],
+                'title': f"Aşama: {row['stage_name']}",
+                'description': f"{row['user_name'] or 'Sistem'} tarafından taşındı. {row['reason'] or ''}"
+            })
+
+        # 3. Lead Etkileşimleri (Hesaplama araçları vs)
+        interactions = conn.execute('''
+            SELECT * FROM lead_interactions 
+            WHERE lead_id = ?
+        ''', (id,)).fetchall()
+        
+        session_ids = set()
         for row in interactions:
             item = dict(row)
-            data_json = item.get('data_json')
-            if data_json:
-                try: item['data'] = json.loads(str(data_json))
-                except: item['data'] = {}
-            timeline.append(item)
+            if item.get('session_id'):
+                session_ids.add(item['session_id'])
             
+            data_json = item.get('data_json')
+            data_info = ""
+            if data_json:
+                try: 
+                    jd = json.loads(str(data_json))
+                    data_info = " | ".join([f"{k}: {v}" for k, v in jd.items()][:3])
+                except: pass
+            
+            timeline.append({
+                'type': 'tool',
+                'timestamp': item['created_at'],
+                'title': f"Araç: {item['tool_name']}",
+                'description': data_info or 'Etkileşim algılandı.'
+            })
+            
+        # 4. Sayfa Görüntülemeleri (user_interactions)
+        for sid in session_ids:
+            ui_rows = conn.execute('''
+                SELECT timestamp as created_at, url, event_type, value
+                FROM user_interactions
+                WHERE session_id = ? AND event_type IN ('stay', 'click')
+            ''', (sid,)).fetchall()
+            for row in ui_rows:
+                label = "Sayfa İncelemesi" if row['event_type'] == 'stay' else "Tıklama Etkileşimi"
+                desc = row['url']
+                val = row['value']
+                if val:
+                    desc += f" ({val} sn)" if row['event_type'] == 'stay' else f" ({val})"
+                    
+                timeline.append({
+                    'type': 'lmetrics',
+                    'timestamp': row['created_at'],
+                    'title': label,
+                    'description': desc
+                })
+
+        # Kronolojik sıralama (Yeniden Eskiye)
+        timeline.sort(key=lambda x: x['timestamp'], reverse=True)
+
         return jsonify({
             'lead_name': lead['name'],
             'ai_score': lead['ai_score'],

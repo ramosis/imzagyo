@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://imzaemlak.com/sitemap-ana.xml</loc>
+    <lastmod>2026-03-26</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://imzaemlak.com/sitemap-ilanlar.xml</loc>
+    <lastmod>2026-03-26</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://imzaemlak.com/sitemap-sehirler.xml</loc>
+    <lastmod>2026-03-26</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://imzaemlak.com/sitemap-blog.xml</loc>
+    <lastmod>2026-03-26</lastmod>
+  </sitemap>
+</sitemapindex>

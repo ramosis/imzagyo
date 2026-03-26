@@ -40,11 +40,12 @@ def add_portfolio():
     hikaye_ar = translate_content(data.get('hikaye', ''), 'Arapça')
 
     cur.execute('''
-        INSERT INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, isitma, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, ozellik_kategori, mulk_tipi, baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        INSERT INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, isitma, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, ozellik_kategori, mulk_tipi, baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar, cephe, gunes_bilgisi)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ''', (
         new_id, data.get('koleksiyon'), data.get('baslik1'), data.get('baslik2'), data.get('lokasyon'), data.get('refNo'), data.get('fiyat'), data.get('oda'), data.get('alan'), data.get('kat'), data.get('isitma'), data.get('ozellik_renk', 'bg-navy text-gold'), data.get('bg_renk'), data.get('btn_renk'), data.get('icon_renk'), data.get('resim_hero'), data.get('resim_hikaye'), data.get('hikaye'), json.dumps(data.get('ozellikler_arr', [])), data.get('ozellik_kategori'), data.get('mulk_tipi', 'Konut'),
-        baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar
+        baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar,
+        data.get('cephe'), data.get('gunes_bilgisi')
     ))
     conn.commit()
     conn.close()
@@ -67,10 +68,11 @@ def update_portfolio(id):
     hikaye_ar = translate_content(data.get('hikaye', ''), 'Arapça')
 
     cur.execute('''
-        UPDATE portfoyler SET koleksiyon=?, baslik1=?, baslik2=?, lokasyon=?, refNo=?, fiyat=?, oda=?, alan=?, kat=?, isitma=?, ozellik_renk=?, resim_hero=?, resim_hikaye=?, hikaye=?, ozellikler=?, ozellik_kategori=?, mulk_tipi=?, baslik1_en=?, baslik1_ar=?, baslik2_en=?, baslik2_ar=?, lokasyon_en=?, lokasyon_ar=?, hikaye_en=?, hikaye_ar=? WHERE id=?
+        UPDATE portfoyler SET koleksiyon=?, baslik1=?, baslik2=?, lokasyon=?, refNo=?, fiyat=?, oda=?, alan=?, kat=?, isitma=?, ozellik_renk=?, resim_hero=?, resim_hikaye=?, hikaye=?, ozellikler=?, ozellik_kategori=?, mulk_tipi=?, baslik1_en=?, baslik1_ar=?, baslik2_en=?, baslik2_ar=?, lokasyon_en=?, lokasyon_ar=?, hikaye_en=?, hikaye_ar=?, cephe=?, gunes_bilgisi=? WHERE id=?
     ''', (
         data.get('koleksiyon'), data.get('baslik1'), data.get('baslik2'), data.get('lokasyon'), data.get('refNo'), data.get('fiyat'), data.get('oda'), data.get('alan'), data.get('kat'), data.get('isitma'), data.get('ozellik_renk', 'bg-navy text-gold'), data.get('resim_hero'), data.get('resim_hikaye'), data.get('hikaye'), json.dumps(data.get('ozellikler_arr', [])), data.get('ozellik_kategori'), data.get('mulk_tipi', 'Konut'),
-        baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar, id
+        baslik1_en, baslik1_ar, baslik2_en, baslik2_ar, lokasyon_en, lokasyon_ar, hikaye_en, hikaye_ar,
+        data.get('cephe'), data.get('gunes_bilgisi'), id
     ))
     conn.commit()
     conn.close()

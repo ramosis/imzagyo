@@ -292,6 +292,66 @@ def get_reservation_calendar():
 
     return jsonify([dict(r) for r in reservations]), 200
 
+# --- APARTMENT POLLS & VOTING ---
+
+@neighborhood_bp.route('/api/neighborhood/polls', methods=['GET'])
+def get_polls():
+    """Mahalle/Apartman anketlerini listeler."""
+    mahalle_id = request.args.get('mahalle_id', default=1, type=int)
+    conn = get_db_connection()
+    polls = conn.execute('SELECT * FROM apartment_polls WHERE mahalle_id = ? ORDER BY created_at DESC', (mahalle_id,)).fetchall()
+    
+    results = []
+    for p in polls:
+        poll_dict = dict(p)
+        # Oylama istatistiklerini getir
+        votes = conn.execute('SELECT selected_option, COUNT(*) as count FROM poll_votes WHERE poll_id = ? GROUP BY selected_option', (p['id'],)).fetchall()
+        poll_dict['stats'] = {v['selected_option']: v['count'] for v in votes}
+        poll_dict['total_votes'] = sum(v['count'] for v in votes)
+        results.append(poll_dict)
+        
+    conn.close()
+    return jsonify(results), 200
+
+@neighborhood_bp.route('/api/neighborhood/polls/vote', methods=['POST'])
+def cast_vote():
+    """Ankete oy verir."""
+    data = request.json
+    if not data or 'poll_id' not in data or 'option' not in data:
+        return jsonify({'error': 'Poll ID and option are required'}), 400
+        
+    user_name = data.get('user_name', 'Mahalle Sakini')
+    
+    conn = get_db_connection()
+    # Mükerrer oy kontrolü (Demo için basitçe kullanıcı adına göre)
+    already_voted = conn.execute('SELECT id FROM poll_votes WHERE poll_id = ? AND user_name = ?', (data['poll_id'], user_name)).fetchone()
+    
+    if already_voted:
+        conn.close()
+        return jsonify({'error': 'Zaten oy verdiniz'}), 403
+        
+    conn.execute('INSERT INTO poll_votes (poll_id, user_name, selected_option) VALUES (?, ?, ?)', 
+                 (data['poll_id'], user_name, data['option']))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'status': 'voted'}), 201
+
+@neighborhood_bp.route('/api/neighborhood/expenses', methods=['GET'])
+def get_detailed_expenses():
+    """Apartman harcamalarının detaylı listesini getirir."""
+    # Demo için 'bogaz-villa' mülkünü baz alıyoruz
+    property_id = request.args.get('property_id', default='bogaz-villa')
+    conn = get_db_connection()
+    expenses = conn.execute('''
+        SELECT id, expense_type as title, amount, expense_date, description, invoice_file as receipt_url 
+        FROM apartment_expenses 
+        WHERE property_id = ? 
+        ORDER BY expense_date DESC
+    ''', (property_id,)).fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in expenses]), 200
+
 # --- MAHALLE BAZLI İLANLAR ---
 
 @neighborhood_bp.route('/api/neighborhood/demands', methods=['POST'])

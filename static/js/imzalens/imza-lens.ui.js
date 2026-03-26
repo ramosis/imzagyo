@@ -183,7 +183,7 @@ const ImzaLensUI = {
                             <p class="text-gold uppercase tracking-[0.4em] text-xs font-bold mb-4 drop-shadow-md border-l-2 border-gold pl-4 italic slide-up">
                                 ${camp.subtitle}
                             </p>
-                            <h1 class="text-5xl md:text-7xl font-serif text-white mb-6 leading-tight slide-up">
+                            <h1 class="text-3xl md:text-7xl font-serif text-white mb-6 leading-tight slide-up">
                                 ${camp.title}
                             </h1>
                             <div class="flex flex-col md:flex-row gap-6 mt-8 slide-up">

@@ -1,0 +1,66 @@
+{
+  "buildFiles": [
+    "G:\\Antigravity Projects\\İmza Gayrimenkul\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\build\\generated\\source\\codegen\\jni\\CMakeLists.txt",
+    "G:\\Antigravity Projects\\İmza Gayrimenkul\\mobile\\node_modules\\react-native-safe-area-context\\android\\src\\main\\jni\\CMakeLists.txt",
+    "G:\\Antigravity Projects\\İmza Gayrimenkul\\mobile\\node_modules\\react-native-vector-icons\\android\\build\\generated\\source\\codegen\\jni\\CMakeLists.txt",
+    "G:\\Antigravity Projects\\İmza Gayrimenkul\\mobile\\node_modules\\react-native\\ReactAndroid\\cmake-utils\\default-app-setup\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\Selim\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "G:\\Antigravity Projects\\İmza Gayrimenkul\\mobile\\android\\app\\.cxx\\Debug\\4z54l30g\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\Selim\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "G:\\Antigravity Projects\\İmza Gayrimenkul\\mobile\\android\\app\\.cxx\\Debug\\4z54l30g\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "appmodules::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "appmodules",
+      "output": "G:\\Antigravity Projects\\İmza Gayrimenkul\\mobile\\android\\app\\build\\intermediates\\cxx\\Debug\\4z54l30g\\obj\\x86\\libappmodules.so",
+      "runtimeFiles": [
+        "C:\\Users\\Selim\\.gradle\\caches\\8.10.2\\transforms\\ecaf85af74491e145fd7c1a1474ff70a\\transformed\\fbjni-0.6.0\\prefab\\modules\\fbjni\\libs\\android.x86\\libfbjni.so",
+        "C:\\Users\\Selim\\.gradle\\caches\\8.10.2\\transforms\\f55693cd78c81fc61ac8b821a5620e2b\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\jsi\\libs\\android.x86\\libjsi.so",
+        "C:\\Users\\Selim\\.gradle\\caches\\8.10.2\\transforms\\f55693cd78c81fc61ac8b821a5620e2b\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\reactnative\\libs\\android.x86\\libreactnative.so"
+      ]
+    },
+    "react_codegen_RNVectorIconsSpec::@479809fae146501fd34d": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "react_codegen_RNVectorIconsSpec"
+    },
+    "react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "react_codegen_rnasyncstorage"
+    },
+    "react_codegen_safeareacontext::@7984cd80db47aa7b952a": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "react_codegen_safeareacontext",
+      "output": "G:\\Antigravity Projects\\İmza Gayrimenkul\\mobile\\android\\app\\build\\intermediates\\cxx\\Debug\\4z54l30g\\obj\\x86\\libreact_codegen_safeareacontext.so",
+      "runtimeFiles": [
+        "C:\\Users\\Selim\\.gradle\\caches\\8.10.2\\transforms\\ecaf85af74491e145fd7c1a1474ff70a\\transformed\\fbjni-0.6.0\\prefab\\modules\\fbjni\\libs\\android.x86\\libfbjni.so",
+        "C:\\Users\\Selim\\.gradle\\caches\\8.10.2\\transforms\\f55693cd78c81fc61ac8b821a5620e2b\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\jsi\\libs\\android.x86\\libjsi.so",
+        "C:\\Users\\Selim\\.gradle\\caches\\8.10.2\\transforms\\f55693cd78c81fc61ac8b821a5620e2b\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\reactnative\\libs\\android.x86\\libreactnative.so"
+      ]
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "C:\\Users\\Selim\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "C:\\Users\\Selim\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

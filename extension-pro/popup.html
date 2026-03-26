@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>İmza Pro Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c5a059;
+            --dark: #0a192f;
+            --light: #f4f4f4;
+            --white: #ffffff;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            width: 380px;
+            margin: 0;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        .header {
+            background-color: var(--dark);
+            color: var(--primary);
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 3px solid var(--primary);
+        }
+        .container {
+            padding: 15px;
+        }
+        .parcel-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+        }
+        .parcel-header {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .parcel-details {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        .actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        button {
+            flex: 1;
+            padding: 6px;
+            font-size: 11px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-imar {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .btn-imar:hover {
+            background-color: #b08d48;
+            color: white;
+        }
+        .empty-state {
+            text-align: center;
+            opacity: 0.6;
+            margin-top: 50px;
+        }
+        .delete-btn {
+            color: #ff4757;
+            font-size: 10px;
+            border: none;
+            background: none;
+            width: auto;
+            flex: 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">İmza Gayrimenkul Pro</div>
+    <div class="container" id="parcel-list">
+        <!-- Parseller buraya yüklenecek -->
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

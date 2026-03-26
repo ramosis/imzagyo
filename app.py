@@ -18,6 +18,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from marshmallow import Schema, fields, validate, ValidationError
 from database import init_db, doldur_ornek_veriler, DB_NAME, get_db_connection
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 from api.portfolio import portfolio_bp
 from api.users import users_bp
 from api.contracts import contracts_bp
@@ -48,7 +50,50 @@ from api.pipeline import pipeline_bp
 from api.automation import automation_bp
 from api.media import media_bp
 from api.appraisal import appraisal_bp
+from api.social_auth import social_auth_bp, setup_oauth
+from api.compass import compass_bp
+from api.inspection import inspection_bp
+from api.mls import mls_bp
+
 app = Flask(__name__, static_folder=None)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "imza-super-secret-session-key")
+
+# Blueprint Registration
+app.register_blueprint(inspection_bp)
+app.register_blueprint(mls_bp)
+
+# OAuth bileşenini ana uygulamaya bağla
+setup_oauth(app)
+# Initialize Sentry
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+    integrations=[FlaskIntegration()],
+    traces_sample_rate=0.2,
+    environment="production" if not app.debug else "development",
+)
+
+# Configure logging
+import logging
+from logging.handlers import RotatingFileHandler
+log_dir = os.path.join(app.root_path, "logs")
+os.makedirs(log_dir, exist_ok=True)
+handler = RotatingFileHandler(os.path.join(log_dir, "app.log"), maxBytes=5*1024*1024, backupCount=5)
+formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
+handler.setFormatter(formatter)
+logger = logging.getLogger()
+logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
+logger.addHandler(handler)
+
+# Middleware to log each request
+@app.after_request
+def log_request(response):
+    logger.info("%s %s %s %s", request.remote_addr, request.method, request.path, response.status_code)
+    return response
+
+# Debug endpoint to trigger an error for testing
+@app.route('/api/debug/error')
+def trigger_error():
+    raise RuntimeError('Intentional error for Sentry testing')
 
 # Rate Limiter Yapılandırması
 limiter = Limiter(
@@ -85,6 +130,7 @@ app.register_blueprint(contract_templates_bp)
 app.register_blueprint(parties_bp)
 app.register_blueprint(leads_bp)
 app.register_blueprint(expenses_bp)
+app.register_blueprint(social_auth_bp)
 app.register_blueprint(integrations_bp)
 app.register_blueprint(documents_bp)
 app.register_blueprint(purchasing_power_bp)
@@ -100,6 +146,15 @@ app.register_blueprint(pipeline_bp)
 app.register_blueprint(automation_bp)
 app.register_blueprint(media_bp)
 app.register_blueprint(appraisal_bp)
+app.register_blueprint(inspection_bp)
+
+@app.route('/inspection')
+def inspection_page():
+    return send_file_from_pages('inspection.html')
+
+@app.route('/mls')
+def mls_page():
+    return send_file_from_pages('mls.html')
 
 @app.after_request
 def add_header(r):
@@ -149,9 +204,26 @@ def serve_file(path):
     # 1. API isteklerini atla
     if path.startswith('api/'):
         return "Not Found", 404
+
+    # --- GENİŞLEME STRATEJİSİ: SEO-FRIENDLY URL REWRITING ---
+    # Örn: /kutahya/satilik -> arama.html?city=kutahya&type=satilik
+    parts = path.strip('/').split('/')
+    
+    # Şehir ve Kategori takibi (Örn: /kutahya/satilik/daire)
+    known_cities = ['kutahya', 'istanbul', 'ankara', 'izmir'] # Genişledikçe buraya ekleyin
+    known_categories = ['satilik', 'kiralik', 'projeler', 'semtler']
+
+    # Eğer yol bir şehirle başlıyorsa
+    if parts[0] in known_cities:
+        if len(parts) == 1:
+            # Sadece şehir: /kutahya -> anasayfa.html (veya sehir.html varsa o)
+            return send_from_directory(pages_dir, 'anasayfa.html')
+        elif len(parts) >= 2 and parts[1] in known_categories:
+            # Şehir + Kategori: /kutahya/satilik -> arama.html
+            # Query params ile frontend'e paslayalım
+            return send_from_directory(pages_dir, 'arama.html')
     
     # 2. HTML dosyalarını pages/ klasöründen servis et
-    # Hem .html eklenmiş hem eklenmemiş halini kontrol et
     clean_path = path.lower()
     file_name = clean_path if clean_path.endswith('.html') else f"{clean_path}.html"
     full_html_path = os.path.join(pages_dir, file_name)

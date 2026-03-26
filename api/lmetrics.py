@@ -11,6 +11,54 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def calculate_intent_score(session_id):
+    """Belirli bir session için detaylı niyet skoru hesaplar."""
+    conn = get_db_connection()
+    interactions = conn.execute('''
+        SELECT event_type, element_id, value, url 
+        FROM user_interactions 
+        WHERE session_id = ?
+    ''', (session_id,)).fetchall()
+    conn.close()
+
+    if not interactions:
+        return 0, "Bilinmiyor"
+
+    score = 0
+    categories = {} # URL bazlı ilgi alanı tespiti
+
+    for i in interactions:
+        etype = i['event_type']
+        eid = i['element_id']
+        url = i['url'] or ""
+
+        # Kategori Tespiti (URL'den anahtar kelime avı)
+        if 'villa' in url.lower(): categories['Villa'] = categories.get('Villa', 0) + 1
+        if 'rezidans' in url.lower() or 'daire' in url.lower(): categories['Rezidans'] = categories.get('Rezidans', 0) + 1
+        if 'bogaz' in url.lower() or 'sariyer' in url.lower(): categories['Boğaz Hattı'] = categories.get('Boğaz Hattı', 0) + 1
+        if 'yatirim' in url.lower(): categories['Yatırımlık'] = categories.get('Yatırımlık', 0) + 1
+
+        # Puanlama
+        if etype == 'click':
+            score += 15
+            if eid and ('whatsapp' in eid.lower() or 'book' in eid.lower() or 'pay' in eid.lower()):
+                score += 30 # Kritik aksiyon
+        elif etype == 'scroll':
+            val = int(i['value']) if i['value'] and i['value'].isdigit() else 0
+            if val >= 75: score += 15
+            elif val >= 50: score += 10
+        elif etype == 'stay':
+            score += 5
+        elif etype == 'pageview':
+            score += 2
+
+    # En baskın kategoriyi bul
+    top_interest = "Genel"
+    if categories:
+        top_interest = max(categories, key=categories.get)
+
+    return min(score, 100), top_interest
+
 @lmetrics_bp.route('/api/lmetrics/collect', methods=['POST'])
 def collect_interaction():
     """Kullanıcı etkileşim verilerini toplar."""
@@ -29,33 +77,44 @@ def collect_interaction():
         INSERT INTO user_interactions (session_id, url, event_type, element_id, value)
         VALUES (?, ?, ?, ?, ?)
     ''', (session_id, url, event_type, element_id, value))
+    
+    # Lead ile eşleşmişse lead_id'yi bull ve lead_interactions'a da pasif kayıt atabiliriz 
+    # Ama user_interactions üzerinden join yapmak daha temiz.
+    
     conn.commit()
     conn.close()
 
     return jsonify({"status": "success"}), 201
 
-@lmetrics_bp.route('/api/lmetrics/stats/<session_id>', methods=['GET'])
-def get_user_stats(session_id):
-    """Belirli bir session için etkileşim özetini getirir."""
+@lmetrics_bp.route('/api/lmetrics/analysis/<int:lead_id>', methods=['GET'])
+def analyze_lead_lmetrics(lead_id):
+    """Bir lead'in dijital niyet analizini yapar."""
     conn = get_db_connection()
-    stats = conn.execute('''
-        SELECT event_type, COUNT(*) as count 
+    # Lead'in session_id'sini bul (lead_interactions veya directly from leads if we added it)
+    # database.py lead tablosuna session_id eklememişiz ama lead_interactions'da var.
+    session_row = conn.execute('SELECT session_id FROM lead_interactions WHERE lead_id = ? LIMIT 1', (lead_id,)).fetchone()
+    
+    if not session_row:
+        conn.close()
+        return jsonify({"error": "Bu aday için dijital iz bulunamadı"}), 404
+    
+    session_id = session_row['session_id']
+    score, interest = calculate_intent_score(session_id)
+    
+    # Timeline
+    timeline = conn.execute('''
+        SELECT event_type, url, timestamp, element_id, value 
         FROM user_interactions 
         WHERE session_id = ? 
-        GROUP BY event_type
+        ORDER BY timestamp DESC LIMIT 50
     ''', (session_id,)).fetchall()
     
-    # Niyet Skoru Hesaplama (Basit Örnek)
-    # Tıklama, derin scroll ve uzun süre kalma skoru artırır.
-    score = 0
-    for s in stats:
-        if s['event_type'] == 'click': score += s['count'] * 10
-        if s['event_type'] == 'scroll' and int(s['count']) > 5: score += 20
-        if s['event_type'] == 'stay': score += s['count'] * 5
-
     conn.close()
+    
     return jsonify({
+        "lead_id": lead_id,
         "session_id": session_id,
-        "stats": [dict(s) for s in stats],
-        "intent_score": min(score, 100) # Max 100
+        "intent_score": score,
+        "top_interest": interest,
+        "timeline": [dict(t) for t in timeline]
     }), 200

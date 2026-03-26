@@ -9,3 +9,6 @@ requests
 flask-limiter
 marshmallow
 cloudinary
+Authlib
+bcrypt==4.1.2
+Pillow

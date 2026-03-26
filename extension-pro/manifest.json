@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "İmza Gayrimenkul Pro: Parsel & İmar Asistanı",
+  "version": "1.0.0",
+  "description": "Parsel Sorgu ve Belediye E-İmar sistemleri için gelişmiş veri toplama aracı.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://parselsorgu.tkgm.gov.tr/*",
+    "https://www.kutahya.bel.tr/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon48.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://parselsorgu.tkgm.gov.tr/*"],
+      "js": ["content_tkgm.js"]
+    },
+    {
+      "matches": ["https://www.kutahya.bel.tr:84/imardurumu/*"],
+      "js": ["content_kutahya.js"]
+    }
+  ]
+}
