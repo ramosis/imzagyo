@@ -18,7 +18,7 @@ def get_maintenance():
     conn = get_db_connection()
     query = '''
         SELECT m.*, p.baslik1, p.refNo
-        FROM maintenance m
+        FROM maintenance_requests m
         LEFT JOIN portfoyler p ON m.property_id = p.id
     '''
     records = conn.execute(query).fetchall()
@@ -32,7 +32,7 @@ def add_maintenance():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
-        INSERT INTO maintenance (property_id, description, scheduled_date, status)
+        INSERT INTO maintenance_requests (property_id, description, scheduled_date, status)
         VALUES (?,?,?,?)
     ''', (
         data.get('property_id'), data.get('description'), data.get('scheduled_date'), data.get('status', 'planned')
@@ -48,7 +48,7 @@ def update_maintenance(id):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
-        UPDATE maintenance SET property_id=?, user_id=?, request_date=?, description=?, status=? WHERE id=?
+        UPDATE maintenance_requests SET property_id=?, user_id=?, request_date=?, description=?, status=? WHERE id=?
     ''', (
         data.get('property_id'), data.get('user_id'), data.get('request_date'), data.get('description'), data.get('status'), id
     ))
@@ -61,7 +61,7 @@ def update_maintenance(id):
 def delete_maintenance(id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('DELETE FROM maintenance WHERE id=?', (id,))
+    cur.execute('DELETE FROM maintenance_requests WHERE id=?', (id,))
     conn.commit()
     conn.close()
     return jsonify({'status': 'deleted'}), 200

@@ -13,13 +13,13 @@ class UserRepository:
     @staticmethod
     def get_all() -> List[Dict[str, Any]]:
         with get_db() as conn:
-            rows = conn.execute('SELECT id, username, role, email, profile_pic FROM users').fetchall()
+            rows = conn.execute('SELECT id, username, role, email, is_admin, profile_pic FROM users').fetchall()
             return [dict(r) for r in rows]
 
     @staticmethod
     def get_by_id(user_id: int) -> Optional[Dict[str, Any]]:
         with get_db() as conn:
-            row = conn.execute('SELECT id, username, role, email, profile_pic FROM users WHERE id = ?', (user_id,)).fetchone()
+            row = conn.execute('SELECT id, username, role, email, is_admin, profile_pic FROM users WHERE id = ?', (user_id,)).fetchone()
             return dict(row) if row else None
 
     @staticmethod
@@ -33,9 +33,10 @@ class UserRepository:
             pwd_hash = hash_password(raw_password)
             
             # 2. Insert User
+            is_admin = data.get('is_admin', 0)
             cursor = conn.execute(
-                'INSERT INTO users (username, password_hash, role, email) VALUES (?,?,?,?)',
-                (username, pwd_hash, role, email)
+                'INSERT INTO users (username, password_hash, role, email, is_admin) VALUES (?,?,?,?,?)',
+                (username, pwd_hash, role, email, is_admin)
             )
             user_id = cursor.lastrowid
             
@@ -68,6 +69,10 @@ class UserRepository:
             if 'role' in data:
                 fields.append("role=?")
                 values.append(data['role'])
+            
+            if 'is_admin' in data:
+                fields.append("is_admin=?")
+                values.append(data['is_admin'])
                 
             raw_password = data.get('password') or data.get('password_hash')
             if raw_password:

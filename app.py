@@ -73,6 +73,8 @@ from api.compass import compass_bp
 from api.inspection import inspection_bp
 from api.mls import mls_bp
 from api.seo import seo_bp
+from api.verification import verification_bp
+from api.valuation import valuation_bp
 
 # Uygulama Ayarları
 app = Flask(__name__, static_folder=None)
@@ -227,6 +229,8 @@ app.register_blueprint(inspection_bp, url_prefix='/api/v1')
 app.register_blueprint(mls_bp, url_prefix='/api/v1')
 app.register_blueprint(compass_bp, url_prefix='/api/v1')
 app.register_blueprint(seo_bp, url_prefix='/api/v1')
+app.register_blueprint(verification_bp, url_prefix='/api/v1')
+app.register_blueprint(valuation_bp, url_prefix='/api/v1')
 
 @app.route('/inspection')
 def inspection_page():

@@ -168,13 +168,16 @@ def login():
         return jsonify({'error': 'Invalid username or password'}), 401
     
     user_role = user['role']
-    circle = "inner" if user_role in INNER_ROLES else "outer"
+    is_admin = user['is_admin']
+    circle = "inner" if (user_role in INNER_ROLES or is_admin) else "outer"
     token = f"token-{user['id']}"
     
     return jsonify({
         'token': token, 
         'role': user_role,
+        'is_admin': is_admin,
         'circle': circle,
+        'id': user['id'],
         'username': user['username']
     }), 200
 
@@ -198,7 +201,8 @@ def mobile_login():
         return jsonify({'error': 'Invalid username or password'}), 401
         
     user_role = user['role']
-    circle = "inner" if user_role in INNER_ROLES else "outer"
+    is_admin = user['is_admin']
+    circle = "inner" if (user_role in INNER_ROLES or is_admin) else "outer"
     authorized_apps = get_app_route_for_role(user_role)
     
     # App giriş izni kontrolü
@@ -221,7 +225,9 @@ def mobile_login():
     return jsonify({
         'token': token, 
         'role': user_role,
+        'is_admin': is_admin,
         'circle': circle,
+        'id': user['id'],
         'username': user['username'],
         'app_route': authorized_apps
     }), 200

@@ -48,13 +48,21 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
+            email TEXT UNIQUE,
+            is_admin BOOLEAN DEFAULT 0,
             role TEXT NOT NULL CHECK(role IN ("admin","super_admin","broker","danisman","vip","kiraci","muteahhit","standart","employee","owner","tenant","partner"))
         )
     ''')
     
     # Social Login alanlarını ekle (Mevcut veritabanını bozmamak için try-except kullanıyoruz)
+    # Upgrade users table
     try:
         cursor.execute('ALTER TABLE users ADD COLUMN email TEXT UNIQUE')
+    except sqlite3.OperationalError: pass
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0')
+    except sqlite3.OperationalError: pass
+    try:
         cursor.execute('ALTER TABLE users ADD COLUMN social_provider TEXT')
         cursor.execute('ALTER TABLE users ADD COLUMN social_id TEXT')
         cursor.execute('ALTER TABLE users ADD COLUMN profile_pic TEXT')
@@ -358,7 +366,7 @@ def init_db():
         )
     ''')
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS maintenance (
+        CREATE TABLE IF NOT EXISTS maintenance_requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             property_id TEXT NOT NULL,
             user_id INTEGER, -- Talep eden kullanıcı
