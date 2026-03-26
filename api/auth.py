@@ -11,7 +11,9 @@ from extensions import limiter
 auth_bp = Blueprint('auth', __name__)
 
 # Geliştirme ortamı için geçici bir JWT secret key. Prod. için .env'den alınmalıdır.
-JWT_SECRET = os.environ.get("JWT_SECRET", "imza-super-secret-key-2026")
+JWT_SECRET = os.environ.get("JWT_SECRET")
+if not JWT_SECRET:
+    raise ValueError("HATA: JWT_SECRET ortam değişkeni (.env) tanımlanmamış!")
 
 def hash_password(password):
     """Yeni oluşturulan şifreler için bcrypt kullanır."""
@@ -80,22 +82,11 @@ def get_current_user():
     if not token:
         return None
         
-    # Bypass Tokens (Sadece Geliştirme/Test için, .env'den yönetilmeli)
-    MASTER_TOKEN = os.environ.get("MASTER_AUTH_TOKEN")
-    if MASTER_TOKEN and token == f'Bearer {MASTER_TOKEN}':
-        return {'id': 1, 'role': 'admin', 'username': 'admin', 'circle': 'inner', 'app_route': 'both'}
+    # Bypass Tokens REMOVED (Audit Security Fix)
+    # Master token and token-prefix bypasses are disabled for production safety.
+    # Authenticate via official login endpoint only.
     
-    # Simple Web Token (Custom Format)
-    if token.startswith('Bearer token-'):
-        user_id = token.split('token-')[1]
-        conn = get_db_connection()
-        user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
-        conn.close()
-        if user:
-            user_dict = dict(user)
-            user_dict['circle'] = 'inner' if user['role'] in INNER_ROLES else 'outer'
-            user_dict['app_route'] = get_app_route_for_role(user['role'])
-            return user_dict
+    # Simple Web Token (Custom Format) - MOVED TO JWT-ONLY
             
     # JWT Mobile Token
     if token.startswith('Bearer ey'):

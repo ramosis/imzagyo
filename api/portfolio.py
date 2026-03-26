@@ -110,41 +110,71 @@ class PortfolioService:
         owner_id = PortfolioRepository.get_owner_id(portfolio_id)
         return owner_id == user.get('id')
 
-@portfolio_bp.route('/api/portfoyler', methods=['GET'])
-@cache.cached(timeout=300, query_string=True)
+def get_portfolio_cache_key():
+    """Generates a cache key that accounts for user circle and language."""
+    from flask import request
+    from .auth import get_current_user
+    user = get_current_user()
+    circle = user.get('circle', 'public') if user else 'public'
+    lang = request.args.get('lang', 'tr').lower()
+    return f"portfolios_{circle}_{lang}_{request.full_path}"
+
+@portfolio_bp.route('', methods=['GET'])
+@cache.cached(timeout=300, key_prefix=get_portfolio_cache_key)
 def get_portfolios():
     """
-    List all portfolios
-    ---
-    responses:
-      200:
-        description: A list of portfolios
+    List all portfolios with role-based filtering and multi-lang support.
     """
-    return jsonify(PortfolioRepository.get_all())
+    from .auth import get_current_user
+    user = get_current_user()
+    
+    with get_db() as conn:
+        if user and user.get('circle') == 'outer':
+            rows = conn.execute('SELECT * FROM portfoyler WHERE owner_id = ?', (user['id'],)).fetchall()
+        else:
+            rows = conn.execute('SELECT * FROM portfoyler').fetchall()
+            
+    lang = request.args.get('lang', 'tr').lower()
+    result = []
+    for row in rows:
+        d = dict(row)
+        # Apply lang overrides
+        if lang in ['en', 'ar']:
+            for field in ['baslik1', 'baslik2', 'lokasyon', 'hikaye']:
+                override = d.get(f'{field}_{lang}')
+                if override: d[field] = override
+        
+        if d.get('ozellikler'):
+            try: d['ozellikler'] = json.loads(d['ozellikler'])
+            except: pass
+        result.append(d)
+        
+    return jsonify(result)
 
-@portfolio_bp.route('/api/portfoyler/<id>', methods=['GET'])
+@portfolio_bp.route('/<id>', methods=['GET'])
 @cache.memoize(timeout=600)
 def get_portfolio(id):
     """
-    Get a single portfolio by ID
-    ---
-    parameters:
-      - name: id
-        in: path
-        type: string
-        required: true
-    responses:
-      200:
-        description: Portfolio details
-      404:
-        description: Portfolio not found
+    Get a single portfolio by ID with multi-lang support.
     """
     portfolio = PortfolioRepository.get_by_id(id)
     if not portfolio:
         return jsonify({"error": "Portföy bulunamadı"}), 404
-    return jsonify(portfolio)
+        
+    d = dict(portfolio)
+    lang = request.args.get('lang', 'tr').lower()
+    if lang in ['en', 'ar']:
+        for field in ['baslik1', 'baslik2', 'lokasyon', 'hikaye']:
+            override = d.get(f'{field}_{lang}')
+            if override: d[field] = override
+            
+    if d.get('ozellikler'):
+        try: d['ozellikler'] = json.loads(d['ozellikler'])
+        except: pass
+        
+    return jsonify(d)
 
-@portfolio_bp.route('/api/portfoyler', methods=['POST'])
+@portfolio_bp.route('', methods=['POST'])
 @require_permission('portfolio.create')
 def add_portfolio():
     try:
@@ -155,7 +185,7 @@ def add_portfolio():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@portfolio_bp.route('/api/portfoyler/<id>', methods=['PUT'])
+@portfolio_bp.route('/<id>', methods=['PUT'])
 @require_permission('portfolio.edit')
 def update_portfolio(id):
     user = g.user
@@ -163,10 +193,11 @@ def update_portfolio(id):
         return jsonify({'error': 'Unauthorized - Owner only (Section 6.2)'}), 403
         
     if PortfolioRepository.update(id, request.json):
+        cache.delete_memoized(get_portfolio, id) # Clear cache on update
         return jsonify({'status': 'updated'}), 200
     return jsonify({'error': 'Portföy bulunamadı'}), 404
 
-@portfolio_bp.route('/api/portfoyler/<id>', methods=['DELETE'])
+@portfolio_bp.route('/<id>', methods=['DELETE'])
 @require_permission('portfolio.delete')
 def delete_portfolio(id):
     user = g.user
@@ -174,5 +205,6 @@ def delete_portfolio(id):
         return jsonify({'error': 'Unauthorized - Owner only (Section 6.2)'}), 403
 
     if PortfolioRepository.delete(id):
+        cache.delete_memoized(get_portfolio, id) # Clear cache on delete
         return jsonify({"status": "deleted"}), 200
     return jsonify({"error": "Portföy bulunamadı"}), 404

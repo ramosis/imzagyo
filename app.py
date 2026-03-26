@@ -84,7 +84,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex(32))
 
 # --- GÜVENLİK YAPILANDIRMASI (Section 6) ---
 from flask_cors import CORS
-CORS(app, resources={r"/api/*": {"origins": ["https://imzagyo.com", "http://localhost:3000"]}})
+CORS(app, resources={r"/api/*": {"origins": ["https://imzagyo.com"]}})
 csrf.init_app(app)
 limiter.init_app(app)
 cache.init_app(app)
@@ -234,6 +234,11 @@ app.register_blueprint(verification_bp, url_prefix='/api/v1')
 app.register_blueprint(analytics_bp, url_prefix='/api/v1/analytics')
 app.register_blueprint(valuation_bp, url_prefix='/api/v1')
 
+# --- CORE PAGE SERVING HELPERS ---
+def send_file_from_pages(filename):
+    """Helper to serve files from the pages directory (Audit Fix)."""
+    return send_from_directory('pages', filename)
+
 @app.route('/inspection')
 def inspection_page():
     return send_file_from_pages('inspection.html')
@@ -272,6 +277,8 @@ def mahalle():
 
 @app.route('/<path:path>')
 def serve_file(path):
+    if not path or path == '/':
+        return index()
     # Ana dizini belirle (app.py'nin olduğu yer)
     base_dir = os.path.abspath(os.path.dirname(__file__))
     pages_dir = os.path.join(base_dir, 'pages')
@@ -404,74 +411,7 @@ def page_not_found(e):
 
 from api.auth import get_current_user
 
-# Tüm portföyleri getir
-@app.route('/api/portfoyler', methods=['GET'])
-def get_portfoyler():
-    user = get_current_user()
-    conn = get_db_connection()
-    
-    # Outer Circle (Örn. Müteahhit, Karacı vb.) sadece kendi ilanlarını/mülklerini görebilir
-    if user and user.get('circle') == 'outer':
-        portfoyler = conn.execute('SELECT * FROM portfoyler WHERE owner_id = ?', (user['id'],)).fetchall()
-    else:
-        # Inner Circle veya Public (anasayfa) erişimi 
-        portfoyler = conn.execute('SELECT * FROM portfoyler').fetchall()
-        
-    conn.close()
-    
-    # SQLite Row nesnelerini dictionary'e çevir
-    result = []
-    lang = request.args.get('lang', 'tr').lower()
-
-    for p in portfoyler:
-        d = dict(p)
-        # Dil bazlı içerik ezme (Phase 4)
-        if lang == 'en' and d.get('baslik1_en'):
-            d['baslik1'] = d['baslik1_en']
-            d['baslik2'] = d['baslik2_en'] or d['baslik2']
-            d['lokasyon'] = d['lokasyon_en'] or d['lokasyon']
-            d['hikaye'] = d['hikaye_en'] or d['hikaye']
-        elif lang == 'ar' and d.get('baslik1_ar'):
-            d['baslik1'] = d['baslik1_ar']
-            d['baslik2'] = d['baslik2_ar'] or d['baslik2']
-            d['lokasyon'] = d['lokasyon_ar'] or d['lokasyon']
-            d['hikaye'] = d['hikaye_ar'] or d['hikaye']
-
-        if d['ozellikler']:
-            d['ozellikler'] = json.loads(d['ozellikler'])
-        result.append(d)
-        
-    return jsonify(result)
-
-# Tek bir portföy getir (id ile)
-@app.route('/api/portfoyler/<id>', methods=['GET'])
-def get_portfoy(id):
-    conn = get_db_connection()
-    portfoy = conn.execute('SELECT * FROM portfoyler WHERE id = ?', (id,)).fetchone()
-    conn.close()
-    
-    if portfoy is None:
-        return jsonify({"error": "Portföy bulunamadı"}), 404
-        
-    d = dict(portfoy)
-    lang = request.args.get('lang', 'tr').lower()
-
-    # Dil bazlı içerik ezme (Phase 4)
-    if lang == 'en' and d.get('baslik1_en'):
-        d['baslik1'] = d['baslik1_en']
-        d['baslik2'] = d['baslik2_en'] or d['baslik2']
-        d['lokasyon'] = d['lokasyon_en'] or d['lokasyon']
-        d['hikaye'] = d['hikaye_en'] or d['hikaye']
-    elif lang == 'ar' and d.get('baslik1_ar'):
-        d['baslik1'] = d['baslik1_ar']
-        d['baslik2'] = d['baslik2_ar'] or d['baslik2']
-        d['lokasyon'] = d['lokasyon_ar'] or d['lokasyon']
-        d['hikaye'] = d['hikaye_ar'] or d['hikaye']
-
-    if d['ozellikler']:
-        d['ozellikler'] = json.loads(d['ozellikler'])
-        
-    return jsonify(d)
+# Portföy işlemleri /api/v1/portfoyler üzerinden Blueprint ile yönetilmektedir.
 
 # Tüm ekibi getir
 @app.route('/api/ekip', methods=['GET'])
@@ -494,9 +434,9 @@ def get_ekip():
 # Lokal Dosya Yükleme (Upload) Uç Noktası
 @app.route('/api/upload-image', methods=['POST'])
 def upload_image():
-    token = request.headers.get('Authorization')
-    if not token or (not token.startswith('Bearer token-') and token != 'Bearer admin-token'):
-        return jsonify({'error': 'Unauthorized'}), 403
+    user = get_current_user()
+    if not user or user.get('role') not in ['admin', 'super_admin', 'broker', 'danisman']:
+        return jsonify({'error': 'Unauthorized - Management access required'}), 403
 
     if 'image' not in request.files:
         return jsonify({'error': 'No image file provided'}), 400

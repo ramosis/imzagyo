@@ -5,7 +5,8 @@ Handles SQLite database initialization, connection management, and sample data p
 import sqlite3
 import json
 import os
-from passlib.hash import bcrypt
+import hashlib
+import bcrypt
 from contextlib import contextmanager
 
 DB_NAME = "data/imza_database.db"
@@ -1008,7 +1009,8 @@ def doldur_ornek_veriler():
     
     # Yeni Örnek Kullanıcılar Ekle (Rol Testleri İçin)
     def get_hashed(pw):
-        return hashlib.sha256(pw.encode()).hexdigest()
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(pw.encode('utf-8'), salt).decode('utf-8')
 
     example_users = [
         ("admin", get_hashed("admin123"), "admin"),
