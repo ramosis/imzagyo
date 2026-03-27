@@ -6,7 +6,7 @@ from flask import Blueprint, request, jsonify, g
 from shared.database import get_db_connection
 from shared.extensions import limiter
 from shared.utils import sanitize_input
-from api.schemas import user_schema, ValidationError
+from shared.schemas import user_schema, ValidationError
 from .service import AuthService, INNER_ROLES, JWT_SECRET
 from .repository import UserRepository
 from .decorators import require_permission, login_required, require_inner_circle
@@ -106,7 +106,7 @@ def request_reset():
                          (user['id'], token, expiry))
             conn.commit()
             
-            from api.mail_service import send_password_reset_email
+            from shared.mail_service import send_password_reset_email
             send_password_reset_email(email, token, user['username'])
             
     return jsonify({'message': 'Şifre sıfırlama talimatları e-posta adresinize gönderildi.'}), 200
@@ -175,3 +175,75 @@ def delete_user(id):
     if UserRepository.delete(id):
         return jsonify({'status': 'deleted'}), 200
     return jsonify({'error': 'User not found'}), 404
+
+# Social Auth Routes (Migrated from social_auth.py)
+from .service import oauth
+from flask import url_for, redirect
+
+@auth_bp.route('/social/login/<provider>')
+def social_login(provider):
+    """Starts login flow for social providers."""
+    client = oauth.create_client(provider)
+    if not client:
+        return jsonify({"error": f"Provider not found: {provider}"}), 404
+    redirect_uri = url_for('auth.authorize', provider=provider, _external=True)
+    return client.authorize_redirect(redirect_uri)
+
+@auth_bp.route('/social/callback/<provider>')
+def authorize(provider):
+    """Handles callback from social providers."""
+    client = oauth.create_client(provider)
+    if not client:
+        return jsonify({"error": f"Provider not found: {provider}"}), 404
+    token = client.authorize_access_token()
+    email = None
+    social_id = None
+    picture = None
+    
+    if provider == 'google':
+        user_info = token.get('userinfo') or client.parse_id_token(token, nonce=None)
+        email = user_info.get('email')
+        social_id = user_info.get('sub')
+        picture = user_info.get('picture')
+        
+    if not email:
+        return jsonify({"error": "Social account did not provide an email"}), 400
+
+    user_id = UserRepository.get_or_create_social_user(email, provider, social_id, picture)
+    user = UserRepository.get_by_id(user_id)
+    
+    user_role = user['role']
+    token = jwt.encode({
+        'user_id': user['id'],
+        'username': user['username'],
+        'role': user_role,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
+    }, JWT_SECRET, algorithm="HS256")
+    
+    return redirect(f"/?login_success=1&token={token}&role={user_role}")
+
+# Verification Routes (Migrated from verification.py)
+@auth_bp.route('/verification/eids', methods=['POST'])
+@login_required
+def verify_eids():
+    """EİDS (Electronic Listing System) Verification Bridge."""
+    data = request.json
+    property_id = data.get('property_id')
+    if not property_id:
+        return jsonify({'error': 'property_id is required'}), 400
+    
+    verification_token = f"EİDS-{datetime.datetime.now().strftime('%Y%m%d')}-{property_id}-VERIFIED"
+    return jsonify({
+        'status': 'success',
+        'verification_token': verification_token,
+        'verified_at': datetime.datetime.now().isoformat()
+    }), 200
+
+@auth_bp.route('/verification/status/<property_id>', methods=['GET'])
+@login_required
+def check_eids_status(property_id):
+    return jsonify({
+        'property_id': property_id,
+        'is_verified': True,
+        'last_verification': datetime.datetime.now().isoformat()
+    }), 200

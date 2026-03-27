@@ -83,3 +83,37 @@ class UserRepository:
             cursor = conn.execute('DELETE FROM users WHERE id=?', (user_id,))
             conn.commit()
             return cursor.rowcount > 0
+
+    @staticmethod
+    def get_or_create_social_user(email: str, provider: str, social_id: str, picture: str = None) -> int:
+        from shared.database import get_db_connection
+        import secrets
+        
+        with get_db_connection() as conn:
+            user = conn.execute('SELECT * FROM users WHERE email = ? OR (social_provider = ? AND social_id = ?)', 
+                                (email, provider, social_id)).fetchone()
+            
+            if not user:
+                base_username = email.split('@')[0]
+                username = base_username
+                counter = 1
+                while conn.execute('SELECT id FROM users WHERE username = ?', (username,)).fetchone():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                
+                pwd_hash = AuthService.hash_password(secrets.token_hex(16))
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO users (username, password_hash, role, email, social_provider, social_id, profile_pic)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (username, pwd_hash, 'standart', email, provider, social_id, picture))
+                conn.commit()
+                return cursor.lastrowid
+            else:
+                if not user['social_provider']:
+                    conn.execute('''
+                        UPDATE users SET email = ?, social_provider = ?, social_id = ?, profile_pic = ?
+                        WHERE id = ?
+                    ''', (email, provider, social_id, picture, user['id']))
+                    conn.commit()
+                return user['id']

@@ -63,74 +63,37 @@ def create_app():
     # Register Blueprints
     from app.routes import main_bp
     from modules.auth.routes import auth_bp
+    from modules.portfolio import portfolio_bp
+    from modules.crm import crm_bp
+    from modules.finance import finance_bp
+    from modules.media import media_bp
+    from modules.ai import ai_bp
+    from modules.legal import legal_bp
+    from modules.automation import automation_bp
+    from modules.integrations import integrations_bp # NEW
+    from modules.maintenance import maintenance_bp # NEW
+    from modules.compass import compass_bp # NEW
+    from modules.auth.service import setup_oauth
     
-    # Legacy Blueprints
-    from api.portfolio import portfolio_bp
-    from api.contracts import contracts_bp
-    from api.taxes import taxes_bp
-    from api.maintenance import maintenance_bp
-    from api.notifications import notifications_bp
-    from api.ai import ai_bp
-    from api.appointments import appointments_bp
-    from api.finance import finance_bp
-    from api.hero import hero_bp
-    from api.contract_templates import contract_templates_bp
-    from api.parties import parties_bp
-    from api.leads import leads_bp
-    from api.expenses import expenses_bp
-    from api.social_auth import social_auth_bp
-    from api.integrations import integrations_bp
-    from api.documents import documents_bp
-    from api.purchasing_power import purchasing_power_bp
-    from api.settings import settings_bp
-    from api.campaigns import campaigns_bp
-    from api.hr import hr_bp
-    from api.contacts import contacts_bp
-    from api.tracking import tracking_bp
-    from api.lmetrics import lmetrics_bp
-    from api.neighborhood import neighborhood_bp
-    from api.projects import projects_bp
-    from api.pipeline import pipeline_bp
-    from api.automation import automation_bp
-    from api.media import media_bp
-    from api.appraisal import appraisal_bp
-    from api.inspection import inspection_bp
-    from api.mls import mls_bp
-    from api.compass import compass_bp
-    from api.seo import seo_bp
-    from api.verification import verification_bp
-    from api.analytics import analytics_bp
-    from api.valuation import valuation_bp
-    from api.team import team_bp
-
+    setup_oauth(app)
+    
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
-
-    bps = [
-        (portfolio_bp, 'portfolios'), (contracts_bp, 'contracts'), (taxes_bp, 'taxes'),
-        (maintenance_bp, 'maintenance'), (notifications_bp, 'notifications'),
-        (ai_bp, 'ai'), (appointments_bp, 'appointments'),
-        (finance_bp, 'finance'), (hero_bp, 'hero'), 
-        (contract_templates_bp, 'contracts/templates'), (parties_bp, 'parties'),
-        (leads_bp, 'leads'), (expenses_bp, 'expenses'), (social_auth_bp, 'auth/social'),
-        (integrations_bp, 'integrations'), (documents_bp, 'documents'),
-        (purchasing_power_bp, 'purchasing-power'), (settings_bp, 'settings'),
-        (campaigns_bp, 'campaigns'), (hr_bp, 'hr'), (contacts_bp, 'contacts'),
-        (tracking_bp, 'tracking'), (lmetrics_bp, 'analytics/lmetrics'),
-        (neighborhood_bp, 'neighborhoods'), (projects_bp, 'projects'),
-        (pipeline_bp, 'pipeline'), (automation_bp, 'automation'),
-        (media_bp, 'media'), (appraisal_bp, 'appraisal'),
-        (inspection_bp, 'inspection'), (mls_bp, 'mls'), (compass_bp, 'compass'),
-        (seo_bp, 'seo'), (verification_bp, 'verification'),
-        (analytics_bp, 'analytics'), (valuation_bp, 'valuation'),
-        (team_bp, 'team')
-    ]
-    for bp, prefix in bps:
-        app.register_blueprint(bp, url_prefix=f'/api/v1/{prefix}')
+    app.register_blueprint(portfolio_bp, url_prefix='/api/v1') # Routes: /portfolios, /hero
+    app.register_blueprint(crm_bp, url_prefix='/api/v1') # Routes: /leads, /pipeline
+    app.register_blueprint(finance_bp, url_prefix='/api/v1/finance')
+    app.register_blueprint(media_bp, url_prefix='/api/v1/media')
+    app.register_blueprint(ai_bp, url_prefix='/api/v1/ai')
+    app.register_blueprint(legal_bp, url_prefix='/api/v1/legal')
+    app.register_blueprint(automation_bp, url_prefix='/api/v1/automation')
+    app.register_blueprint(integrations_bp, url_prefix='/api/v1/integrations')
+    app.register_blueprint(maintenance_bp, url_prefix='/api/v1/maintenance')
+    app.register_blueprint(compass_bp, url_prefix='/api/v1/compass')
     
     # Local File Serving (Legacy Fallback)
     @app.route('/uploads/<path:filename>')
     def serve_uploads(filename):
+        from flask import send_from_directory
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     # Initialize DB

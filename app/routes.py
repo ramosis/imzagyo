@@ -1,7 +1,7 @@
 from flask import Blueprint, send_from_directory, request, jsonify
 import os
 from shared.database import get_db_connection
-from api.page_service import PageService
+from shared.page_service import PageService
 
 main_bp = Blueprint('main', __name__)
 
