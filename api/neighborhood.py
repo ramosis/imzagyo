@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from database import get_db_connection
+from shared.database import get_db_connection
 from api.auth import get_current_user
 from api.mail_service import send_email
 import urllib.request
@@ -758,4 +758,4 @@ def add_due_payment():
     new_id = cur.lastrowid
     conn.close()
     
-    return jsonify({'status': 'created', 'id': new_id}), 201
+    return jsonify({'status': 'created', 'id': new_id}), 201

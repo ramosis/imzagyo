@@ -397,7 +397,7 @@
             danismanGrid.innerHTML = '<div class="text-center w-full col-span-full">Yükleniyor...</div>';
 
             try {
-                const response = await fetch('/api/ekip');
+                const response = await fetch('/api/v1/team');
                 if (!response.ok) throw new Error("API Hatası");
                 const ekipUyeleri = await response.json();
 
@@ -405,19 +405,11 @@
                 danismanGrid.innerHTML = '';
 
                 ekipUyeleri.forEach((kisi, index) => {
-                    const isYonetici = kisi.tip === 'yonetici';
+                    const isYonetici = kisi.type === 'yonetici';
 
-                    // Fallback to Parsing if String from DB.
-                    if (typeof kisi.detaylar === 'string') {
-                        try {
-                            kisi.detaylar = JSON.parse(kisi.detaylar);
-                        } catch (e) { kisi.detaylar = [kisi.detaylar]; }
-                    }
-                    if (typeof kisi.uzmanlikAlanlari === 'string') {
-                        try {
-                            kisi.uzmanlikAlanlari = JSON.parse(kisi.uzmanlikAlanlari);
-                        } catch (e) { kisi.uzmanlikAlanlari = [kisi.uzmanlikAlanlari]; }
-                    }
+                    // API already returns structured data for details and specialties
+                    const details = Array.isArray(kisi.details) ? kisi.details : [kisi.details];
+                    const specialties = Array.isArray(kisi.specialties) ? kisi.specialties : [kisi.specialties];
 
                     // Sosyal ikon HTML'i
                     let sosyalHtml = `
@@ -434,13 +426,13 @@
                             <div class="group relative cursor-pointer ${marginClass}">
                                 <div class="relative overflow-hidden rounded-[2rem] aspect-[3/4] mb-6 shadow-2xl">
                                     <div class="absolute inset-0 border-4 border-transparent group-hover:border-gold/30 rounded-[2rem] z-20 transition-colors duration-500 pointer-events-none"></div>
-                                    <img src="${optimizeLuxuryImage(kisi.resim, 800)}" alt="${kisi.isim}" class="w-full h-full object-cover team-photo" ${index === 2 ? 'style="object-position: top;"' : ''}>
+                                    <img src="${optimizeLuxuryImage(kisi.image, 800)}" alt="${kisi.name}" class="w-full h-full object-cover team-photo" ${index === 2 ? 'style="object-position: top;"' : ''}>
                                     <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
                                     <div class="absolute bottom-6 left-6 right-6 flex flex-col justify-end z-30">
                                         <div class="flex justify-between items-end">
                                             <div>
-                                                <div class="text-gold font-serif italic text-sm mb-1">${kisi.unvan.split(' ')[0]}</div>
-                                                <h3 class="text-fluid-xl font-bold text-white uppercase tracking-wider">${kisi.isim.replace(' ', '<br>')}</h3>
+                                                <div class="text-gold font-serif italic text-sm mb-1">${kisi.title.split(' ')[0]}</div>
+                                                <h3 class="text-fluid-xl font-bold text-white uppercase tracking-wider">${kisi.name.replace(' ', '<br>')}</h3>
                                             </div>
                                             <a href="mailto:${kisi.email}" class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy shadow-lg transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                                                 <i class="fas fa-envelope"></i>
@@ -450,26 +442,26 @@
                                     </div>
                                 </div>
                                 <p class="text-[11px] font-black uppercase tracking-widest text-navy mb-2 flex items-center gap-2">
-                                    <i class="fas fa-crown text-gold"></i> ${kisi.unvan}
+                                    <i class="fas fa-crown text-gold"></i> ${kisi.title}
                                 </p>
-                                <p class="text-fluid-xs text-gray-500 font-light leading-relaxed">${Array.isArray(kisi.detaylar) ? kisi.detaylar.join(', ') : kisi.detaylar}</p>
+                                <p class="text-fluid-xs text-gray-500 font-light leading-relaxed">${details.join(', ')}</p>
                             </div>
                         `;
                         yoneticiGrid.innerHTML += html;
                     }
-                    else {
+                        else {
                         const html = `
                             <div class="group relative cursor-pointer">
                                 <div class="relative overflow-hidden rounded-3xl aspect-square mb-6 shadow-xl">
-                                    <img src="${optimizeLuxuryImage(kisi.resim, 600)}" alt="${kisi.isim}" class="w-full h-full object-cover team-photo">
+                                    <img src="${optimizeLuxuryImage(kisi.image, 600)}" alt="${kisi.name}" class="w-full h-full object-cover team-photo">
                                     <div class="absolute inset-0 bg-navy/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center gap-4">
                                         <a href="mailto:${kisi.email}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy hover:bg-gold hover:text-white transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 delay-100"><i class="fas fa-envelope"></i></a>
-                                        <a href="tel:${kisi.telefon.replace(/\s+/g, '')}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy hover:bg-gold hover:text-white transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 delay-200"><i class="fas fa-phone"></i></a>
+                                        <a href="tel:${kisi.phone.replace(/\s+/g, '')}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy hover:bg-gold hover:text-white transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 delay-200"><i class="fas fa-phone"></i></a>
                                     </div>
                                 </div>
-                                <h3 class="text-fluid-l font-bold text-navy uppercase tracking-wide">${kisi.isim}</h3>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-gold mt-1 mb-2">${kisi.unvan}</p>
-                                <p class="text-fluid-xs text-gray-500 font-light">${Array.isArray(kisi.uzmanlikAlanlari) ? kisi.uzmanlikAlanlari.join(', ') : kisi.uzmanlikAlanlari}</p>
+                                <h3 class="text-fluid-l font-bold text-navy uppercase tracking-wide">${kisi.name}</h3>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-gold mt-1 mb-2">${kisi.title}</p>
+                                <p class="text-fluid-xs text-gray-500 font-light">${specialties.join(', ')}</p>
                             </div>
                         `;
                         danismanGrid.innerHTML += html;

@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, render_template, current_app
 import jwt
 from datetime import datetime, timedelta
 import json
-from database import get_db_connection
+from shared.database import get_db_connection
 
 compass_bp = Blueprint('compass', __name__)
 
@@ -24,7 +24,7 @@ def decode_magic_link(token):
         return None
 
 # API to generate link (for admins)
-@compass_bp.route('/api/compass/generate_link/<int:lead_id>', methods=['POST'])
+@compass_bp.route('/generate-link/<int:lead_id>', methods=['POST'])
 def create_link(lead_id):
     token = generate_magic_link(lead_id)
     url = f"{request.host_url}pusula/{token}"
@@ -38,7 +38,7 @@ def pusula_dashboard(token):
         return "Geçersiz veya süresi dolmuş bağlantı. Lütfen danışmanınızdan yeni bir link isteyin.", 403
     return render_template('compass-dashboard.html', token=token)
 
-@compass_bp.route('/api/compass/data', methods=['GET'])
+@compass_bp.route('/data', methods=['GET'])
 def get_compass_data():
     auth_header = request.headers.get('Authorization')
     if not auth_header or not auth_header.startswith('Bearer '):
@@ -49,8 +49,8 @@ def get_compass_data():
     if not lead_id:
         return jsonify({'error': 'Geçersiz token'}), 403
 
-    conn = get_db_connection()
-    try:
+    from shared.database import get_db
+    with get_db() as conn:
         lead = conn.execute('SELECT name, interest_property_id, status, created_at FROM leads WHERE id = ?', (lead_id,)).fetchone()
         if not lead:
             return jsonify({'error': 'Lead bulunamadı'}), 404
@@ -60,7 +60,8 @@ def get_compass_data():
         stats = {'views': 124, 'calculations': 3, 'favorites': 12}
         
         if lead['interest_property_id']:
-            prop = conn.execute('SELECT id, baslik, resim_url, fiyat FROM portfoyler WHERE id = ?', (lead['interest_property_id'],)).fetchone()
+            # Using standardized English field names (Phase 13)
+            prop = conn.execute('SELECT id, baslik1 as title, resim_hero as image_url, fiyat as price FROM portfoyler WHERE id = ?', (lead['interest_property_id'],)).fetchone()
             if prop:
                 property_data = dict(prop)
 
@@ -99,5 +100,3 @@ def get_compass_data():
             'timeline': timeline,
             'status': lead['status']
         }), 200
-    finally:
-        conn.close()

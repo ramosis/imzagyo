@@ -1,11 +1,11 @@
 import pytest
 import json
-from api.auth import AuthService
-from database import get_db
+from modules.auth.service import AuthService
+from shared.database import get_db
 
 def test_login_success(client, app):
     """Test standard admin login."""
-    response = client.post('/api/login', json={
+    response = client.post('/api/v1/auth/login', json={
         'username': 'admin',
         'password': 'admin123'
     })
@@ -16,7 +16,7 @@ def test_login_success(client, app):
 
 def test_login_invalid_credentials(client):
     """Test login with wrong password."""
-    response = client.post('/api/login', json={
+    response = client.post('/api/v1/auth/login', json={
         'username': 'admin',
         'password': 'wrongpassword'
     })
@@ -25,8 +25,8 @@ def test_login_invalid_credentials(client):
 
 def test_protected_route_no_token(client):
     """Test accessing protected route without JWT."""
-    response = client.get('/api/portfoyler')
+    response = client.get('/api/v1/portfolios')
     # If using @require_permission, it should return 401/403
     # Portfolio list might be public, but let's check a protected one
-    response = client.post('/api/portfoyler', json={})
+    response = client.post('/api/v1/portfolios', json={})
     assert response.status_code in [401, 403]

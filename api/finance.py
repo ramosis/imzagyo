@@ -2,7 +2,7 @@ import urllib.request
 import urllib.error
 from bs4 import BeautifulSoup
 from flask import Blueprint, jsonify, request, g
-from database import get_db_connection
+from shared.database import get_db_connection
 from api.auth import require_inner_circle, login_required
 import datetime
 

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
-from database import get_db_connection
+from shared.database import get_db_connection
 import os
 import time
 from werkzeug.utils import secure_filename

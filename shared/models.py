@@ -1,5 +1,5 @@
 from datetime import datetime
-from extensions import db
+from shared.extensions import db
 
 class User(db.Model):
     __tablename__ = 'users'

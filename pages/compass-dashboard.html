@@ -85,8 +85,8 @@
             <div class="hidden md:flex flex-col items-center gap-4 mt-auto border-t border-white/10 pt-6 w-full">
                 <p class="text-[10px] text-slate-500 uppercase tracking-widest hidden lg:block mb-2 font-bold">Aile Modülü</p>
                 <div class="flex -space-x-3">
-                    <img src="https://ui-avatars.com/api/?name=Ali&background=3b82f6&color=fff" class="w-10 h-10 rounded-full border-2 border-brand-base">
-                    <img src="https://ui-avatars.com/api/?name=Ayşe&background=10b981&color=fff" class="w-10 h-10 rounded-full border-2 border-brand-base">
+                    <img src="https://ui-avatars.com\/api/v1/?name=Ali&background=3b82f6&color=fff" class="w-10 h-10 rounded-full border-2 border-brand-base">
+                    <img src="https://ui-avatars.com\/api/v1/?name=Ayşe&background=10b981&color=fff" class="w-10 h-10 rounded-full border-2 border-brand-base">
                 </div>
                 <button class="text-xs text-brand-glow hover:underline opacity-80 cursor-not-allowed hidden lg:block">Yakında Aktif</button>
             </div>
@@ -104,7 +104,7 @@
                 <div class="hidden sm:flex text-right">
                     <div class="text-sm font-medium text-slate-400">Danışmanınız</div>
                     <div class="flex items-center gap-3 ml-4 bg-white/5 py-1.5 px-3 rounded-full border border-white/10">
-                        <img src="https://ui-avatars.com/api/?name=Danisman&background=222&color=fff" class="w-8 h-8 rounded-full">
+                        <img src="https://ui-avatars.com\/api/v1/?name=Danisman&background=222&color=fff" class="w-8 h-8 rounded-full">
                         <a href="#" class="text-sm font-bold text-brand-glow hover:text-white transition"><i class="fab fa-whatsapp mr-1"></i> İletişime Geç</a>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
             const token = document.getElementById('app-token').value;
             
             try {
-                const response = await fetch('/api/compass/data', {
+                const response = await fetch('/api/v1/compass/data', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
@@ -219,8 +219,8 @@
                 if (data.property) {
                     const pCard = document.getElementById('property-card');
                     pCard.classList.remove('hidden');
-                    document.getElementById('prop-title').innerText = data.property.baslik;
-                    document.getElementById('prop-price').innerText = `₺${Number(data.property.fiyat).toLocaleString('tr-TR')}`;
+                    document.getElementById('prop-title').innerText = data.property.title;
+                    document.getElementById('prop-price').innerText = `₺${Number(data.property.price).toLocaleString('tr-TR')}`;
                     if (data.property.resim_url) {
                         document.getElementById('prop-img').style.backgroundImage = `url('${data.property.resim_url}')`;
                     }

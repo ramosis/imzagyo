@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import sqlite3
 import json
-from database import get_db_connection
+from shared.database import get_db_connection
 
 inspection_bp = Blueprint('inspection', __name__)
 

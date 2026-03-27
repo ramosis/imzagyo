@@ -1,6 +1,6 @@
 from typing import Optional, List, Dict, Any
 from flask import Blueprint, request, jsonify, g
-from database import get_db
+from shared.database import get_db
 from api.utils import sanitize_input
 from .schemas import user_schema, ValidationError
 from .auth import hash_password, require_permission
@@ -106,18 +106,18 @@ class UserService:
         user_id = UserRepository.create(validated_data)
         return UserRepository.get_by_id(user_id)
 
-@users_bp.route('/api/users', methods=['GET'])
+@users_bp.route('', methods=['GET'])
 @require_permission('admin')
 def get_users():
     return jsonify(UserRepository.get_all()), 200
 
-@users_bp.route('/api/users/<int:id>', methods=['GET'])
+@users_bp.route('/<int:id>', methods=['GET'])
 @require_permission('admin')
 def get_user(id):
     user = UserRepository.get_by_id(id)
     return jsonify(user) if user else (jsonify({'error': 'User not found'}), 404)
 
-@users_bp.route('/api/users', methods=['POST'])
+@users_bp.route('', methods=['POST'])
 @require_permission('admin')
 def add_user():
     try:
@@ -128,14 +128,14 @@ def add_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@users_bp.route('/api/users/<int:id>', methods=['PUT'])
+@users_bp.route('/<int:id>', methods=['PUT'])
 @require_permission('admin')
 def update_user(id):
     if UserRepository.update(id, request.json):
         return jsonify({'status': 'updated'}), 200
     return jsonify({'error': 'User not found'}), 404
 
-@users_bp.route('/api/users/<int:id>', methods=['DELETE'])
+@users_bp.route('/<int:id>', methods=['DELETE'])
 @require_permission('admin')
 def delete_user(id):
     if UserRepository.delete(id):

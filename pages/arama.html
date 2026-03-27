@@ -504,7 +504,7 @@
                         const lng = parseFloat(p.boylam);
                         if (!isNaN(lat) && !isNaN(lng)) {
                             const m = L.marker([lat, lng], { icon: customIcon })
-                                .bindPopup(`<b style="color:#0a192f;font-family:'Playfair Display'">${p.baslik1}</b><br><span style="color:#c5a059;font-weight:bold;">${p.fiyat}</span>`);
+                                .bindPopup(`<b style="color:#0a192f;font-family:'Playfair Display'">${p.title}</b><br><span style="color:#c5a059;font-weight:bold;">₺${p.price}</span>`);
                             markersLayer.addLayer(m);
                             allPortfoliosMarkerMap.set(p.id, m);
                         }
@@ -519,7 +519,7 @@
             // Portföyleri API'den çek ve render et
             const fetchPortfoyler = async () => {
                 try {
-                    const response = await fetch('/api/portfoyler');
+                    const response = await fetch('/api/v1/portfolios');
                     const portfoyler = await response.json();
 
                     const listContainer = document.getElementById('portfoy-list');
@@ -533,35 +533,36 @@
                             turizm: 'bg-cyan-700 text-white', donusum: 'bg-orange-700 text-white', bina: 'bg-indigo-700 text-white',
                             devremulk: 'bg-purple-700 text-white'
                         };
-                        const kolRaw = (item.koleksiyon || '').toLowerCase();
+                        const kolRaw = (item.category || '').toLowerCase();
                         let collectionKey = 'konut';
                         for (const k of Object.keys(COL_STYLES)) {
                             if (kolRaw.includes(k) || kolRaw === k) { collectionKey = k; break; }
                         }
                         const durumRenk = COL_STYLES[collectionKey] || 'bg-navy/90 text-gold';
 
-                        const fiyatKisa = item.fiyat.replace('0.000', 'M').replace('.000', 'K').replace('₺', '').trim(); // Çok basit bir format
+                        const fiyatStr = String(item.price || '0');
+                        const fiyatKisa = fiyatStr.replace('0.000', 'M').replace('.000', 'K').replace('₺', '').trim();
 
                         const html = `
                         <div onclick="luxNavigate('detay.html?id=${item.id}')" data-collection="${collectionKey}"
                             class="list-item-card group flex flex-col md:flex-row gap-8 bg-white hover:shadow-2xl hover:shadow-gold/5 rounded-[3rem] p-5 transition-all duration-700 border border-transparent hover:border-gold/10 cursor-pointer text-left">
                             <div class="w-full md:w-72 h-56 rounded-[2.5rem] overflow-hidden relative shrink-0 text-left">
-                                <img src="${item.resim_hero}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                                <img src="${item.image_hero}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
                                 <div class="absolute top-5 left-5 ${durumRenk} text-[8px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest backdrop-blur-md">Satılık</div>
                             </div>
                             <div class="flex flex-col justify-between py-3 flex-1 text-left">
                                 <div class="text-left">
-                                    <h3 class="font-serif font-bold text-navy text-xl group-hover:text-gold transition-colors uppercase leading-tight mb-2 text-left">${item.baslik1} ${item.baslik2}</h3>
+                                    <h3 class="font-serif font-bold text-navy text-xl group-hover:text-gold transition-colors uppercase leading-tight mb-2 text-left">${item.title} ${item.subtitle || ''}</h3>
                                     <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-6 text-left">
-                                        <i class="fa-solid fa-location-dot text-gold/60 mr-1"></i> ${item.lokasyon}
+                                        <i class="fa-solid fa-location-dot text-gold/60 mr-1"></i> ${item.location}
                                     </p>
                                     <div class="flex gap-8 text-[11px] font-black uppercase tracking-widest text-gray-500 text-left">
-                                        <span><i class="fa-solid fa-bed text-gold mr-1"></i> ${item.oda}</span>
-                                        <span><i class="fa-solid fa-vector-square text-gold mr-1"></i> ${item.alan}</span>
+                                        <span><i class="fa-solid fa-bed text-gold mr-1"></i> ${item.rooms}</span>
+                                        <span><i class="fa-solid fa-vector-square text-gold mr-1"></i> ${item.area}</span>
                                     </div>
                                 </div>
                                 <div class="flex justify-between items-center mt-8 text-left">
-                                    <span class="text-2xl font-serif font-bold text-navy">${item.fiyat}</span>
+                                    <span class="text-2xl font-serif font-bold text-navy">₺${item.price}</span>
                                     <span class="text-gold font-bold text-[10px] uppercase tracking-widest border-b-2 border-gold/20 pb-1 group-hover:border-gold transition-all text-left">Detay &rarr;</span>
                                 </div>
                             </div>

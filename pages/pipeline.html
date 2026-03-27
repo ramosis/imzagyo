@@ -123,7 +123,7 @@
     <script>
         async function fetchLeads() {
             try {
-                const response = await fetch('/api/pipeline/leads');
+                const response = await fetch('/api/v1/pipeline/leads');
                 const leads = await response.json();
                 renderLeads(leads);
             } catch (error) {
@@ -195,7 +195,7 @@
             modal.classList.add('active');
             
             try {
-                const res = await fetch(`/api/leads/${leadId}/footprint`);
+                const res = await fetch(`\/api/v1/leads/${leadId}/footprint`);
                 const data = await res.json();
                 
                 document.getElementById('modal-lead-name').innerText = data.lead_name ? `Aday Analizi: ${data.lead_name}` : `Aday Analizi: ${leadId}`;
@@ -244,7 +244,7 @@
 
         async function updateLeadStatus(leadId, newStatus) {
             try {
-                const response = await fetch(`/api/pipeline/leads/${leadId}`, {
+                const response = await fetch(`\/api/v1/pipeline/leads/${leadId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: newStatus })

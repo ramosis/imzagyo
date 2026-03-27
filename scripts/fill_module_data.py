@@ -1,5 +1,5 @@
 import sqlite3
-from database import DB_NAME
+from shared.database import DB_NAME
 
 def insert_samples():
     conn = sqlite3.connect(DB_NAME)

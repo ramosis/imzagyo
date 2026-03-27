@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, g
-from database import get_db_connection
+from shared.database import get_db_connection
 from .auth import require_inner_circle, login_required
 import datetime
 

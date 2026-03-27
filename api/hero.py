@@ -1,6 +1,7 @@
-import sqlite3
 from flask import Blueprint, jsonify, request
-from database import DB_NAME
+from shared.database import get_db
+from api.schemas import heros_schema
+from shared.database import DB_NAME
 
 hero_bp = Blueprint('hero', __name__)
 
@@ -9,23 +10,30 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-@hero_bp.route('/api/hero', methods=['GET'])
-def get_slides():
-    conn = get_db_connection()
-    slides = conn.execute('SELECT * FROM hero_slides ORDER BY sira ASC').fetchall()
-    conn.close()
-    return jsonify([dict(s) for s in slides])
+# Context manager for database connection
+def get_db():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    try:
+        yield conn
+    finally:
+        conn.close()
 
-@hero_bp.route('/api/hero/<int:slide_id>', methods=['GET'])
+@hero_bp.route('', methods=['GET'])
+def get_slides():
+    with get_db_connection() as conn: # Changed to use get_db_connection as a context manager
+        rows = conn.execute('SELECT * FROM hero_slides ORDER BY sira ASC').fetchall()
+    return jsonify(heros_schema.dump([dict(r) for r in rows]))
+
+@hero_bp.route('/<int:slide_id>', methods=['GET'])
 def get_slide(slide_id):
-    conn = get_db_connection()
-    slide = conn.execute('SELECT * FROM hero_slides WHERE id = ?', (slide_id,)).fetchone()
-    conn.close()
+    with get_db_connection() as conn: # Changed to use get_db_connection as a context manager
+        slide = conn.execute('SELECT * FROM hero_slides WHERE id = ?', (slide_id,)).fetchone()
     if slide is None:
         return jsonify({"error": "Slide bulunamadı"}), 404
     return jsonify(dict(slide))
 
-@hero_bp.route('/api/hero', methods=['POST'])
+@hero_bp.route('', methods=['POST'])
 def add_slide():
     data = request.json
     try:
@@ -50,7 +58,7 @@ def add_slide():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@hero_bp.route('/api/hero/<int:slide_id>', methods=['PUT'])
+@hero_bp.route('/<int:slide_id>', methods=['PUT'])
 def update_slide(slide_id):
     data = request.json
     try:
@@ -83,7 +91,7 @@ def update_slide(slide_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@hero_bp.route('/api/hero/<int:slide_id>', methods=['DELETE'])
+@hero_bp.route('/<int:slide_id>', methods=['DELETE'])
 def delete_slide(slide_id):
     try:
         conn = get_db_connection()

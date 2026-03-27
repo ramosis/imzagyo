@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, g
-from database import get_db_connection
+from shared.database import get_db_connection
 from api.auth import require_inner_circle, get_current_user
 import json
 
@@ -7,7 +7,7 @@ projects_bp = Blueprint('projects', __name__)
 
 # --- ADMIN ENDPOINTS ---
 
-@projects_bp.route('/api/projects', methods=['GET'])
+@projects_bp.route('', methods=['GET'])
 @require_inner_circle
 def get_projects():
     """Tüm projeleri listeler (Admin)."""
@@ -16,7 +16,7 @@ def get_projects():
     conn.close()
     return jsonify([dict(p) for p in projects]), 200
 
-@projects_bp.route('/api/projects', methods=['POST'])
+@projects_bp.route('', methods=['POST'])
 @require_inner_circle
 def create_project():
     """Yeni bir landing page projesi oluşturur (Admin)."""
@@ -49,7 +49,7 @@ def create_project():
     conn.close()
     return jsonify({'status': 'created', 'id': new_id}), 201
 
-@projects_bp.route('/api/projects/<int:id>/leads', methods=['GET'])
+@projects_bp.route('/<int:id>/leads', methods=['GET'])
 @require_inner_circle
 def get_project_leads(id):
     """Belirli bir projeye gelen müşteri taleplerini (Leads) listeler."""
@@ -60,7 +60,7 @@ def get_project_leads(id):
 
 # --- PUBLIC ENDPOINTS (Landing Page için) ---
 
-@projects_bp.route('/api/projects/public/<slug>', methods=['GET'])
+@projects_bp.route('/public/<slug>', methods=['GET'])
 def get_public_project(slug):
     """Ziyaretçinin göreceği proje detaylarını getirir (Slug üzerinden)."""
     conn = get_db_connection()
@@ -80,7 +80,7 @@ def get_public_project(slug):
             
     return jsonify(project_dict), 200
 
-@projects_bp.route('/api/projects/public/<slug>/leads', methods=['POST'])
+@projects_bp.route('/public/<slug>/leads', methods=['POST'])
 def create_lead(slug):
     """Ziyaretçinin Landing Page üzerinden doldurduğu formu kaydeder."""
     data = request.json

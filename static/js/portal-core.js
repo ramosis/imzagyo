@@ -1,7 +1,7 @@
 // --- IMZA PORTAL CORE JS ---
 // Extracted from portal.html for audit compliance and maintainability.
 
-const API_BASE = '/api';
+const API_BASE = '/api/v1';
 
 // --- CONSTANTS & CONFIG ---
 const PROPERTY_CATEGORIES = {
@@ -361,7 +361,7 @@ async function fetchDashboardStats() {
 
 async function fetchPortfoliosForDashboard() {
     try {
-        const res = await apiFetch(`${API_BASE}/portfoyler`);
+        const res = await apiFetch(`${API_BASE}/portfolios`);
         const data = await res.json();
         const tableBody = document.getElementById('dashboard-portfolio-list');
         if (!tableBody) return;
@@ -369,10 +369,10 @@ async function fetchPortfoliosForDashboard() {
         data.slice(0, 3).forEach(item => {
             tableBody.innerHTML += `
                 <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                    <td class="py-3 px-4"><span class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-xs font-mono font-bold">${item.refNo}</span></td>
-                    <td class="py-3 px-4 font-medium text-navy">${item.baslik1}</td>
-                    <td class="py-3 px-4 text-gray-500">${item.lokasyon}</td>
-                    <td class="py-3 px-4 font-bold text-slate-700">${item.fiyat}</td>
+                    <td class="py-3 px-4"><span class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-xs font-mono font-bold">${item.ref_no}</span></td>
+                    <td class="py-3 px-4 font-medium text-navy">${item.title}</td>
+                    <td class="py-3 px-4 text-gray-500">${item.location}</td>
+                    <td class="py-3 px-4 font-bold text-slate-700">${item.price}</td>
                 </tr>`;
         });
     } catch (err) { console.error(err); }
@@ -403,7 +403,7 @@ async function fetchUpcomingBirthdays() {
 // --- PORTFOLIO (CRUD & AI SUMMARY) ---
 async function fetchAllPortfolios() {
     try {
-        const res = await apiFetch(`${API_BASE}/portfoyler`);
+        const res = await apiFetch(`${API_BASE}/portfolios`);
         const data = await res.json();
         const container = document.getElementById('portfolio-grid');
         const tableBody = document.getElementById('portfolios-table-body');
@@ -425,11 +425,11 @@ async function fetchAllPortfolios() {
             tableBody.innerHTML = '';
             data.forEach(item => {
                 tableBody.innerHTML += `<tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors group">
-                    <td class="py-3 px-6"><div class="w-12 h-12 rounded bg-cover bg-center border border-gray-200" style="background-image: url('${item.resim_hero}')"></div></td>
-                    <td class="py-3 px-6"><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-mono font-bold">${item.refNo}</span></td>
+                    <td class="py-3 px-6"><div class="w-12 h-12 rounded bg-cover bg-center border border-gray-200" style="background-image: url('${item.image_hero}')"></div></td>
+                    <td class="py-3 px-6"><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-mono font-bold">${item.ref_no}</span></td>
                     <td class="py-3 px-6"><span class="text-xs font-bold uppercase tracking-wider ${item.ozellik_renk}">${item.koleksiyon}</span></td>
-                    <td class="py-3 px-6 font-bold text-navy">${item.baslik1}</td>
-                    <td class="py-3 px-6 font-bold text-slate-700">${item.fiyat}</td>
+                    <td class="py-3 px-6 font-bold text-navy">${item.title}</td>
+                    <td class="py-3 px-6 font-bold text-slate-700">${item.price}</td>
                     <td class="py-3 px-6 text-right flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onclick="openMediaManager('${item.id}')" class="text-emerald-500 p-2 bg-emerald-50 rounded shadow hover:bg-emerald-100 transition-colors" title="Medya Yönetimi"><i class="fa-solid fa-camera"></i> Medya</button>
                         <button onclick="editPortfolio('${item.id}')" class="text-blue-500 p-2"><i class="fa-solid fa-pen"></i></button>
@@ -608,7 +608,7 @@ async function initContractBuilder() {
     selectedProperty = null;
     updateConWizUI();
     try {
-        const resP = await apiFetch(`${API_BASE}/portfoyler`);
+        const resP = await apiFetch(`${API_BASE}/portfolios`);
         allProperties = await resP.json();
         const resT = await apiFetch(`${API_BASE}/parties`);
         allParties = await resT.json();
@@ -1072,7 +1072,7 @@ function closePartyModal() { document.getElementById('party-modal')?.classList.a
 async function deletePortfolio(id) {
     if (!confirm('Bu portföyü silmek istediğinize emin misiniz?')) return;
     try {
-        const res = await apiFetch(`${API_BASE}/portfoyler/${id}`, { method: 'DELETE' });
+        const res = await apiFetch(`${API_BASE}/portfolios/${id}`, { method: 'DELETE' });
         if (res.ok) { showToast('Portföy silindi', 'success'); fetchAllPortfolios(); }
         else showToast('Silme hatası', 'error');
     } catch (e) { showToast('Bağlantı hatası', 'error'); }
@@ -1082,13 +1082,25 @@ async function editPortfolio(id) {
     openPortfolioModal();
     // Fetch data and fill form...
     try {
-        const res = await apiFetch(`${API_BASE}/portfoyler/${id}`);
+        const res = await apiFetch(`${API_BASE}/portfolios/${id}`);
         const data = await res.json();
-        // Populate form fields (This is a simplified version for restoration)
-        document.getElementById('p-id').value = data.id;
-        document.getElementById('p-baslik1').value = data.baslik1;
-        document.getElementById('p-fiyat').value = data.fiyat;
-        // ... populate more fields as needed
+        // Populate form fields (Standardized Mapping)
+        document.getElementById('p-id').value = data.id || '';
+        document.getElementById('p-refNo').value = data.ref_no || '';
+        document.getElementById('p-ozellik_kategori').value = data.listing_category || 'Satılık';
+        document.getElementById('p-baslik1').value = data.title || '';
+        document.getElementById('p-baslik2').value = data.subtitle || '';
+        document.getElementById('p-koleksiyon').value = data.category || 'Konut';
+        document.getElementById('p-fiyat').value = data.price || '';
+        document.getElementById('p-lokasyon').value = data.location || '';
+        document.getElementById('p-oda').value = data.rooms || '';
+        document.getElementById('p-alan').value = data.area || '';
+        document.getElementById('p-isitma').value = data.heating || '';
+        document.getElementById('p-kat').value = data.floor || '';
+        document.getElementById('p-resim_hero').value = data.image_hero || '';
+        document.getElementById('p-resim_hikaye').value = data.image_story || '';
+        document.getElementById('p-ozellikler_arr').value = data.features ? data.features.join(', ') : '';
+        document.getElementById('p-hikaye').value = data.description || '';
     } catch (e) { console.error(e); }
 }
 
@@ -1140,23 +1152,87 @@ async function runAutomationNow() {
 }
 
 async function savePortfolio() {
+    // Shared implementation with submitPortfolioForm for consistency
+    await submitPortfolioForm();
+}
+
+async function submitPortfolioForm() {
     const id = document.getElementById('p-id')?.value;
+    const featuresRaw = document.getElementById('p-ozellikler_arr')?.value || '';
+    
+    // Payload mapped to current standardized English Schema (Phase 14)
     const payload = {
-        baslik1: document.getElementById('p-baslik1')?.value,
-        fiyat: document.getElementById('p-fiyat')?.value,
+        ref_no: document.getElementById('p-refNo')?.value,
+        listing_category: document.getElementById('p-ozellik_kategori')?.value,
+        title: document.getElementById('p-baslik1')?.value,
+        subtitle: document.getElementById('p-baslik2')?.value,
+        category: document.getElementById('p-koleksiyon')?.value,
+        price: parseFloat(document.getElementById('p-fiyat')?.value) || 0,
+        location: document.getElementById('p-lokasyon')?.value,
+        rooms: document.getElementById('p-oda')?.value,
+        area: document.getElementById('p-alan')?.value,
+        heating: document.getElementById('p-isitma')?.value,
+        floor: document.getElementById('p-kat')?.value,
+        image_hero: document.getElementById('p-resim_hero')?.value,
+        image_story: document.getElementById('p-resim_hikaye')?.value,
+        features: featuresRaw.split(',').map(s => s.trim()).filter(s => s !== ''),
+        description: document.getElementById('p-hikaye')?.value
     };
     
     const method = id ? 'PUT' : 'POST';
-    const url = id ? `${API_BASE}/portfoyler/${id}` : `${API_BASE}/portfoyler`;
+    const url = id ? `${API_BASE}/portfolios/${id}` : `${API_BASE}/portfolios`;
     
     try {
         const res = await apiFetch(url, { method, body: JSON.stringify(payload) });
         if (res.ok) {
-            showToast('Portföy kaydedildi', 'success');
+            showToast('Portföy başarıyla kaydedildi', 'success');
             closePortfolioModal();
             fetchAllPortfolios();
+            // Also update dashboard if visible
+            if (typeof fetchDashboardStats === 'function') fetchDashboardStats();
+        } else {
+            const err = await res.json();
+            showToast(`Hata: ${err.message || 'Kaydedilemedi'}`, 'error');
         }
-    } catch (e) { showToast('Kaydetme hatası', 'error'); }
+    } catch (e) { 
+        console.error(e);
+        showToast('Bağlantı hatası oluştu', 'error'); 
+    }
+}
+
+async function saveLead() {
+    const payload = {
+        name: document.getElementById('lead-name')?.value,
+        phone: document.getElementById('lead-phone')?.value,
+        email: document.getElementById('lead-email')?.value,
+        notes: document.getElementById('lead-notes')?.value,
+        status: 'new'
+    };
+    try {
+        const res = await apiFetch(`${API_BASE}/leads`, { method: 'POST', body: JSON.stringify(payload) });
+        if (res.ok) {
+            showToast('Müşteri adayı kaydedildi', 'success');
+            closeLeadModal();
+            if (typeof fetchLeads === 'function') fetchLeads();
+        }
+    } catch (e) { showToast('Hata oluştu', 'error'); }
+}
+
+async function saveExpense() {
+    const payload = {
+        date: document.getElementById('exp-date')?.value,
+        category: document.getElementById('exp-category')?.value,
+        amount: parseFloat(document.getElementById('exp-amount')?.value) || 0,
+        description: document.getElementById('exp-desc')?.value
+    };
+    try {
+        const res = await apiFetch(`${API_BASE}/expenses`, { method: 'POST', body: JSON.stringify(payload) });
+        if (res.ok) {
+            showToast('Harcama kaydedildi', 'success');
+            closeExpenseModal();
+            if (typeof fetchExpenses === 'function') fetchExpenses();
+        }
+    } catch (e) { showToast('Hata oluştu', 'error'); }
 }
 
 async function triggerAiTranslation() {
@@ -1167,7 +1243,7 @@ async function triggerAiTranslation() {
     }
     showToast('AI Çeviri başlatıldı...', 'info');
     try {
-        await apiFetch(`${API_BASE}/portfoyler/${id}/translate`, { method: 'POST' });
+        await apiFetch(`${API_BASE}/portfolios/${id}/translate`, { method: 'POST' });
         showToast('Çeviriler tamamlandı', 'success');
     } catch (e) { showToast('Çeviri hatası', 'error'); }
 }

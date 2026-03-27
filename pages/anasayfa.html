@@ -1320,7 +1320,7 @@
             try {
                 let heroData = [];
                 try {
-                    const response = await fetch('/api/hero');
+                    const response = await fetch('/api/v1/hero');
                     if (response.ok) {
                         heroData = await response.json();
                     } else {
@@ -1329,8 +1329,8 @@
                 } catch (e) {
                     console.warn("[İmza] Hero API unavailable, using fallback data.");
                     heroData = [
-                        { id: 1, resim_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80', alt_baslik: 'Koleksiyon 01 // Executive' },
-                        { id: 2, resim_url: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1920&q=80', alt_baslik: 'Koleksiyon 02 // Panorama' }
+                        { id: 1, image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80', alt_title: 'Koleksiyon 01 // Executive' },
+                        { id: 2, image_url: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1920&q=80', alt_title: 'Koleksiyon 02 // Panorama' }
                     ];
                 }
 
@@ -1357,7 +1357,7 @@
                 if (heroData.length === 0 && wrapper.children.length === 0) return;
 
                 heroData.forEach((item, index) => {
-                    const optimizedImg = optimizeLuxuryImage(item.resim_url);
+                    const optimizedImg = optimizeLuxuryImage(item.image_url);
                     const isFirst = index === 0;
                     const slideHTML = `
                     <div class="slide absolute inset-0 transition-opacity duration-1000 opacity-0 z-0">
@@ -1369,7 +1369,7 @@
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative h-full flex items-center w-full px-fluid-screen">
                             <div class="max-w-4xl text-left">
                                 <p class="text-gold uppercase tracking-[0.4em] text-xs font-bold mb-4 md:mb-6 drop-shadow-md border-l-2 border-gold pl-4 slide-up italic">
-                                    ${item.alt_baslik}
+                                    ${item.alt_title}
                                 </p>
                                 <${index === 0 ? 'h1' : 'h2'} data-i18n="hero_title" class="text-fluid-9xl font-serif text-white mb-6 leading-tight opacity-0 translate-y-10 transition-all duration-1000 delay-300 uppercase tracking-tighter">
                                     Lüksün Yeni İmzası
@@ -1478,7 +1478,7 @@
 
             // Portföyleri Yükle
             try {
-                const response = await fetch(`/api/portfoyler?lang=${i18n.getLang()}`);
+                const response = await fetch(`/api/v1/portfolios?lang=${i18n.getLang()}`);
                 if (response.ok) {
                     allPortfolios = await response.json();
                 } else {
@@ -1487,8 +1487,8 @@
             } catch (error) {
                 console.warn("[İmza] Portfolio API unavailable, using fallback data.");
                 allPortfolios = [
-                    { id: 101, baslik: 'Boğaz Manzaralı Villa', lokasyon: 'Sarıyer, İstanbul', fiyat: '₺35.000.000', tip: 'Villa', alan: '450m²', oda: '6+2', resim: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80', kategori: 'prestij' },
-                    { id: 102, baslik: 'Modern Loft Daire', lokasyon: 'Kadıköy, İstanbul', fiyat: '₺12.000.000', tip: 'Daire', alan: '180m²', oda: '3+1', resim: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80', kategori: 'modern' }
+                    { id: 101, title: 'Boğaz Manzaralı Villa', location: 'Sarıyer, İstanbul', price: '₺35.000.000', category: 'prestij', area: '450m²', rooms: '6+2', image_hero: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80' },
+                    { id: 102, title: 'Modern Loft Daire', location: 'Kadıköy, İstanbul', price: '₺12.000.000', category: 'modern', area: '180m²', rooms: '3+1', image_hero: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80' }
                 ];
             }
             renderPortfolios('tumu'); 
@@ -1510,7 +1510,7 @@
             const filtered = filterCategory === 'tumu'
                 ? visibleInMarket
                 : visibleInMarket.filter(p => {
-                    const kolek = p.koleksiyon.toLowerCase();
+                    const kolek = (p.category || '').toLowerCase();
                     const filt = filterCategory.toLowerCase();
                     return kolek.includes(filt) || (kolek.includes('doğa') && filt === 'doga');
                 });
@@ -1519,8 +1519,8 @@
             const portfoyGosterilecek = filtered.slice(0, 3);
 
             portfoyGosterilecek.forEach(item => {
-                const isModern = item.koleksiyon.toLowerCase().includes('modern');
-                const isDoga = item.koleksiyon.toLowerCase().includes('doğa') || item.koleksiyon.toLowerCase().includes('doga');
+                const isModern = (item.category || '').toLowerCase().includes('modern');
+                const isDoga = (item.category || '').toLowerCase().includes('doğa') || (item.category || '').toLowerCase().includes('doga');
 
                 let textColor = 'text-gold';
                 let typeColor = 'text-gold';
@@ -1540,15 +1540,16 @@
                 }
 
                 // Çok basit bir format
-                const fiyatKisa = item.fiyat.replace('0.000', 'M').replace('.000', 'K').replace('₺', '').trim();
+                const fiyatStr = String(item.price || '0');
+                const fiyatKisa = fiyatStr.replace('0.000', 'M').replace('.000', 'K').replace('₺', '').trim();
 
-                const optimizedPortfolioImg = optimizeLuxuryImage(item.resim_hero, 600);
+                const optimizedPortfolioImg = optimizeLuxuryImage(item.image_hero, 600);
                 const html = `
                 <div onclick="luxNavigate('detay.html?id=${item.id}')"
                     data-imza-lens-track="portfoy-${item.id}"
                     class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 flex flex-col border border-gray-50 text-left cursor-pointer h-full flex-shrink-0 w-[85%] md:w-full lg:w-auto snap-center">
                     <div class="relative h-56 md:h-64 overflow-hidden shrink-0">
-                        <img src="${optimizedPortfolioImg}" loading="lazy" alt="${item.baslik1} ${item.baslik2}"
+                        <img src="${optimizedPortfolioImg}" loading="lazy" alt="${item.title} ${item.subtitle || ''}"
                             width="600" height="400"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute top-6 left-6 ${tagColor} text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">
@@ -1560,13 +1561,13 @@
                     <div class="p-6 md:p-8 text-left flex-1 flex flex-col justify-between">
                         <div class="mb-4">
                             <h3 class="font-bold text-navy text-base md:text-xl group-hover:${textColor} transition-colors mb-1 font-serif uppercase tracking-tight text-left line-clamp-2">
-                                ${item.baslik1} ${item.baslik2}</h3>
+                                ${item.title} ${item.subtitle || ''}</h3>
                             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest text-left truncate">
-                                ${item.lokasyon}</p>
+                                ${item.location}</p>
                         </div>
                         <div class="grid grid-cols-3 border-t border-gray-100 pt-6 gap-2 text-center mt-auto">
-                            <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-400 mb-1">Oda</span><span class="text-xs font-bold text-navy truncate">${item.oda}</span></div>
-                            <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-400 mb-1">Alan</span><span class="text-xs font-bold text-navy truncate">${item.alan}</span></div>
+                            <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-400 mb-1">Oda</span><span class="text-xs font-bold text-navy truncate">${item.rooms}</span></div>
+                            <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-400 mb-1">Alan</span><span class="text-xs font-bold text-navy truncate">${item.area}</span></div>
                             <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-400 mb-1">Tip</span><span class="text-xs font-bold ${typeColor} uppercase truncate">${categoryType}</span></div>
                         </div>
                     </div>

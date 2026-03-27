@@ -100,7 +100,7 @@
 
         async function loadProject() {
             try {
-                const response = await fetch(`/api/projects/public/${slug}`);
+                const response = await fetch(`/api/v1/projects/public/${slug}`);
                 if (!response.ok) throw new Error('Proje bulunamadı');
                 
                 const project = await response.json();
@@ -157,7 +157,7 @@
             const msg = document.getElementById('form-msg');
 
             try {
-                const res = await fetch(`/api/projects/public/${slug}/leads`, {
+                const res = await fetch(`/api/v1/projects/public/${slug}/leads`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: json.stringify(data)

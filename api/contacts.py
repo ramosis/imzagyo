@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from database import get_db_connection
+from shared.database import get_db_connection
 from datetime import datetime
 
 contacts_bp = Blueprint('contacts', __name__)

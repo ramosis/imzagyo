@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, g
 import sqlite3
 import json
-from database import get_db_connection
+from shared.database import get_db_connection
 
 mls_bp = Blueprint('mls', __name__)
 

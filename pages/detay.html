@@ -723,25 +723,25 @@
             }
 
             try {
-                const response = await fetch(`/api/portfoyler/${pId}?lang=${i18n.getLang()}`);
+                const response = await fetch(`/api/v1/portfolios/${pId}?lang=${i18n.getLang()}`);
                 if (!response.ok) throw new Error('Portföy bulunamadı');
 
                 const veri = await response.json();
 
                 // --- DYNAMIC SEO & GEO OPTIMIZATION ---
                 const updateDynamicSEO = (data) => {
-                    const title = `${data.baslik1} ${data.baslik2} | İmza Gayrimenkul`;
-                    const description = data.hikaye ? data.hikaye.substring(0, 160) : data.baslik1;
+                    const title = `${data.title} ${data.subtitle || ''} | İmza Gayrimenkul`;
+                    const description = data.description ? data.description.substring(0, 160) : data.title;
                     
                     document.title = title;
                     document.getElementById('seo-description')?.setAttribute('content', description);
                     document.getElementById('og-title')?.setAttribute('content', title);
                     document.getElementById('og-description')?.setAttribute('content', description);
-                    document.getElementById('og-image')?.setAttribute('content', data.resim_hero);
+                    document.getElementById('og-image')?.setAttribute('content', data.image_hero);
 
                     if (data.enlem && data.boylam) {
                         document.getElementById('geo-region')?.setAttribute('content', 'TR-43'); 
-                        document.getElementById('geo-placename')?.setAttribute('content', data.lokasyon);
+                        document.getElementById('geo-placename')?.setAttribute('content', data.location);
                         document.getElementById('geo-position')?.setAttribute('content', `${data.enlem};${data.boylam}`);
                         document.getElementById('geo-icbm')?.setAttribute('content', `${data.enlem}, ${data.boylam}`);
                     }
@@ -751,11 +751,11 @@
                         "@type": "RealEstateListing",
                         "name": title,
                         "description": description,
-                        "image": data.resim_hero,
+                        "image": data.image_hero,
                         "url": window.location.href,
                         "address": {
                             "@type": "PostalAddress",
-                            "addressLocality": data.lokasyon,
+                            "addressLocality": data.location,
                             "addressCountry": "TR"
                         },
                         "geo": {
@@ -771,22 +771,22 @@
                 updateDynamicSEO(veri);
 
                 // Hero
-                document.getElementById('p-hero-bg').style.backgroundImage = `url('${optimizeLuxuryImage(veri.resim_hero)}')`;
-                document.getElementById('p-koleksiyon').innerText = veri.koleksiyon;
+                document.getElementById('p-hero-bg').style.backgroundImage = `url('${optimizeLuxuryImage(veri.image_hero)}')`;
+                document.getElementById('p-koleksiyon').innerText = veri.category;
                 document.getElementById('p-koleksiyon').className = `uppercase tracking-[0.4em] text-[10px] font-bold mb-2 italic ${veri.ozellik_renk}`;
-                document.getElementById('p-baslik1').innerText = veri.baslik1;
-                document.getElementById('p-baslik2').innerText = veri.baslik2;
+                document.getElementById('p-baslik1').innerText = veri.title;
+                document.getElementById('p-baslik2').innerText = veri.subtitle || '';
                 document.getElementById('p-baslik2').className = `italic ${veri.ozellik_renk}`;
-                document.getElementById('p-lokasyon').innerText = veri.lokasyon;
-                document.getElementById('p-ref').innerText = veri.refNo;
+                document.getElementById('p-lokasyon').innerText = veri.location;
+                document.getElementById('p-ref').innerText = veri.ref_no;
                 document.getElementById('p-icon-loc').className = `fa-solid fa-location-dot mr-2 text-left ${veri.ozellik_renk}`;
                 document.getElementById('p-dot1').className = `w-1 h-1 rounded-full text-left bg-${veri.ozellik_renk.split('-')[1]}`;
 
                 // Specs
-                document.getElementById('p-oda').innerText = veri.oda;
-                document.getElementById('p-alan').innerText = veri.alan;
-                document.getElementById('p-kat').innerText = veri.kat;
-                document.getElementById('p-fiyat').innerText = veri.fiyat;
+                document.getElementById('p-oda').innerText = veri.rooms;
+                document.getElementById('p-alan').innerText = veri.area;
+                document.getElementById('p-kat').innerText = veri.floor;
+                document.getElementById('p-fiyat').innerText = veri.price;
                 document.getElementById('p-fiyat').className = `text-fluid-2xl font-serif font-bold ${veri.ozellik_renk}`;
                 document.getElementById('p-icon-bed').className = `fa-solid fa-bed text-fluid-lg ${veri.ozellik_renk}`;
                 document.getElementById('p-icon-sq').className = `fa-solid fa-vector-square text-fluid-lg ${veri.ozellik_renk}`;
@@ -794,12 +794,13 @@
 
                 // Story
                 document.getElementById('p-line-story').className = `w-16 h-1 mb-10 text-left bg-${veri.ozellik_renk.split('-')[1]}`;
-                document.getElementById('p-hikaye').innerText = veri.hikaye;
-                document.getElementById('p-resim-hikaye').src = optimizeLuxuryImage(veri.resim_hikaye, 800);
+                document.getElementById('p-hikaye').innerText = veri.description;
+                document.getElementById('p-resim-hikaye').src = optimizeLuxuryImage(veri.image_story, 800);
 
                 // Features
                 const ozList = document.getElementById('p-ozellikler-list');
-                veri.ozellikler.forEach(oz => {
+                const features = Array.isArray(veri.features) ? veri.features : [];
+                features.forEach(oz => {
                     const li = document.createElement('li');
                     li.className = 'flex items-center gap-3';
                     li.innerHTML = `<i class="fa-solid fa-check ${veri.ozellik_renk}"></i> ${oz}`;
@@ -871,7 +872,7 @@
 
                 // === BENZER İLANLAR (Buna Bakanlar Buna da Baktı) ===
                 try {
-                    const allRes = await fetch(`/api/portfoyler?lang=${i18n.getLang()}`);
+                    const allRes = await fetch(`/api/v1/portfolios?lang=${i18n.getLang()}`);
                     if (allRes.ok) {
                         const allItems = await allRes.json();
                         const others = allItems.filter(item => item.id !== pId);
@@ -887,19 +888,19 @@
                             card.onclick = () => { window.location.href = `detay.html?id=${item.id}`; };
                             card.innerHTML = `
                                 <div class="relative h-64 overflow-hidden">
-                                    <img src="${item.resim_hero}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="${item.baslik1}">
+                                    <img src="${item.image_hero}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="${item.title}">
                                     <div class="absolute top-fluid-s left-fluid-s ${badgeBg} ${accentColor} text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-xl">Satılık</div>
                                     <div class="absolute bottom-0 left-0 right-0 p-fluid-m bg-gradient-to-t from-navy/80 to-transparent">
-                                        <span class="text-white font-serif font-bold text-fluid-2xl">${item.fiyat}</span>
+                                        <span class="text-white font-serif font-bold text-fluid-2xl">₺${item.price}</span>
                                     </div>
                                 </div>
                                 <div class="p-fluid-m">
-                                    <h3 class="font-bold text-navy text-fluid-xl group-hover:text-gold transition-colors mb-1 font-serif uppercase tracking-tight line-clamp-1">${item.baslik1} ${item.baslik2}</h3>
-                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-fluid-m">${item.lokasyon}</p>
+                                    <h3 class="font-bold text-navy text-fluid-xl group-hover:text-gold transition-colors mb-1 font-serif uppercase tracking-tight line-clamp-1">${item.title} ${item.subtitle || ''}</h3>
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-fluid-m">${item.location}</p>
                                     <div class="grid grid-cols-3 border-t border-gray-100 pt-fluid-m gap-fluid-s text-center">
-                                        <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Oda</span><span class="text-fluid-xs font-bold text-navy">${item.oda}</span></div>
-                                        <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Alan</span><span class="text-fluid-xs font-bold text-navy">${item.alan}</span></div>
-                                        <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Koleksiyon</span><span class="text-fluid-xs font-bold ${accentColor} uppercase">${item.koleksiyon.split(' ')[0]}</span></div>
+                                        <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Oda</span><span class="text-fluid-xs font-bold text-navy">${item.rooms}</span></div>
+                                        <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Alan</span><span class="text-fluid-xs font-bold text-navy">${item.area}</span></div>
+                                        <div class="flex flex-col"><span class="text-[8px] uppercase font-black text-gray-300 mb-1">Koleksiyon</span><span class="text-fluid-xs font-bold ${accentColor} uppercase">${(item.category || '').split(' ')[0]}</span></div>
                                     </div>
                                 </div>
                             `;
@@ -925,7 +926,7 @@
             }
 
             window.trackImzaEvent = function (type, meta = {}) {
-                fetch('/api/track', {
+                fetch('/api/v1/track', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

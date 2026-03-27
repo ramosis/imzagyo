@@ -396,7 +396,7 @@
             }, 800);
 
             try {
-                const response = await fetch('/api/ai/analyze-investor', {
+                const response = await fetch('/api/v1/ai/analyze-investor', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ choices })
@@ -442,7 +442,7 @@
             const notes = `AI Fırsat Rotası Analizi Bitti. \nBütçe: ${document.getElementById('budget-display').innerText}\nProfil Teşhisi: ${analysisResult.internal_data.diagnosis}\nMüzakere Taktiği: ${analysisResult.internal_data.tactic}\nÖnerilen Danışman Tipi: ${analysisResult.internal_data.agent}`;
 
             try {
-                await fetch('/api/leads', {
+                await fetch('/api/v1/leads', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

@@ -1,7 +1,7 @@
 flowchart TD
     %% === PROJECT GOALS ===
     %% Ultimate Goal: Türkiye'nin en teknolojik ve şeffaf gayrimenkul yönetim platformu olmak.
-    %% Current Goal: Faz 12 Denetim & Remediation tamamlandı. Kod yapısı ve güvenlik sıkılaştırıldı.
+    %% Current Goal: Faz 18 (Modüler Mimari) tamamlandı. Platform ölçeklenebilir ve kurumsal yapıya kavuştu.
 
     %% === START ===
     %% @project_start [start, closed, 2026-03-01, user]
@@ -89,6 +89,12 @@ flowchart TD
     %% @feature_audit_remediation [ai-task, closed, 2026-03-26, antigravity]
     feature_audit_remediation("Kapsamlı Denetim & Onarım<br/><sub>Kritik buglar (send_file), güvenlik<br/>bypassları ve route çakışmaları<br/>giderildi, şema hizalandı.</sub>")
 
+    %% @feature_dx_standardization [ai-task, closed, 2026-03-26, antigravity]
+    feature_dx_standardization("DX & Standartizasyon (Faz 13)<br/><sub>API İngilizce eşleşmesi yapıldı,<br/>PageService modülerliği getirildi,<br/>hata yönetimi ve cache optimize edildi.</sub>")
+
+    %% @feature_modular_migration [ai-task, closed, 2026-03-27, antigravity]
+    feature_modular_migration("Modüler Mimari Geçişi (Faz 18)<br/><sub>App Factory pattern, Auth modülü<br/>ayrımı ve shared/ core altyapısı<br/>başarıyla kuruldu ve test edildi.</sub>")
+
     %% === CONNECTIONS ===
     project_start --> feature_apt_mgmt
     feature_apt_mgmt --> feature_lmetrics_intent
@@ -114,13 +120,16 @@ flowchart TD
     testing_doc_ci_phase8 --> feature_unified_assistant
     feature_unified_assistant --> feature_analytics_deployment
     feature_analytics_deployment --> feature_audit_fix_phase11
+    feature_audit_fix_phase11 --> feature_portal_restoration
     feature_portal_restoration --> feature_audit_remediation
-    feature_audit_remediation -.-> ultimate_goal
+    feature_audit_remediation --> feature_dx_standardization
+    feature_dx_standardization --> feature_modular_migration
+    feature_modular_migration -.-> ultimate_goal
     goal_security -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        feature_audit_remediation
+        feature_modular_migration
     end
 
     %% === STYLES ===
@@ -151,9 +160,11 @@ flowchart TD
     style feature_audit_fix_phase11 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_portal_restoration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_audit_remediation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_dx_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_modular_migration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
     %% Recent node
-    style feature_audit_remediation fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style feature_modular_migration fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

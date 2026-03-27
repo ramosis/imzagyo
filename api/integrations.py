@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from database import get_db_connection
+from shared.database import get_db_connection
 import json
 
 integrations_bp = Blueprint('integrations', __name__)

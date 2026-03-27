@@ -3,7 +3,7 @@ Parties API Module
 Provides endpoints for managing contract parties (clients, sellers, etc.).
 """
 from flask import Blueprint, jsonify, request
-from database import get_db_connection
+from shared.database import get_db_connection
 
 parties_bp = Blueprint('parties', __name__, url_prefix='/api/parties')
 

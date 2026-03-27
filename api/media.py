@@ -2,7 +2,7 @@ import os
 import io
 from PIL import Image
 from flask import Blueprint, request, jsonify, current_app
-from database import get_db_connection
+from shared.database import get_db_connection
 from api.upload_service import upload_image_to_cloudinary
 from werkzeug.utils import secure_filename
 
@@ -149,7 +149,36 @@ def list_media_for_portfolio(portfolio_id):
     media = [dict(row) for row in rows]
     return jsonify(media), 200
 
-@media_bp.route('/api/media/<int:media_id>', methods=['DELETE'])
+@media_bp.route('/upload-image', methods=['POST'])
+def upload_image():
+    from modules.auth.service import AuthService # Use modular auth
+    user = AuthService.get_current_user()
+    if not user or user.get('role') not in ['admin', 'super_admin', 'broker', 'danisman']:
+        return jsonify({'error': 'Unauthorized - Management access required'}), 403
+
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image file provided'}), 400
+    
+    file = request.files['image']
+    if file.filename == '' or not allowed_file(file.filename):
+        return jsonify({'error': 'No selected file or type not allowed'}), 400
+        
+    if not file.content_type.startswith('image/'):
+        return jsonify({'error': 'Invalid mime-type. Only images are allowed.'}), 400
+
+    import time
+    from shared.extensions import db
+    filename = secure_filename(file.filename)
+    safe_filename = f"{int(time.time())}_{filename}"
+    filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], safe_filename)
+    file.save(filepath)
+    file_url = f"/uploads/{safe_filename}"
+    return jsonify({'url': file_url}), 200
+
+def uploaded_file(filename):
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
+
+@media_bp.route('/<int:media_id>', methods=['DELETE'])
 def delete_media(media_id):
     """Delete a media record."""
     # Note: Should ideally also delete from Cloudinary here

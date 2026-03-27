@@ -1,8 +1,8 @@
 
 from flask import Blueprint, request, jsonify
-from api.auth import login_required, circle_required
+from modules.auth.decorators import login_required, circle_required
 import sqlite3
-from database import DB_NAME, get_db_connection
+from shared.database import DB_NAME, get_db_connection
 
 valuation_bp = Blueprint('valuation', __name__)
 

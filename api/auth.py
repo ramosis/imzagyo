@@ -1,19 +1,21 @@
 from functools import wraps
 from flask import Blueprint, request, jsonify, g
-from database import get_db_connection
+from shared.database import get_db_connection
 import hashlib
 import jwt
 import os
 import datetime
 import bcrypt
-from extensions import limiter
+from shared.extensions import limiter
 
 auth_bp = Blueprint('auth', __name__)
 
 # Geliştirme ortamı için geçici bir JWT secret key. Prod. için .env'den alınmalıdır.
 JWT_SECRET = os.environ.get("JWT_SECRET")
 if not JWT_SECRET:
-    raise ValueError("HATA: JWT_SECRET ortam değişkeni (.env) tanımlanmamış!")
+    if os.environ.get("FLASK_ENV") == "production":
+        raise ValueError("HATA: JWT_SECRET ortam değişkeni (.env) tanımlanmamış!")
+    JWT_SECRET = "dev-secret-key-temporary"
 
 def hash_password(password):
     """Yeni oluşturulan şifreler için bcrypt kullanır."""
@@ -23,6 +25,9 @@ def hash_password(password):
 
 def verify_password(plain_password, stored_hash, user_id=None):
     """Şifre doğrulaması yapar ve eski tip SHA256 şifreleri anında bcrypt'e günceller."""
+    if not stored_hash or not plain_password:
+        return False
+        
     if stored_hash.startswith('$2b$') or stored_hash.startswith('$2a$') or stored_hash.startswith('$2y$'):
         try:
             return bcrypt.checkpw(plain_password.encode('utf-8'), stored_hash.encode('utf-8'))
@@ -52,7 +57,12 @@ PERMISSIONS = {
     'super_admin': ['*'],
     'broker': ['*'],
     'danisman': ['portfolio.view', 'portfolio.create', 'leads.view', 'leads.edit'],
-    'contractor': ['portfolio.view', 'projects.view'],
+    'employee': ['portfolio.view', 'leads.view'], # Asistan
+    'contractor': ['portfolio.view', 'projects.view'], # Muteahhit
+    'owner': ['portfolio.view'], # m_sahibi
+    'tenant': ['portfolio.view'], # kiraci
+    'partner': ['portfolio.view', 'projects.view'], # partner_ajans
+    'vip': ['portfolio.view'],
     'm_sahibi': ['portfolio.view'],
     'kiraci': ['portfolio.view'],
     'standart': ['portfolio.view']

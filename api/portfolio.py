@@ -4,12 +4,13 @@ import uuid
 import json
 import bleach
 from flask import Blueprint, request, jsonify, g
-from database import get_db
+from shared.database import get_db
 from api.ai import translate_content
 from api.utils import sanitize_input, sanitize_html
-from extensions import cache
+from shared.extensions import cache
 from .schemas import portfolio_schema, ValidationError
 from .auth import require_permission
+from shared.utils import api_error, invalidate_entity_cache
 
 portfolio_bp = Blueprint('portfolio', __name__)
 
@@ -122,9 +123,7 @@ def get_portfolio_cache_key():
 @portfolio_bp.route('', methods=['GET'])
 @cache.cached(timeout=300, key_prefix=get_portfolio_cache_key)
 def get_portfolios():
-    """
-    List all portfolios with role-based filtering and multi-lang support.
-    """
+    """List all portfolios (English Standardized)."""
     from .auth import get_current_user
     user = get_current_user()
     
@@ -135,31 +134,32 @@ def get_portfolios():
             rows = conn.execute('SELECT * FROM portfoyler').fetchall()
             
     lang = request.args.get('lang', 'tr').lower()
-    result = []
+    portfolios = []
     for row in rows:
         d = dict(row)
-        # Apply lang overrides
+        # Lang overrides (Internal logic still uses Turkish columns for now)
         if lang in ['en', 'ar']:
             for field in ['baslik1', 'baslik2', 'lokasyon', 'hikaye']:
                 override = d.get(f'{field}_{lang}')
                 if override: d[field] = override
         
+        # Handle features JSON
         if d.get('ozellikler'):
-            try: d['ozellikler'] = json.loads(d['ozellikler'])
-            except: pass
-        result.append(d)
+            try: d['ozellikler_arr'] = json.loads(d['ozellikler'])
+            except: d['ozellikler_arr'] = []
+            
+        portfolios.append(d)
         
-    return jsonify(result)
+    # Standardize to English using Schema
+    return jsonify(portfolio_schema.dump(portfolios, many=True))
 
 @portfolio_bp.route('/<id>', methods=['GET'])
 @cache.memoize(timeout=600)
 def get_portfolio(id):
-    """
-    Get a single portfolio by ID with multi-lang support.
-    """
+    """Get single portfolio (English Standardized)."""
     portfolio = PortfolioRepository.get_by_id(id)
     if not portfolio:
-        return jsonify({"error": "Portföy bulunamadı"}), 404
+        return api_error("NOT_FOUND", "Portfolio not found", status_code=404)
         
     d = dict(portfolio)
     lang = request.args.get('lang', 'tr').lower()
@@ -169,42 +169,79 @@ def get_portfolio(id):
             if override: d[field] = override
             
     if d.get('ozellikler'):
-        try: d['ozellikler'] = json.loads(d['ozellikler'])
-        except: pass
+        try: d['ozellikler_arr'] = json.loads(d['ozellikler'])
+        except: d['ozellikler_arr'] = []
         
-    return jsonify(d)
+    return jsonify(portfolio_schema.dump(d))
 
 @portfolio_bp.route('', methods=['POST'])
-@require_permission('portfolio.create')
-def add_portfolio():
+@require_permission('admin')
+def create_portfolio():
+    """
+    Create a new portfolio.
+    ---
+    parameters:
+      - in: body
+        name: body
+        schema:
+          $ref: '#/definitions/Portfolio'
+    responses:
+      201:
+        description: Portfolio created successfully
+    """
     try:
-        portfolio = PortfolioService.process_and_create(request.json)
-        return jsonify(portfolio), 201
+        validated_data = PortfolioService.process_and_create(request.json)
+        # Invalidate cache after creating a new portfolio
+        # TODO: This is a brute-force approach. A more targeted invalidation
+        # that respects the dynamic cache keys should be implemented.
+        invalidate_entity_cache('portfolio')
+        # Note: process_and_create returns a dict with 'id' if successful
+        return jsonify(validated_data), 201
     except ValidationError as err:
-        return jsonify({"error": "Geçersiz veri", "details": err.messages}), 400
+        return api_error("VALIDATION_ERROR", "Zorunlu alanlar eksik", details=err.messages, status_code=400)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return api_error("INTERNAL_ERROR", str(e), status_code=500)
 
 @portfolio_bp.route('/<id>', methods=['PUT'])
 @require_permission('portfolio.edit')
 def update_portfolio(id):
     user = g.user
     if not PortfolioService.can_manage_portfolio(user, id):
-        return jsonify({'error': 'Unauthorized - Owner only (Section 6.2)'}), 403
+        return api_error("FORBIDDEN", "Unauthorized - Owner only", status_code=403)
         
-    if PortfolioRepository.update(id, request.json):
-        cache.delete_memoized(get_portfolio, id) # Clear cache on update
-        return jsonify({'status': 'updated'}), 200
-    return jsonify({'error': 'Portföy bulunamadı'}), 404
+    try:
+        # Standardize update data through schema (Audit Section 6.2)
+        sanitized_data = sanitize_input(request.json)
+        # Use partial=True to allow individual field updates
+        update_data = portfolio_schema.load(sanitized_data, partial=True)
+        
+        # Manually handle AI summary fields if they are update candidates
+        target_fields = ['baslik1', 'baslik2', 'lokasyon', 'hikaye']
+        for field in target_fields:
+            if field in update_data:
+                source = update_data[field]
+                update_data[f'{field}_en'] = translate_content(source, 'İngilizce')
+                update_data[f'{field}_ar'] = translate_content(source, 'Arapça')
+
+        if PortfolioRepository.update(id, update_data):
+            cache.delete_memoized(get_portfolio, id)
+            cache.clear() # Invalidate lists
+            return jsonify({'status': 'updated'}), 200
+        return api_error("NOT_FOUND", "Portfolio not found", status_code=404)
+    except ValidationError as err:
+        return api_error("VALIDATION_ERROR", "Invalid update data", details=err.messages)
+    except Exception as e:
+        return api_error("SERVER_ERROR", str(e), status_code=500)
 
 @portfolio_bp.route('/<id>', methods=['DELETE'])
 @require_permission('portfolio.delete')
 def delete_portfolio(id):
     user = g.user
     if not PortfolioService.can_manage_portfolio(user, id):
-        return jsonify({'error': 'Unauthorized - Owner only (Section 6.2)'}), 403
+        return api_error("FORBIDDEN", "Unauthorized - Owner only", status_code=403)
 
     if PortfolioRepository.delete(id):
-        cache.delete_memoized(get_portfolio, id) # Clear cache on delete
+        cache.delete_memoized(get_portfolio, id)
+        cache.clear() # Invalidate lists
         return jsonify({"status": "deleted"}), 200
-    return jsonify({"error": "Portföy bulunamadı"}), 404
+    return api_error("NOT_FOUND", "Portfolio not found", status_code=404)

@@ -1,31 +1,33 @@
 import pytest
 import json
 
-def test_create_portfolio(client):
-    """Test creating a portfolio with sanitization check."""
-    # Master token might be needed if master auth is active
-    headers = {'Content-Type': 'application/json'}
-    
-    payload = {
-        'id': 'test-villa',
-        'baslik1': '<b>Danger</b> Villa',
-        'baslik2': 'Sanitized Subtitle',
-        'fiyat': '1000000',
-        'koleksiyon': 'Test'
+def test_create_and_get_portfolio_v1(client, admin_auth):
+    """Test full cycle of creating and retrieving a portfolio via V1 API (Standardized)."""
+    new_portfolio = {
+        "ref_no": "LUX-999",
+        "title": "Bozüyük Luxury Villa",
+        "listing_category": "Satılık",
+        "category": "Konut",
+        "price": 15000000.0,
+        "location": "Bozüyük, Bilecik",
+        "rooms": "5+2",
+        "area": "450 m²"
     }
     
-    # We ignore auth for now or use master token
-    response = client.post('/api/portfoyler', 
-                          json=payload,
-                          headers={'X-Master-Token': 'master-auth-token-123'}) # Mocked
+    # 1. Create
+    res_post = client.post('/api/v1/portfolios', 
+                           data=json.dumps(new_portfolio),
+                           content_type='application/json',
+                           headers=admin_auth)
+    assert res_post.status_code == 201
+    created_id = res_post.get_json()['id']
     
-    assert response.status_code in [201, 401] # 401 if auth is strictly enforced
-    
-    if response.status_code == 201:
-        data = response.get_json()
-        # Check sanitization
-        assert '<b>' not in data['baslik1']
-        assert 'Danger' in data['baslik1']
+    # 2. Get
+    res_get = client.get(f'/api/v1/portfolios/{created_id}', headers=admin_auth)
+    assert res_get.status_code == 200
+    data = res_get.get_json()
+    assert data['title'] == "Bozüyük Luxury Villa"
+    assert data['price'] == 15000000.0
 
 def test_get_portfolios(client):
     """Test listing portfolios."""

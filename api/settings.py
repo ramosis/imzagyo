@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from database import get_db_connection
+from shared.database import get_db_connection
 from api.auth import require_inner_circle
 
 settings_bp = Blueprint('settings_bp', __name__)

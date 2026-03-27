@@ -1,6 +1,6 @@
 
 from flask import Blueprint, request, jsonify
-from api.auth import login_required, require_permission
+from modules.auth.decorators import login_required, require_permission
 import datetime
 
 verification_bp = Blueprint('verification', __name__)

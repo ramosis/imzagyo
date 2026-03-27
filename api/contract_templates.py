@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from database import get_db_connection
+from shared.database import get_db_connection
 
 contract_templates_bp = Blueprint('contract_templates', __name__)
 

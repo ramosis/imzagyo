@@ -513,7 +513,7 @@
             }
 
             try {
-                const response = await fetch('/api/neighborhood/demands', {
+                const response = await fetch('/api/v1/neighborhoods/demands', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -544,7 +544,7 @@
             }
 
             try {
-                const response = await fetch('/api/neighborhood/businesses/register', {
+                const response = await fetch('/api/v1/neighborhoods/businesses/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -574,7 +574,7 @@
         // Fetch Regional Listings
         async function fetchRegionalListings() {
             try {
-                const response = await fetch('/api/neighborhood/listings?limit=3');
+                const response = await fetch('/api/v1/neighborhoods/listings?limit=3');
                 const listings = await response.json();
                 const container = document.getElementById('listing-container');
                 
@@ -586,16 +586,16 @@
                 container.innerHTML = listings.map(item => `
                     <div class="glass-card overflow-hidden rounded-[2rem] hover:shadow-2xl transition-all group">
                         <div class="relative h-64">
-                            <img src="${item.resim_hero}" alt="${item.baslik1}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="${item.image_hero}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-navy">İmza Seçimi</div>
                         </div>
                         <div class="p-8">
                             <div class="flex justify-between items-start mb-2">
-                                <span class="text-gold font-bold text-xs uppercase tracking-widest">${item.koleksiyon}</span>
-                                <span class="text-navy font-bold">${item.fiyat}</span>
+                                <span class="text-gold font-bold text-xs uppercase tracking-widest">${item.category}</span>
+                                <span class="text-navy font-bold">₺${item.price}</span>
                             </div>
-                            <h4 class="text-xl font-serif text-navy mb-4">${item.baslik1} ${item.baslik2}</h4>
-                            <p class="text-gray-400 text-sm mb-6 flex items-center"><i class="fa-solid fa-location-dot mr-2"></i> ${item.lokasyon}</p>
+                            <h4 class="text-xl font-serif text-navy mb-4">${item.title} ${item.subtitle || ''}</h4>
+                            <p class="text-gray-400 text-sm mb-6 flex items-center"><i class="fa-solid fa-location-dot mr-2"></i> ${item.location}</p>
                             <button onclick="window.location.href='/anasayfa'" class="w-full border border-navy/10 text-navy font-bold py-4 rounded-xl text-xs uppercase tracking-widest hover:bg-navy hover:text-white transition-all">İncele</button>
                         </div>
                     </div>
@@ -613,7 +613,7 @@
         async function fetchConciergeData() {
             try {
                 // Fetch Shuttle
-                const shuttleRes = await fetch('/api/neighborhood/shuttle');
+                const shuttleRes = await fetch('/api/v1/neighborhoods/shuttle');
                 const shuttleData = await shuttleRes.json();
                 document.getElementById('shuttle-list').innerHTML = shuttleData.map(s => `
                     <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5 hover:border-gold/30 transition-all">
@@ -632,7 +632,7 @@
                 `).join('');
 
                 // Fetch Facilities
-                const facilityRes = await fetch('/api/neighborhood/facilities');
+                const facilityRes = await fetch('/api/v1/neighborhoods/facilities');
                 const facilityData = await facilityRes.json();
                 document.getElementById('facility-list').innerHTML = facilityData.map(f => `
                     <button onclick="selectFacility('${f.id}', '${f.name}')" class="flex flex-col items-center justify-center p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-gold transition-all group">
@@ -678,7 +678,7 @@
         async function fetchPharmacies() {
             try {
                 // First try to fetch duty pharmacies dynamically scraped from Kütahya Eczacı Odası
-                const res = await fetch('/api/neighborhood/pharmacies/duty');
+                const res = await fetch('/api/v1/neighborhoods/pharmacies/duty');
                 const result = await res.json();
                 
                 let data = [];
@@ -690,7 +690,7 @@
                     }));
                 } else {
                     // Fallback to static businesses registered in the portal
-                    const fallbackRes = await fetch('/api/neighborhood/businesses?category=Eczane');
+                    const fallbackRes = await fetch('/api/v1/neighborhoods/businesses?category=Eczane');
                     data = await fallbackRes.json();
                 }
 
@@ -771,7 +771,7 @@
         // --- EXPENSES (ŞEFFAF KASA) ---
         async function fetchExpenses() {
             try {
-                const res = await fetch('/api/neighborhood/expenses');
+                const res = await fetch('/api/v1/neighborhoods/expenses');
                 const data = await res.json();
                 const container = document.getElementById('expense-list');
                 const totalEl = document.getElementById('total-expense');
@@ -810,7 +810,7 @@
         // --- POLLS (OYLAMA) ---
         async function fetchPolls() {
             try {
-                const res = await fetch('/api/neighborhood/polls');
+                const res = await fetch('/api/v1/neighborhoods/polls');
                 const data = await res.json();
                 const container = document.getElementById('poll-container');
                 document.getElementById('active-poll-count').innerText = data.length;
@@ -853,7 +853,7 @@
 
         async function castVote(pollId, option) {
             try {
-                const res = await fetch('/api/neighborhood/polls/vote', {
+                const res = await fetch('/api/v1/neighborhoods/polls/vote', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ poll_id: pollId, option: option })
@@ -871,7 +871,7 @@
         // Relocation Guide Logic
         async function fetchRelocationGuide() {
             try {
-                const response = await fetch('/api/neighborhood/relocation-guide');
+                const response = await fetch('/api/v1/neighborhoods/relocation-guide');
                 const data = await response.json();
                 const container = document.getElementById('relocation-checklist');
                 
@@ -915,7 +915,7 @@
         async function fetchManagementData() {
             try {
                 // Fetch My Unit
-                const unitRes = await fetch('/api/neighborhood/my-unit');
+                const unitRes = await fetch('/api/v1/neighborhoods/my-unit');
                 const unitData = await unitRes.json();
                 const unitContainer = document.getElementById('unit-info');
                 

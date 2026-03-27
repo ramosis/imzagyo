@@ -2,7 +2,7 @@ from flask import Blueprint, url_for, request, jsonify, redirect
 from authlib.integrations.flask_client import OAuth
 import os
 import secrets
-from database import get_db_connection
+from shared.database import get_db_connection
 from api.auth import JWT_SECRET, get_app_route_for_role, INNER_ROLES, hash_password
 import jwt
 

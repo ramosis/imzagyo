@@ -1,5 +1,5 @@
 from flask import Blueprint, Response, current_app
-from database import get_db_connection
+from shared.database import get_db_connection
 import datetime
 
 seo_bp = Blueprint('seo', __name__)

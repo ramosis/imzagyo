@@ -6,7 +6,7 @@ from .auth import require_inner_circle
 
 ai_bp = Blueprint('ai', __name__)
 
-@ai_bp.route('/api/generate-summary', methods=['POST'])
+@ai_bp.route('/generate-summary', methods=['POST'])
 @require_inner_circle
 def generate_summary():
     data = request.json
@@ -69,7 +69,7 @@ Metin:
         print(f"AI Çeviri Hatası ({target_lang}): {e}")
         return text
 
-@ai_bp.route('/api/ai/auto-translate-portfolio', methods=['POST'])
+@ai_bp.route('/auto-translate-portfolio', methods=['POST'])
 @require_inner_circle
 def auto_translate_portfolio():
     data = request.json
@@ -86,7 +86,7 @@ def auto_translate_portfolio():
 
 # --- STRATEJİK YATIRIMCI ANALİZİ (DUNNING-KRUGER SHADOW) ---
 
-@ai_bp.route('/api/ai/analyze-investor', methods=['POST'])
+@ai_bp.route('/analyze-investor', methods=['POST'])
 def analyze_investor():
     """
     Frontend'den gelen ham cevapları (A, B, C, D) analiz eder.
@@ -147,13 +147,13 @@ def analyze_investor():
         }
     }), 200
 
-@ai_bp.route('/api/ai/lead-insights/<int:id>', methods=['GET'])
+@ai_bp.route('/lead-insights/<int:id>', methods=['GET'])
 @require_inner_circle
 def lead_insights(id):
     """
     Belirli bir lead'in dijital ayak izlerini analiz eder ve AI özeti oluşturur.
     """
-    from database import get_db_connection
+    from shared.database import get_db_connection
     import json
 
     conn = get_db_connection()
