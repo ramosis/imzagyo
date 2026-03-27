@@ -125,12 +125,13 @@ flowchart TD
     feature_audit_remediation --> feature_dx_standardization
     feature_dx_standardization --> feature_modular_migration
     feature_modular_migration --> feature_modular_cleanup
-    feature_modular_cleanup -.-> ultimate_goal
+    feature_modular_cleanup --> feature_final_polish
+    feature_final_polish -.-> ultimate_goal
     goal_security -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        feature_modular_cleanup
+        feature_final_polish
     end
 
     %% === STYLES ===

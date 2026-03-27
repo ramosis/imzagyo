@@ -48,4 +48,15 @@ Thumbs.db
 desktop.ini
 docs/sunucu_rehberi.md
 Ollama-mcp/
-node_modules
+node_modules/
+dist/
+build/
+.next/
+
+# Test & Coverage
+.coverage
+htmlcov/
+test_output.txt
+test_auth_verification.txt
+test_coverage_output.txt
+api_calls_portal.txt
