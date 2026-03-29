@@ -10,7 +10,7 @@ class Contract(db.Model):
     status = db.Column(db.String(20), default='draft')  # draft, sent, signed, cancelled
     
     # İlişkili kayıtlar
-    property_id = db.Column(db.Integer, db.ForeignKey('portfoyler.id'), nullable=True)
+    property_id = db.Column(db.String(100), db.ForeignKey('portfoyler.id'), nullable=True)
     lead_id = db.Column(db.Integer, db.ForeignKey('leads.id'), nullable=True)
     
     # Taraflar

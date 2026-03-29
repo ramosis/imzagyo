@@ -168,7 +168,7 @@ def init_db():
             contract_number TEXT UNIQUE NOT NULL,
             contract_type TEXT NOT NULL,
             status TEXT DEFAULT 'draft',
-            property_id INTEGER,
+            property_id TEXT,
             lead_id INTEGER,
             landlord_id INTEGER,
             tenant_id INTEGER,
@@ -1125,7 +1125,7 @@ def doldur_ornek_veriler():
             contract_number, contract_type, property_id, price, 
             start_date, end_date, created_by, status
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', ('IMZ-2024-00001', 'kiralama', 1, 150000.0, '2024-01-01', '2025-01-01', 5, 'active'))
+    ''', ('IMZ-2024-00001', 'kiralama', 'bogaz-villa', 150000.0, '2024-01-01', '2025-01-01', 5, 'active'))
 
     # 4. REMAINING (Simplified for stability)
     cursor.execute("INSERT OR IGNORE INTO property_units (id, property_id, unit_number, floor, unit_type, area_sqm, status) VALUES (1, 'bogaz-villa', 'A-12', '1', 'Villa', 450.0, 'Dolu')")

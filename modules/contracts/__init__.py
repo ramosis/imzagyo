@@ -1,6 +1,1 @@
-from flask import Blueprint
-
-contracts_bp = Blueprint('contracts', __name__)
-
-# Import routes to register them with the blueprint
-from . import routes
+# Empty __init__.py for consistency with other modules.

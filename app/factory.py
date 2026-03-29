@@ -71,7 +71,7 @@ def create_app():
     from modules.legal import legal_bp
     from modules.automation import automation_bp
     from modules.integration import integration_bp
-    from modules.contracts import contracts_bp
+    from modules.contracts.routes import contracts_bp
     from modules.maintenance import maintenance_bp
     from modules.compass import compass_bp
     from modules.finance.tax_routes import finance_tax_bp
