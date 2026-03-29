@@ -6,7 +6,7 @@ from modules.contracts.repository import (
     ContractRepository, ContractTemplateRepository, PartyRepository
 )
 from modules.contracts.utils.pdf_generator import PDFGenerator
-from shared.notifications import send_email_notification
+from shared.mail_service import send_email
 
 class ContractService:
     @staticmethod
@@ -84,16 +84,10 @@ class ContractService:
         
         for party in parties:
             if party['email'] and send_method == 'email':
-                send_email_notification(
-                    to=party['email'],
+                send_email(
+                    recipient=party['email'],
                     subject=f"İmza Gerekiyor: Sözleşme #{contract['contract_number']}",
-                    template='contract_signature_request',
-                    data={
-                        'contract_number': contract['contract_number'],
-                        'party_name': party['full_name'],
-                        'sign_url': f"/contracts/sign/{contract_id}/party/{party['id']}"
-                    },
-                    attachments=[pdf_path]
+                    body_html=f"Merhaba {party['full_name']}, lütfen sözleşmeyi imzalayınız: /contracts/sign/{contract_id}/party/{party['id']}"
                 )
         
         ContractRepository.update(contract_id, {'status': 'sent'})

@@ -94,6 +94,12 @@ class ContractRepository:
             return cursor.rowcount > 0
     
     @staticmethod
+    def get_by_id(contract_id: int) -> Optional[Dict]:
+        with get_db_connection() as conn:
+            contract = conn.execute('SELECT * FROM contracts WHERE id = ?', (contract_id,)).fetchone()
+            return dict(contract) if contract else None
+
+    @staticmethod
     def generate_contract_number() -> str:
         """IMZ-2024-00001 formatında numara üret"""
         with get_db_connection() as conn:
