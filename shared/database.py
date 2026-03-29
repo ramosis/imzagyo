@@ -151,11 +151,71 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS contract_clauses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            template_id INTEGER NOT NULL,
-            clause_text TEXT NOT NULL,
-            is_mandatory BOOLEAN DEFAULT 0,
-            sort_order INTEGER DEFAULT 0,
-            FOREIGN KEY(template_id) REFERENCES contract_templates(id)
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            clause_type TEXT,
+            usage_count INTEGER DEFAULT 0,
+            is_active BOOLEAN DEFAULT 1,
+            created_by INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # 10. CONTRACTS & PARTIES (Section 3.10)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS contracts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            contract_number TEXT UNIQUE NOT NULL,
+            contract_type TEXT NOT NULL,
+            status TEXT DEFAULT 'draft',
+            property_id INTEGER,
+            lead_id INTEGER,
+            landlord_id INTEGER,
+            tenant_id INTEGER,
+            buyer_id INTEGER,
+            seller_id INTEGER,
+            price REAL NOT NULL,
+            currency TEXT DEFAULT 'TRY',
+            commission_rate REAL DEFAULT 0.0,
+            commission_amount REAL DEFAULT 0.0,
+            start_date TEXT,
+            end_date TEXT,
+            signing_date TEXT,
+            template_id INTEGER,
+            content TEXT,
+            content_json TEXT,
+            is_signed BOOLEAN DEFAULT 0,
+            signed_by_landlord BOOLEAN DEFAULT 0,
+            signed_by_tenant BOOLEAN DEFAULT 0,
+            signed_by_buyer BOOLEAN DEFAULT 0,
+            signed_by_seller BOOLEAN DEFAULT 0,
+            signature_data TEXT,
+            created_by INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS contract_clause_links (
+            contract_id INTEGER,
+            clause_id INTEGER,
+            PRIMARY KEY (contract_id, clause_id)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS prepared_contracts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            contract_id INTEGER NOT NULL,
+            pdf_path TEXT,
+            pdf_url TEXT,
+            status TEXT DEFAULT 'prepared',
+            sent_to TEXT,
+            sent_at TIMESTAMP,
+            viewed_at TIMESTAMP,
+            signed_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
 
@@ -163,14 +223,16 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS parties (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            tc_no TEXT UNIQUE,
-            vkn TEXT UNIQUE,
-            party_type TEXT NOT NULL CHECK(party_type IN ('individual', 'corporate')),
-            name TEXT NOT NULL,
+            contract_id INTEGER NOT NULL,
+            party_type TEXT NOT NULL,
+            full_name TEXT NOT NULL,
+            tc_no TEXT,
             phone TEXT,
             email TEXT,
             address TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            is_signed BOOLEAN DEFAULT 0,
+            signed_at TIMESTAMP,
+            signature_ip TEXT
         )
     ''')
 
@@ -351,22 +413,6 @@ def init_db():
     ''')
 
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS contracts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            property_id TEXT NOT NULL,
-            user_id INTEGER NOT NULL,
-            seller_id INTEGER,
-            buyer_id INTEGER,
-            contract_type TEXT,
-            special_conditions TEXT,
-            status TEXT DEFAULT 'draft',
-            start_date TEXT,
-            end_date TEXT,
-            type TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(property_id) REFERENCES portfoyler(id),
-            FOREIGN KEY(user_id) REFERENCES users(id),
-            FOREIGN KEY(seller_id) REFERENCES parties(id),
             FOREIGN KEY(buyer_id) REFERENCES parties(id)
         )
     ''')
@@ -1076,8 +1122,13 @@ def doldur_ornek_veriler():
 
     # 3. CONTRACTS (Dependent on Users & Portfoyler)
     # user_id 5 should be 'kiraci' if we inserted in order and it's a fresh DB
-    cursor.execute('INSERT OR IGNORE INTO contracts (property_id, user_id, start_date, end_date, type) VALUES (?, ?, ?, ?, ?)', 
-                   ('bogaz-villa', 5, '2024-01-01', '2025-01-01', 'Kira Sözleşmesi'))
+    # 10. CONTRACTS (Standardized)
+    cursor.execute('''
+        INSERT OR IGNORE INTO contracts (
+            contract_number, contract_type, property_id, price, 
+            start_date, end_date, created_by, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', ('IMZ-2024-00001', 'kiralama', 1, 150000.0, '2024-01-01', '2025-01-01', 5, 'active'))
 
     # 4. REMAINING (Simplified for stability)
     cursor.execute("INSERT OR IGNORE INTO property_units (id, property_id, unit_number, floor, unit_type, area_sqm, status) VALUES (1, 'bogaz-villa', 'A-12', '1', 'Villa', 450.0, 'Dolu')")

@@ -3,13 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <title>Kira Sözleşmesi - {{ contract_number }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .parties { margin: 20px 0; }
+        .party { margin: 15px 0; padding: 10px; background: #f5f5f5; }
+        .terms { margin: 30px 0; }
+        .signatures { margin-top: 50px; page-break-inside: avoid; }
+        .signature-line { margin: 30px 0; border-top: 1px solid #333; width: 300px; }
+    </style>
 </head>
 <body>
-    <h1>KİRA SÖZLEŞMESİ</h1>
-    <p>Sözleşme No: {{ contract_number }}</p>
-    <p>Mülk: {{ property_address }}</p>
-    <p>Bedel: {{ price }} {{ currency }}</p>
-    <p>Başlangıç: {{ start_date }}</p>
-    <p>Bitiş: {{ end_date }}</p>
+    <div class="header">
+        <h1>KİRA SÖZLEŞMESİ</h1>
+        <p>Sözleşme No: {{ contract_number }}</p>
+        <p>Tarih: {{ start_date }}</p>
+    </div>
+
+    <div class="parties">
+        <h2>TARAFLAR</h2>
+        
+        <div class="party">
+            <h3>KİRAYA VEREN</h3>
+            <p><strong>Ad Soyad:</strong> {{ landlord_name }}</p>
+            <p><strong>TC No:</strong> {{ landlord_tc }}</p>
+            <p><strong>Telefon:</strong> {{ landlord_phone }}</p>
+            <p><strong>Adres:</strong> {{ landlord_address }}</p>
+        </div>
+
+        <div class="party">
+            <h3>KİRACI</h3>
+            <p><strong>Ad Soyad:</strong> {{ tenant_name }}</p>
+            <p><strong>TC No:</strong> {{ tenant_tc }}</p>
+            <p><strong>Telefon:</strong> {{ tenant_phone }}</p>
+            <p><strong>Adres:</strong> {{ tenant_address }}</p>
+        </div>
+    </div>
+
+    <div class="terms">
+        <h2>SÖZLEŞME KONUSU</h2>
+        <p>Adres: {{ property_address }}</p>
+        <p>Kira Bedeli: {{ price }} {{ currency }}/ay</p>
+        <p>Depozito: {{ deposit }} {{ currency }}</p>
+        <p>Sözleşme Süresi: {{ start_date }} - {{ end_date }}</p>
+        
+        <h2>ÖZEL ŞARTLAR</h2>
+        <p>{{ custom_clauses }}</p>
+    </div>
+
+    <div class="signatures">
+        <h2>İMZALAR</h2>
+        <p>Yukarıdaki şartları kabul ederek imzaları atılmıştır.</p>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 50px;">
+            <div>
+                <p><strong>Kiraya Veren</strong></p>
+                <div class="signature-line"></div>
+                <p>{{ landlord_name }}</p>
+            </div>
+            <div>
+                <p><strong>Kiracı</strong></p>
+                <div class="signature-line"></div>
+                <p>{{ tenant_name }}</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 50px;">
+            <p><strong>Danışman</strong></p>
+            <div class="signature-line"></div>
+            <p>{{ agent_name }} - İmza Gayrimenkul</p>
+        </div>
+    </div>
 </body>
 </html>

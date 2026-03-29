@@ -5,6 +5,8 @@ from jinja2 import Template
 from modules.contracts.repository import (
     ContractRepository, ContractTemplateRepository, PartyRepository
 )
+from modules.contracts.utils.pdf_generator import PDFGenerator
+from shared.notifications import send_email_notification
 
 class ContractService:
     @staticmethod
@@ -37,6 +39,11 @@ class ContractService:
         for party in data.get('parties', []):
             PartyRepository.create(contract_id, party)
         
+        # Komisyon hesapla
+        if data.get('commission_rate'):
+            commission = data['price'] * (data['commission_rate'] / 100)
+            ContractRepository.update(contract_id, {'commission_amount': commission})
+        
         return {
             'id': contract_id,
             'contract_number': contract_number,
@@ -51,10 +58,91 @@ class ContractService:
     
     @staticmethod
     def generate_pdf(contract_id: int) -> str:
-        """Sözleşmeyi PDF'e dönüştür (Simulated for now)"""
+        """Sözleşmeyi PDF'e dönüştür"""
         contract = ContractRepository.get_by_id(contract_id)
         if not contract:
             raise ValueError("Contract not found")
         
-        # Gerçek PDF kütüphanesi (pdfkit/reportlab) eklenebilir
-        return f"contracts/pdf/{contract['contract_number']}.pdf"
+        parties = PartyRepository.get_by_contract(contract_id)
+        
+        # PDF oluştur
+        pdf_path = PDFGenerator.generate(
+            content=contract['content'],
+            contract_number=contract['contract_number'],
+            parties=parties
+        )
+        
+        return pdf_path
+    
+    @staticmethod
+    def send_for_signature(contract_id: int, send_method: str = 'email') -> bool:
+        """Sözleşmeyi imzaya gönder"""
+        contract = ContractRepository.get_by_id(contract_id)
+        parties = PartyRepository.get_by_contract(contract_id)
+        
+        pdf_path = ContractService.generate_pdf(contract_id)
+        
+        for party in parties:
+            if party['email'] and send_method == 'email':
+                send_email_notification(
+                    to=party['email'],
+                    subject=f"İmza Gerekiyor: Sözleşme #{contract['contract_number']}",
+                    template='contract_signature_request',
+                    data={
+                        'contract_number': contract['contract_number'],
+                        'party_name': party['full_name'],
+                        'sign_url': f"/contracts/sign/{contract_id}/party/{party['id']}"
+                    },
+                    attachments=[pdf_path]
+                )
+        
+        ContractRepository.update(contract_id, {'status': 'sent'})
+        return True
+    
+    @staticmethod
+    def sign_contract(contract_id: int, party_id: int, signature_data: Dict[str, Any]) -> bool:
+        """Sözleşmeyi imzala"""
+        # Tarafı imzala
+        PartyRepository.sign(party_id, signature_data)
+        
+        # Sözleşme durumunu güncelle
+        parties = PartyRepository.get_by_contract(contract_id)
+        all_signed = all(p['is_signed'] for p in parties)
+        
+        if all_signed:
+            ContractRepository.update(contract_id, {
+                'status': 'signed',
+                'is_signed': True,
+                'signing_date': datetime.utcnow().isoformat()
+            })
+            
+            # Bildirim gönder
+            contract = ContractRepository.get_by_id(contract_id)
+            # ... başarılı imza bildirimi
+        
+        return True
+    
+    @staticmethod
+    def calculate_commission(price: float, commission_type: str = 'standard') -> Dict[str, float]:
+        """Komisyon hesapla"""
+        rates = {
+            'standard': 0.03,      # %3
+            'premium': 0.025,      # %2.5
+            'enterprise': 0.02,    # %2
+            'kiralama': 1.0        # 1 kira bedeli
+        }
+        
+        rate = rates.get(commission_type, 0.03)
+        
+        if commission_type == 'kiralama':
+            # Kiralama için 1 aylık kira
+            commission = price
+        else:
+            commission = price * rate
+        
+        return {
+            'price': price,
+            'commission_rate': rate * 100 if commission_type != 'kiralama' else 100,
+            'commission_amount': commission,
+            'net_to_owner': price - commission if commission_type != 'kiralama' else price
+        }

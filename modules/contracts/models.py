@@ -13,7 +13,7 @@ class Contract(db.Model):
     property_id = db.Column(db.Integer, db.ForeignKey('portfoyler.id'), nullable=True)
     lead_id = db.Column(db.Integer, db.ForeignKey('leads.id'), nullable=True)
     
-    # Taraflar (Contacts modülünden)
+    # Taraflar
     landlord_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=True)
     tenant_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=True)
     buyer_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=True)
@@ -37,6 +37,10 @@ class Contract(db.Model):
     
     # E-imza
     is_signed = db.Column(db.Boolean, default=False)
+    signed_by_landlord = db.Column(db.Boolean, default=False)
+    signed_by_tenant = db.Column(db.Boolean, default=False)
+    signed_by_buyer = db.Column(db.Boolean, default=False)
+    signed_by_seller = db.Column(db.Boolean, default=False)
     signature_data = db.Column(db.JSON)  # E-imza verileri
     
     # Meta
@@ -44,8 +48,13 @@ class Contract(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    # İlişkiler
+    template = db.relationship('ContractTemplate', backref='contracts')
+    clauses = db.relationship('ContractClause', secondary='contract_clause_links', backref='contracts')
+    
     def __repr__(self):
         return f'<Contract {self.contract_number}>'
+
 
 class ContractTemplate(db.Model):
     __tablename__ = 'contract_templates'
@@ -66,6 +75,62 @@ class ContractTemplate(db.Model):
     # Meta
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<ContractTemplate {self.name}>'
+
+
+class ContractClause(db.Model):
+    __tablename__ = 'contract_clauses'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    clause_type = db.Column(db.String(50))  # zorunlu, opsiyonel, ozel
+    
+    # Kullanım
+    usage_count = db.Column(db.Integer, default=0)
+    is_active = db.Column(db.Boolean, default=True)
+    
+    # Meta
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<ContractClause {self.title}>'
+
+
+# Many-to-many ilişki tablosu
+contract_clause_links = db.Table('contract_clause_links',
+    db.Column('contract_id', db.Integer, db.ForeignKey('contracts.id'), primary_key=True),
+    db.Column('clause_id', db.Integer, db.ForeignKey('contract_clauses.id'), primary_key=True)
+)
+
+
+class PreparedContract(db.Model):
+    __tablename__ = 'prepared_contracts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    contract_id = db.Column(db.Integer, db.ForeignKey('contracts.id'), nullable=False)
+    
+    # PDF dosyası
+    pdf_path = db.Column(db.String(500))
+    pdf_url = db.Column(db.String(500))
+    
+    # Durum
+    status = db.Column(db.String(20), default='prepared')  # prepared, sent, viewed, signed
+    
+    # Gönderim
+    sent_to = db.Column(db.JSON)  # Email adresleri
+    sent_at = db.Column(db.DateTime)
+    viewed_at = db.Column(db.DateTime)
+    signed_at = db.Column(db.DateTime)
+    
+    # Meta
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    contract = db.relationship('Contract', backref='prepared_versions')
+
 
 class Party(db.Model):
     __tablename__ = 'parties'
