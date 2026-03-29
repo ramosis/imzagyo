@@ -24,7 +24,7 @@ eventlet
 pytest
 pytest-flask
 pytest-cov
-marshmallow
+marshmallow>=3.0.0
 beautifulsoup4
 pdfkit
 html5lib

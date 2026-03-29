@@ -5,8 +5,7 @@ from datetime import datetime, timedelta
 def test_create_contract(client, admin_auth):
     """Sözleşme oluşturma testi"""
     data = {
-        'contract_type': 'kiralama',
-        'property_id': 1,
+        'property_id': 'bogaz-villa',
         'price': 5000.0,
         'currency': 'TRY',
         'commission_rate': 3.0,

@@ -6,7 +6,7 @@ class LeadSchema(Schema):
     phone = fields.Str(required=True)
     email = fields.Email(required=False, allow_none=True)
     source = fields.Str(dump_default="portal")
-    interest_property_id = fields.Int(required=False, allow_none=True)
+    interest_property_id = fields.Str(required=False, allow_none=True)
     assigned_user_id = fields.Int(required=False, allow_none=True)
     status = fields.Str(dump_default="new")
     notes = fields.Str(required=False, allow_none=True)
@@ -47,7 +47,7 @@ class UserSchema(Schema):
 
 class ContractCreateSchema(Schema):
     contract_type = fields.Str(required=True, validate=validate.OneOf(['kiralama', 'satis', 'komisyon']))
-    property_id = fields.Int(required=False, allow_none=True)
+    property_id = fields.Str(required=False, allow_none=True)
     lead_id = fields.Int(required=False, allow_none=True)
     price = fields.Float(required=True)
     currency = fields.Str(dump_default="TRY")
