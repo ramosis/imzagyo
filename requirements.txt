@@ -24,3 +24,6 @@ eventlet
 pytest
 pytest-flask
 pytest-cov
+beautifulsoup4
+pdfkit
+html5lib
