@@ -7,7 +7,7 @@ from modules.contracts.repository import ContractRepository, PartyRepository
 from modules.auth.decorators import login_required, require_permission
 from shared.schemas import contract_schema, ContractCreateSchema
 
-contracts_bp = Blueprint('contracts', __name__)
+from . import contracts_bp
 
 @contracts_bp.route('/', methods=['GET'])
 @login_required
