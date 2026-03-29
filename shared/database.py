@@ -9,10 +9,16 @@ import hashlib
 import bcrypt
 from contextlib import contextmanager
 
-DB_NAME = "data/imza_database.db"
+DB_URL = os.environ.get("DATABASE_URL", "data/imza_database.db")
+# Normalize path (remove sqlite:/// used in CI)
+DB_NAME = DB_URL.replace("sqlite:///", "").replace("sqlite://", "")
+if not DB_NAME or DB_NAME == ":memory:":
+    DB_NAME = ":memory:"
 
 def get_db_connection():
     """Returns a sqlite3 connection object with row_factory set to Row."""
+    if DB_NAME != ":memory:":
+        os.makedirs(os.path.dirname(DB_NAME), exist_ok=True)
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
@@ -143,7 +149,11 @@ def init_db():
         CREATE TABLE IF NOT EXISTS contract_templates (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL UNIQUE,
-            description TEXT
+            contract_type TEXT NOT NULL,
+            description TEXT,
+            html_template TEXT NOT NULL,
+            is_active BOOLEAN DEFAULT 1,
+            is_default BOOLEAN DEFAULT 0
         )
     ''')
 
@@ -1116,6 +1126,12 @@ def doldur_ornek_veriler():
             INSERT OR IGNORE INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, danisman_isim, danisman_unvan, danisman_resim)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (p['id'], p['koleksiyon'], p['baslik1'], p['baslik2'], p['lokasyon'], p['refNo'], p['fiyat'], p['oda'], p['alan'], p['kat'], p['ozellik_renk'], p['bg_renk'], p['btn_renk'], p['icon_renk'], p['resim_hero'], p['resim_hikaye'], p['hikaye'], p['ozellikler'], p['danisman_isim'], p['danisman_unvan'], p['danisman_resim']))
+
+    # 1.5 CONTRACT TEMPLATES (Crucial for service logic)
+    cursor.execute('''
+        INSERT OR IGNORE INTO contract_templates (name, contract_type, html_template, is_default)
+        VALUES (?, ?, ?, ?)
+    ''', ('Standart Kiralama', 'kiralama', '<h1>Kiralama Sözleşmesi</h1><p>Mülk: {{ property_id }}</p>', 1))
 
     # 3. CONTRACTS (Dependent on Users & Portfoyler)
     # user_id 5 should be 'kiraci' if we inserted in order and it's a fresh DB
