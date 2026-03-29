@@ -412,10 +412,7 @@ def init_db():
         )
     ''')
 
-    cursor.execute('''
-            FOREIGN KEY(buyer_id) REFERENCES parties(id)
-        )
-    ''')
+    # DEPRECATED: contracts table is now handled in Section 3.10 above.
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS taxes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
