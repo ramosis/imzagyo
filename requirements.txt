@@ -29,4 +29,3 @@ beautifulsoup4
 pdfkit
 html5lib
 requests
-marshmallow-sqlalchemy
