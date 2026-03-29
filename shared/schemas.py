@@ -45,6 +45,26 @@ class UserSchema(Schema):
     email = fields.Email(required=False, allow_none=True)
     is_active = fields.Bool(dump_default=True)
 
+class ContractCreateSchema(Schema):
+    contract_type = fields.Str(required=True, validate=validate.OneOf(['kiralama', 'satis', 'komisyon']))
+    property_id = fields.Int(required=False, allow_none=True)
+    lead_id = fields.Int(required=False, allow_none=True)
+    price = fields.Float(required=True)
+    currency = fields.Str(dump_default="TRY")
+    commission_rate = fields.Float(required=False)
+    start_date = fields.Str(required=False)
+    end_date = fields.Str(required=False)
+    parties = fields.List(fields.Dict(), required=False)
+
+class ContractSchema(Schema):
+    id = fields.Int(dump_only=True)
+    contract_number = fields.Str(dump_only=True)
+    contract_type = fields.Str(dump_only=True)
+    status = fields.Str(dump_only=True)
+    price = fields.Float()
+    currency = fields.Str()
+    created_at = fields.DateTime(dump_only=True)
+
 # Instances for easy access
 lead_schema = LeadSchema()
 leads_schema = LeadSchema(many=True)
@@ -54,3 +74,5 @@ hero_schema = HeroSchema()
 heros_schema = HeroSchema(many=True)
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+contract_schema = ContractSchema()
+contracts_schema = ContractSchema(many=True)

@@ -7,7 +7,7 @@ from shared.database import get_db_connection
 from shared.extensions import limiter
 from shared.utils import sanitize_input
 from shared.schemas import user_schema, ValidationError
-from .service import AuthService, INNER_ROLES, JWT_SECRET
+from .service import AuthService, INNER_ROLES, get_jwt_secret
 from .repository import UserRepository
 from .decorators import require_permission, login_required, require_inner_circle
 
@@ -76,7 +76,7 @@ def mobile_login():
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=30)
     }
     
-    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
     
     return jsonify({
         'token': token, 
@@ -218,7 +218,7 @@ def authorize(provider):
         'username': user['username'],
         'role': user_role,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
-    }, JWT_SECRET, algorithm="HS256")
+    }, get_jwt_secret(), algorithm="HS256")
     
     return redirect(f"/?login_success=1&token={token}&role={user_role}")
 

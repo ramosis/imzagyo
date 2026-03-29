@@ -90,6 +90,14 @@ def init_db():
             resim_hero TEXT,
             resim_hikaye TEXT,
             hikaye TEXT,
+            baslik1_en TEXT,
+            baslik1_ar TEXT,
+            baslik2_en TEXT,
+            baslik2_ar TEXT,
+            lokasyon_en TEXT,
+            lokasyon_ar TEXT,
+            hikaye_en TEXT,
+            hikaye_ar TEXT,
             ozellikler TEXT, -- JSON formatında liste
             danisman_isim TEXT,
             danisman_unvan TEXT,
@@ -111,6 +119,13 @@ def init_db():
         cursor.execute('ALTER TABLE portfoyler ADD COLUMN owner_id INTEGER REFERENCES users(id)')
     except sqlite3.OperationalError:
         pass # Kolonlar zaten eklenmişse hatayı yoksay
+
+    # Dil Sütunları
+    for col in ['baslik1_en', 'baslik1_ar', 'baslik2_en', 'baslik2_ar', 'lokasyon_en', 'lokasyon_ar', 'hikaye_en', 'hikaye_ar']:
+        try:
+            cursor.execute(f'ALTER TABLE portfoyler ADD COLUMN {col} TEXT')
+        except sqlite3.OperationalError:
+            pass
 
     # Pipeline Aşamaları
     cursor.execute('''

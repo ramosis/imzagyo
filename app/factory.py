@@ -70,9 +70,11 @@ def create_app():
     from modules.ai import ai_bp
     from modules.legal import legal_bp
     from modules.automation import automation_bp
-    from modules.integrations import integrations_bp # NEW
-    from modules.maintenance import maintenance_bp # NEW
-    from modules.compass import compass_bp # NEW
+    from modules.integration import integration_bp
+    from modules.contracts import contracts_bp
+    from modules.maintenance import maintenance_bp
+    from modules.compass import compass_bp
+    from modules.finance.tax_routes import finance_tax_bp
     from modules.auth.service import setup_oauth
     
     setup_oauth(app)
@@ -86,9 +88,11 @@ def create_app():
     app.register_blueprint(ai_bp, url_prefix='/api/v1/ai')
     app.register_blueprint(legal_bp, url_prefix='/api/v1/legal')
     app.register_blueprint(automation_bp, url_prefix='/api/v1/automation')
-    app.register_blueprint(integrations_bp, url_prefix='/api/v1/integrations')
+    app.register_blueprint(integration_bp, url_prefix='/api/v1/integration')
+    app.register_blueprint(contracts_bp, url_prefix='/api/v1/contracts')
     app.register_blueprint(maintenance_bp, url_prefix='/api/v1/maintenance')
     app.register_blueprint(compass_bp, url_prefix='/api/v1/compass')
+    app.register_blueprint(finance_tax_bp, url_prefix='/api/v1/finance/tax')
     
     # Local File Serving (Legacy Fallback)
     @app.route('/uploads/<path:filename>')

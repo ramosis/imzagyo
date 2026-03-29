@@ -7,7 +7,8 @@ from flask import request, jsonify, g
 from shared.database import get_db_connection
 from shared.extensions import limiter
 
-JWT_SECRET = os.environ.get("JWT_SECRET")
+def get_jwt_secret():
+    return os.environ.get("JWT_SECRET", "dev-secret-key")
 
 # Permission Map
 PERMISSIONS = {
@@ -67,7 +68,7 @@ class AuthService:
         if token.startswith('Bearer ey'):
             jwt_token = token.split(' ')[1]
             try:
-                payload = jwt.decode(jwt_token, JWT_SECRET, algorithms=["HS256"])
+                payload = jwt.decode(jwt_token, get_jwt_secret(), algorithms=["HS256"])
                 user_id = payload.get('user_id')
                 if user_id:
                     with get_db_connection() as conn:

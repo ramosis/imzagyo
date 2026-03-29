@@ -45,7 +45,7 @@ def runner(app):
 def admin_auth(app):
     import jwt
     import datetime
-    from modules.auth.service import JWT_SECRET
+    from modules.auth.service import get_jwt_secret
     
     payload = {
         'user_id': 1,
@@ -55,5 +55,5 @@ def admin_auth(app):
         'app_route': 'both',
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     }
-    token = jwt.encode(payload, JWT_SECRET or 'test-jwt-secret', algorithm="HS256")
+    token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
     return {'Authorization': f'Bearer {token}'}

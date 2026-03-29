@@ -1,7 +1,7 @@
 flowchart TD
     %% === PROJECT GOALS ===
     %% Ultimate Goal: Türkiye'nin en teknolojik ve şeffaf gayrimenkul yönetim platformu olmak.
-    %% Current Goal: Faz 18 (Modüler Mimari) tamamlandı. Platform ölçeklenebilir ve kurumsal yapıya kavuştu.
+    %% Current Goal: Faz 20 (Sözleşme & Standartizasyon) tamamlandı. Tüm modüller Service/Repo yapısında.
 
     %% === START ===
     %% @project_start [start, closed, 2026-03-01, user]
@@ -95,6 +95,9 @@ flowchart TD
     %% @feature_modular_migration [ai-task, closed, 2026-03-27, antigravity]
     feature_modular_migration("Modüler Mimari Geçişi (Faz 18)<br/><sub>App Factory pattern, Auth modülü<br/>ayrımı ve shared/ core altyapısı<br/>başarıyla kuruldu ve test edildi.</sub>")
 
+    %% @feature_phase20_standardization [ai-task, closed, 2026-03-29, antigravity]
+    feature_phase20_standardization("Sözleşme & Standartizasyon (Faz 20)<br/><sub>Contracts modülü kuruldu,<br/>tüm domainler Service/Repo<br/>yapısına çekildi ve verifiye edildi.</sub>")
+
     %% === CONNECTIONS ===
     project_start --> feature_apt_mgmt
     feature_apt_mgmt --> feature_lmetrics_intent
@@ -124,14 +127,14 @@ flowchart TD
     feature_portal_restoration --> feature_audit_remediation
     feature_audit_remediation --> feature_dx_standardization
     feature_dx_standardization --> feature_modular_migration
-    feature_modular_migration --> feature_modular_cleanup
-    feature_modular_cleanup --> feature_final_polish
+    feature_modular_migration --> feature_phase20_standardization
+    feature_phase20_standardization --> feature_final_polish
     feature_final_polish -.-> ultimate_goal
     goal_security -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        feature_final_polish
+        feature_phase20_standardization
     end
 
     %% === STYLES ===
@@ -164,9 +167,10 @@ flowchart TD
     style feature_audit_remediation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_dx_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_modular_migration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-
+    style feature_phase20_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    
     %% Recent node
-    style feature_modular_migration fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style feature_phase20_standardization fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
