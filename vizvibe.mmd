@@ -96,7 +96,13 @@ flowchart TD
     feature_modular_migration("Modüler Mimari Geçişi (Faz 18)<br/><sub>App Factory pattern, Auth modülü<br/>ayrımı ve shared/ core altyapısı<br/>başarıyla kuruldu ve test edildi.</sub>")
 
     %% @feature_phase20_standardization [ai-task, closed, 2026-03-29, antigravity]
-    feature_phase20_standardization("Sözleşme & Standartizasyon (Faz 20)<br/><sub>Contracts modülü kuruldu,<br/>tüm domainler Service/Repo<br/>yapısına çekildi ve verifiye edildi.</sub>")
+    feature_phase20_standardization("Sözleşme & Modüler Standartizasyon<br/><sub>Contracts modülü kuruldu, tüm domainler<br/>Service/Repo yapısına çekildi.<br/>Mimari tutarlılık %100 sağlandı.</sub>")
+
+    %% @feature_ci_recovery [ai-task, closed, 2026-03-29, antigravity]
+    feature_ci_recovery("CI/CD Recovery & Hardening<br/><sub>ImportError'lar giderildi, URI formatı<br/>(SQLAlchemy->SQLite) normalize edildi<br/>ve test collection hataları çözüldü.</sub>")
+
+    %% @feature_dynamic_storage [ai-task, closed, 2026-03-29, antigravity]
+    feature_dynamic_storage("Dinamik Depolama & Ayarlar<br/><sub>Esnek StorageManager (Local/Drive/Cloud),<br/>Yönetim Paneli Ayar API'sı ve<br/>system_settings tablosu eklendi.</sub>")
 
     %% === CONNECTIONS ===
     project_start --> feature_apt_mgmt
@@ -128,13 +134,15 @@ flowchart TD
     feature_audit_remediation --> feature_dx_standardization
     feature_dx_standardization --> feature_modular_migration
     feature_modular_migration --> feature_phase20_standardization
-    feature_phase20_standardization --> feature_final_polish
+    feature_phase20_standardization --> feature_ci_recovery
+    feature_ci_recovery --> feature_dynamic_storage
+    feature_dynamic_storage --> feature_final_polish
     feature_final_polish -.-> ultimate_goal
     goal_security -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        feature_phase20_standardization
+        feature_dynamic_storage
     end
 
     %% === STYLES ===
@@ -168,11 +176,11 @@ flowchart TD
     style feature_dx_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_modular_migration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_phase20_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style fix_ci_dependencies fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    
+    style feature_ci_recovery fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_dynamic_storage fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+
     %% Recent node
-    style feature_phase20_standardization fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
-    style fix_ci_dependencies fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style feature_dynamic_storage fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

@@ -557,6 +557,21 @@ def init_db():
 
     # (contract_templates and clauses moved/consolidated)
 
+        -- System Settings Table for configurable options
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS system_settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL,
+                category TEXT,
+                description TEXT,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        -- Seed default storage settings
+        cursor.execute("INSERT OR IGNORE INTO system_settings (key, value, category, description) VALUES ('storage_provider', 'local', 'storage', 'Provider for file storage (local, drive, cloud)')")
+        cursor.execute("INSERT OR IGNORE INTO system_settings (key, value, category, description) VALUES ('upload_path', 'static/uploads/contracts', 'storage', 'Base path for contract related uploads')")
+
 
     # (parties table moved to top)
 
