@@ -8,11 +8,13 @@ from flasgger import Swagger
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 import structlog
+from dotenv import load_dotenv
 
 from shared.extensions import db, cache, limiter, babel, csrf, socketio
 from shared.database import init_db, doldur_ornek_veriler
 
 def create_app():
+    load_dotenv()
     app = Flask(__name__, template_folder='../pages', static_folder='../static')
     
     # Configuration
@@ -110,11 +112,6 @@ def create_app():
     app.register_blueprint(compass_bp, url_prefix='/api/v1/compass')
     app.register_blueprint(finance_tax_bp, url_prefix='/api/v1/finance/tax')
     
-    # Local File Serving (Legacy Fallback)
-    @app.route('/uploads/<path:filename>')
-    def serve_uploads(filename):
-        from flask import send_from_directory
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     # Initialize DB
     with app.app_context():

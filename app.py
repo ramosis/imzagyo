@@ -1,19 +1,18 @@
 """ 
-Main Application Entry Point
-Uses the Application Factory pattern to initialize the Flask app.
+İmza Gayrimenkul - Main Application Entry Point
+Uygulama artık tam App Factory pattern kullanıyor.
 """
-import os
-from dotenv import load_dotenv
 from app.factory import create_app
 from shared.extensions import socketio
+import os
 
-# Load environment variables
-load_dotenv()
-
-# Create application instance
+# Uygulama instance'ını oluştur (load_dotenv içeride çalışır)
 app = create_app()
 
 if __name__ == '__main__':
-    # Flask sunucusunu başlat (Docker için 0.0.0.0'a bağlamak şart)
+    # Çalışma zamanı ayarlarını çevresel değişkenlerden al
     is_debug = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
-    socketio.run(app, debug=is_debug, host='0.0.0.0', port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    
+    # Sunucuyu başlat
+    socketio.run(app, debug=is_debug, host='0.0.0.0', port=port)

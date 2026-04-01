@@ -37,7 +37,7 @@ def admin_analytics_page():
 def mls_page():
     return send_from_directory('pages', 'mls.html')
 
-@main_bp.route('/uploads/<filename>')
+@main_bp.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     # This assumes UPLOAD_FOLDER is configured in app.config
     from flask import current_app

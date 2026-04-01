@@ -1,7 +1,7 @@
 flowchart TD
     %% === PROJECT GOALS ===
     %% Ultimate Goal: Türkiye'nin en teknolojik ve şeffaf gayrimenkul yönetim platformu olmak.
-    %% Current Goal: Faz 22: Üç Modlu Site Yapısı ve Mahalle Modülü tamamlandı. Sistem yayına (Live) hazır.
+    %% Current Goal: Faz 23: App Factory & Entry Point standardizasyonu tamamlandı. Mimari derin temizlik yapıldı.
 
     %% === START ===
     %% @project_start [start, closed, 2026-01-09, user]
@@ -119,6 +119,9 @@ flowchart TD
     %% @feature_phase22_3mode_neighborhood [ai-task, closed, 2026-04-01, antigravity]
     feature_phase22_3mode_neighborhood("Üç Modlu Site & Mahalle Rezervasyon<br/><sub>Implemented Demo/Placeholder/Live modes,<br/>neighborhood facility reservations,<br/>and advanced lead capture with<br/>segmented action types for production.</sub>")
 
+    %% @feature_phase23_app_factory_standardization [ai-task, closed, 2026-04-01, antigravity]
+    feature_phase23_app_factory_standardization("App Factory Standardizasyonu<br/><sub>Unified created_app factory with<br/>load_dotenv, removed redundant<br/>routes, and minimized app.py<br/>to a clean 4-line entry point.</sub>")
+
     %% === CONNECTIONS ===
     project_start --> feature_apt_mgmt
     feature_apt_mgmt --> feature_lmetrics_intent
@@ -155,12 +158,13 @@ flowchart TD
     feature_google_oauth_prod --> feature_unified_identity
     feature_security_audit --> feature_phase21_ui_appointments
     feature_phase21_ui_appointments --> feature_phase22_3mode_neighborhood
-    feature_phase22_3mode_neighborhood --> ultimate_goal
+    feature_phase22_3mode_neighborhood --> feature_phase23_app_factory_standardization
+    feature_phase23_app_factory_standardization --> ultimate_goal
     goal_security -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        feature_phase22_3mode_neighborhood
+        feature_phase23_app_factory_standardization
     end
 
     %% === STYLES ===
@@ -199,10 +203,9 @@ flowchart TD
     style feature_google_oauth_prod fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_unified_identity fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_security_audit fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    %% Recent node
-    style feature_phase22_3mode_neighborhood fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style feature_phase23_app_factory_standardization fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
     
-    style feature_phase22_3mode_neighborhood fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_phase23_app_factory_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
