@@ -40,9 +40,23 @@ def create_app():
     app.logger.addHandler(handler)
     app.logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 
-    # CORS & Middleware
-    CORS(app, resources={r"/api/*": {"origins": ["https://imzagyo.com"]}})
+    CORS(app, resources={r"/api/*": {"origins": [
+        "https://imzaemlak.com", 
+        "https://www.imzaemlak.com",
+        "https://imzamahalle.com",
+        "https://www.imzamahalle.com",
+        "http://localhost:5000" if os.environ.get("FLASK_DEBUG") == "True" else ""
+    ]}})
     Compress().init_app(app)
+    
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response.headers['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data: blob:;"
+        return response
     
     # Initialize Extensions
     db.init_app(app)
@@ -75,6 +89,7 @@ def create_app():
     from modules.maintenance import maintenance_bp
     from modules.compass import compass_bp
     from modules.finance.tax_routes import finance_tax_bp
+    from modules.neighborhood import neighborhood_bp
     from modules.auth.service import setup_oauth
     
     setup_oauth(app)
@@ -84,6 +99,7 @@ def create_app():
     app.register_blueprint(portfolio_bp, url_prefix='/api/v1') # Routes: /portfolios, /hero
     app.register_blueprint(crm_bp, url_prefix='/api/v1') # Routes: /leads, /pipeline
     app.register_blueprint(finance_bp, url_prefix='/api/v1/finance')
+    app.register_blueprint(neighborhood_bp, url_prefix='/api/neighborhood')
     app.register_blueprint(media_bp, url_prefix='/api/v1/media')
     app.register_blueprint(ai_bp, url_prefix='/api/v1/ai')
     app.register_blueprint(legal_bp, url_prefix='/api/v1/legal')

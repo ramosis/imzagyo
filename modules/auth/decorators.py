@@ -7,7 +7,9 @@ def require_permission(permission):
         @wraps(f)
         def wrapper(*args, **kwargs):
             user = AuthService.get_current_user()
-            if not user or not AuthService.has_permission(user.get('role'), permission):
+            if not user:
+                return jsonify({'error': 'Unauthorized - Token missing or expired'}), 401
+            if not AuthService.has_permission(user.get('role'), permission):
                 return jsonify({'error': f'Forbidden - Missing permission: {permission}'}), 403
             g.user = user
             return f(*args, **kwargs)
@@ -28,8 +30,10 @@ def require_inner_circle(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         user = AuthService.get_current_user()
-        if not user or user.get('circle') != 'inner':
-            return jsonify({'error': 'Unauthorized - Inner Circle Only'}), 403
+        if not user:
+            return jsonify({'error': 'Unauthorized - Token missing or expired'}), 401
+        if user.get('circle') != 'inner':
+            return jsonify({'error': 'Forbidden - Inner Circle Only'}), 403
         g.user = user
         return f(*args, **kwargs)
     return wrapper

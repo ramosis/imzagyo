@@ -60,3 +60,5 @@ test_output.txt
 test_auth_verification.txt
 test_coverage_output.txt
 api_calls_portal.txt
+test_results.txt
+git_push_output.log

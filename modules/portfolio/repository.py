@@ -7,15 +7,34 @@ class PortfolioRepository:
     """Handles low-level SQL operations for Portfolios."""
     @staticmethod
     def get_all(filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        from shared.database import get_setting
+        site_mode = get_setting('site_mode', 'demo')
+        
+        # Placeholder mode: return empty list (triggers empty-state-geo on frontend)
+        if site_mode == 'placeholder':
+            return []
+        
         with get_db() as conn:
             query = 'SELECT * FROM portfoyler'
+            conditions = []
             params = []
+            
+            # Live mode: only real listings (not samples)
+            if site_mode == 'live':
+                conditions.append('(is_sample = 0 OR is_sample IS NULL)')
+            # Demo mode: show everything (no filter)
+            
             if filters:
                 if filters.get('owner_id'):
-                    query += ' WHERE owner_id = ?'
+                    conditions.append('owner_id = ?')
                     params.append(filters['owner_id'])
+            
+            if conditions:
+                query += ' WHERE ' + ' AND '.join(conditions)
+            
             rows = conn.execute(query, params).fetchall()
             return [dict(row) for row in rows]
+
 
     @staticmethod
     def get_by_id(portfolio_id: str) -> Optional[Dict[str, Any]]:
@@ -30,20 +49,28 @@ class PortfolioRepository:
                 data['id'] = str(uuid.uuid4())
             if 'ozellikler_arr' in data:
                 data['ozellikler'] = json.dumps(data.pop('ozellikler_arr'))
-            columns = ', '.join(data.keys())
-            placeholders = ', '.join(['?' for _ in data])
-            conn.execute(f"INSERT INTO portfoyler ({columns}) VALUES ({placeholders})", list(data.values()))
+            
+            # Security: Filter out any keys that aren't valid identifiers to prevent SQLi
+            safe_data = {k: v for k, v in data.items() if str(k).isidentifier()}
+            if not safe_data: return str(uuid.uuid4()) # Fallback for emptiness
+            
+            columns = ', '.join(safe_data.keys())
+            placeholders = ', '.join(['?' for _ in safe_data])
+            conn.execute(f"INSERT INTO portfoyler ({columns}) VALUES ({placeholders})", list(safe_data.values()))
             conn.commit()
-            return data['id']
+            return safe_data['id']
 
     @staticmethod
     def update(portfolio_id: str, update_data: Dict[str, Any]) -> bool:
         with get_db() as conn:
             if 'ozellikler_arr' in update_data:
                 update_data['ozellikler'] = json.dumps(update_data.pop('ozellikler_arr'))
-            fields = [f"{k} = ?" for k in update_data.keys()]
+            
+            # Security: Filter out any keys that aren't valid identifiers to prevent SQLi
+            safe_data = {k: v for k, v in update_data.items() if str(k).isidentifier()}
+            fields = [f"{k} = ?" for k in safe_data.keys()]
             if not fields: return False
-            values = list(update_data.values()) + [portfolio_id]
+            values = list(safe_data.values()) + [portfolio_id]
             cursor = conn.execute(f"UPDATE portfoyler SET {', '.join(fields)} WHERE id = ?", values)
             conn.commit()
             return cursor.rowcount > 0

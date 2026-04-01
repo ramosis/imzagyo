@@ -6,6 +6,7 @@ import bcrypt
 from flask import request, jsonify, g
 from shared.database import get_db_connection
 from shared.extensions import limiter
+import json
 
 def get_jwt_secret():
     return os.environ.get("JWT_SECRET", "dev-secret-key")
@@ -113,3 +114,101 @@ def setup_oauth(app):
             'scope': 'openid email profile'
         }
     )
+
+class UnifiedAuthService:
+    @staticmethod
+    def audit_log(user_id: int, action: str, details: dict):
+        with get_db_connection() as conn:
+            conn.execute('''
+                INSERT INTO auth_audit_log (user_id, action, details)
+                VALUES (?, ?, ?)
+            ''', (user_id, action, json.dumps(details)))
+
+    @staticmethod
+    def link_identity(user_id: int, provider: str, provider_id: str, email: str, is_verified: bool = False):
+        with get_db_connection() as conn:
+            # Check if this provider_id is already linked to another user
+            existing = conn.execute(
+                'SELECT * FROM user_identities WHERE provider = ? AND provider_id = ? AND deleted_at IS NULL',
+                (provider, provider_id)
+            ).fetchone()
+            
+            if existing:
+                if existing['user_id'] != user_id:
+                    raise Exception("Bu hesap başka bir kullanıcıya bağlı.")
+                return # Zaten bağlı
+            
+            # Ana kimlik mi? (Hiç kimliği yoksa ilk ekleneni ana kimlik yap)
+            count = conn.execute('SELECT COUNT(*) FROM user_identities WHERE user_id = ? AND deleted_at IS NULL', (user_id,)).fetchone()[0]
+            is_primary = count == 0
+
+            conn.execute('''
+                INSERT INTO user_identities (user_id, provider, provider_id, email, is_verified, is_primary)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (user_id, provider, provider_id, email, is_verified, is_primary))
+            
+            UnifiedAuthService.audit_log(user_id, 'link', {'provider': provider, 'email': email})
+
+    @staticmethod
+    def unlink_identity(user_id: int, identity_id: int):
+        with get_db_connection() as conn:
+            identity = conn.execute(
+                'SELECT * FROM user_identities WHERE id = ? AND user_id = ? AND deleted_at IS NULL', 
+                (identity_id, user_id)
+            ).fetchone()
+            
+            if not identity:
+                raise Exception("Kimlik bulunamadı veya zaten silinmiş.")
+                
+            if identity['is_primary']:
+                raise Exception("Ana kimlik silinemez. Önce başka bir kimliği ana yapın.")
+
+            # Soft delete
+            conn.execute(
+                'UPDATE user_identities SET deleted_at = CURRENT_TIMESTAMP, is_primary = FALSE WHERE id = ?',
+                (identity_id,)
+            )
+            
+            UnifiedAuthService.audit_log(user_id, 'unlink', {'provider': identity['provider'], 'identity_id': identity_id})
+
+    @staticmethod
+    def set_primary_identity(user_id: int, identity_id: int):
+        with get_db_connection() as conn:
+            # Önce kimlik bu kullanıcıya mı ait kontrol et
+            identity = conn.execute(
+                'SELECT * FROM user_identities WHERE id = ? AND user_id = ? AND deleted_at IS NULL', 
+                (identity_id, user_id)
+            ).fetchone()
+            if not identity:
+                raise Exception("Geçerli bir kimlik bulunamadı.")
+                
+            # Diğerlerini false yap
+            conn.execute('UPDATE user_identities SET is_primary = 0 WHERE user_id = ?', (user_id,))
+            # Bunu true yap
+            conn.execute('UPDATE user_identities SET is_primary = 1 WHERE id = ?', (identity_id,))
+            
+            UnifiedAuthService.audit_log(user_id, 'set_primary', {'provider': identity['provider'], 'identity_id': identity_id})
+
+    @staticmethod
+    def get_user_identities(user_id: int):
+        with get_db_connection() as conn:
+            rows = conn.execute(
+                'SELECT id, provider, provider_id, email, is_verified, is_primary, deleted_at FROM user_identities WHERE user_id = ? AND deleted_at IS NULL',
+                (user_id,)
+            ).fetchall()
+            return [dict(r) for r in rows]
+            
+    @staticmethod
+    def get_audit_logs(user_id: int = None, limit: int = 50):
+        with get_db_connection() as conn:
+            if user_id:
+                rows = conn.execute(
+                    'SELECT * FROM auth_audit_log WHERE user_id = ? ORDER BY created_at DESC LIMIT ?',
+                    (user_id, limit)
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    'SELECT * FROM auth_audit_log ORDER BY created_at DESC LIMIT ?',
+                    (limit,)
+                ).fetchall()
+            return [dict(r) for r in rows]

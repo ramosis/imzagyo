@@ -7,11 +7,25 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 
+import filetype
+
 # Helper to check allowed extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def is_safe_file_content(file_stream) -> bool:
+    """Uses magic bytes (filetype) to ensure file matches allowed types."""
+    # Read the first 2Kb to guess file type
+    header = file_stream.read(2048)
+    file_stream.seek(0)
+    
+    kind = filetype.guess(header)
+    if not kind:
+        return False
+        
+    return kind.extension in ALLOWED_EXTENSIONS
 
 def upload_to_cloudinary(file_path, folder="imza_gayrimenkul"):
     """Yerel dosyayı Cloudinary'ye yükler."""
@@ -26,7 +40,13 @@ def upload_to_cloudinary(file_path, folder="imza_gayrimenkul"):
 
 def process_and_save_media(file, portfolio_id, category):
     """Görseli optimize eder ve hem yerel hem buluta kaydeder."""
-    filename = secure_filename(file.filename)
+    if not is_safe_file_content(file):
+        raise ValueError("Invalid file content or signature")
+        
+    import uuid
+    # Enforce uuid-based unique filename to avoid path traversal / spoofing
+    ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'bin'
+    filename = secure_filename(f"{uuid.uuid4().hex}.{ext}")
     category_map = {
         'İç Mekan': 'photos', 'Dış Mekan': 'photos', 'Drone': 'drone',
         'Video': 'vids', 'Plan': 'plans', 'Belge': 'docs'

@@ -1,6 +1,7 @@
 /**
  * İmza Gayrimenkul - Anasayfa Logic
  * Extracted from inline script block for better maintainability (Audit Ref 3.0)
+ * Enhanced: 3-Mode System (Demo/Placeholder/Live) + Lead Form
  */
 
 // Lux Image Optimizer (Unsplash API Bridge)
@@ -45,6 +46,203 @@ window.addEventListener('scroll', function () {
     }
 });
 
+// ═══════════════════════════════════════════════════
+// 3-MODE SYSTEM: Site Mode Aware Portfolio Rendering
+// ═══════════════════════════════════════════════════
+
+/**
+ * Checks site_mode and renders appropriate content:
+ * - demo: Shows all portfolios (including samples)  
+ * - placeholder: Shows Geo-SEO empty state + lead form
+ * - live: Shows only real (non-sample) portfolios
+ */
+async function checkSiteModeAndRender() {
+    try {
+        const res = await fetch('/api/v1/settings/site_mode');
+        const data = await res.json();
+        const mode = data.site_mode || 'placeholder';
+        
+        const container = document.getElementById('portfoy-list-container');
+        if (!container) return;
+        
+        if (mode === 'placeholder') {
+            renderGeoPlaceholder(container);
+        }
+        // demo and live modes: API already filters, frontend just renders normally
+    } catch (err) {
+        console.warn('Site mode check failed, using existing content:', err);
+    }
+}
+
+/**
+ * Renders the Geo-SEO placeholder with lead form when no listings are available
+ */
+function renderGeoPlaceholder(container) {
+    container.innerHTML = `
+        <div class="empty-state-geo col-span-full" itemscope itemtype="https://schema.org/RealEstateAgent">
+            <meta itemprop="name" content="İmza Emlak - Kütahya"/>
+            <meta itemprop="areaServed" content="Kütahya, Türkiye"/>
+            
+            <div class="empty-state-geo__icon">
+                <i class="fa-solid fa-building-columns"></i>
+            </div>
+            
+            <h3 class="empty-state-geo__title">
+                Kütahya'da Yeni Dönem Başlıyor
+            </h3>
+            
+            <p class="empty-state-geo__subtitle">
+                İmza Gayrimenkul, Kütahya'nın en prestijli lokasyonlarında 
+                benzersiz yatırım fırsatlarını sizinle buluşturmaya hazırlanıyor. 
+                Lansman öncesi bildirim alın.
+            </p>
+            
+            <div class="empty-state-geo__stats">
+                <div class="empty-state-geo__stat">
+                    <span class="empty-state-geo__stat-value">43</span>
+                    <span class="empty-state-geo__stat-label">İlçe Kapsama</span>
+                </div>
+                <div class="empty-state-geo__stat">
+                    <span class="empty-state-geo__stat-value">7/24</span>
+                    <span class="empty-state-geo__stat-label">Danışmanlık</span>
+                </div>
+                <div class="empty-state-geo__stat">
+                    <span class="empty-state-geo__stat-value">%100</span>
+                    <span class="empty-state-geo__stat-label">Şeffaf</span>
+                </div>
+            </div>
+            
+            <!-- Lead Form -->
+            <div class="lead-form-wrapper">
+                <form class="lead-form" id="geoLeadForm" onsubmit="return submitGeoLeadForm(event)">
+                    <h4 class="lead-form__title">
+                        <i class="fa-solid fa-bell" style="margin-right: 0.5rem; font-size: 0.9em;"></i>
+                        Bize Ulaşın
+                    </h4>
+                    <p class="lead-form__subtitle">
+                        İhtiyacınıza uygun portföyleri sizin için bulalım.
+                    </p>
+                    
+                    <div class="lead-form__options" id="leadActionOptions">
+                        <div class="lead-form__option">
+                            <input type="radio" name="action_type" id="lead_buy" value="buy" checked>
+                            <label for="lead_buy">
+                                <i class="fa-solid fa-house-chimney"></i> Satılık Arıyorum
+                            </label>
+                        </div>
+                        <div class="lead-form__option">
+                            <input type="radio" name="action_type" id="lead_rent" value="rent">
+                            <label for="lead_rent">
+                                <i class="fa-solid fa-key"></i> Kiralık Arıyorum
+                            </label>
+                        </div>
+                        <div class="lead-form__option">
+                            <input type="radio" name="action_type" id="lead_sell" value="sell">
+                            <label for="lead_sell">
+                                <i class="fa-solid fa-tag"></i> Mülkümü Satmak İstiyorum
+                            </label>
+                        </div>
+                        <div class="lead-form__option">
+                            <input type="radio" name="action_type" id="lead_lease" value="lease">
+                            <label for="lead_lease">
+                                <i class="fa-solid fa-file-signature"></i> Mülkümü Kiraya Vermek İstiyorum
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="lead-form__group">
+                        <input type="text" class="lead-form__input" id="leadName" name="name" 
+                               placeholder="Adınız Soyadınız" required autocomplete="name">
+                    </div>
+                    <div class="lead-form__group">
+                        <input type="tel" class="lead-form__input" id="leadPhone" name="phone" 
+                               placeholder="Telefon (0 5XX XXX XX XX)" autocomplete="tel">
+                    </div>
+                    <div class="lead-form__group">
+                        <input type="email" class="lead-form__input" id="leadEmail" name="email" 
+                               placeholder="E-posta (opsiyonel)" autocomplete="email">
+                    </div>
+                    
+                    <button type="submit" class="lead-form__submit" id="leadSubmitBtn">
+                        <i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i>
+                        Haber Ver
+                    </button>
+                </form>
+                
+                <div class="lead-form__success" id="leadFormSuccess">
+                    <div class="lead-form__success-icon">
+                        <i class="fa-solid fa-check-circle"></i>
+                    </div>
+                    <h4 class="lead-form__success-title">Teşekkürler!</h4>
+                    <p class="lead-form__success-text">
+                        Bilgileriniz alındı. En kısa sürede sizinle iletişime geçeceğiz.
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Handles lead form submission
+ */
+async function submitGeoLeadForm(e) {
+    e.preventDefault();
+    
+    const form = document.getElementById('geoLeadForm');
+    const submitBtn = document.getElementById('leadSubmitBtn');
+    const successDiv = document.getElementById('leadFormSuccess');
+    
+    if (!form || !submitBtn || !successDiv) return false;
+    
+    const nameEl = document.getElementById('leadName');
+    const phoneEl = document.getElementById('leadPhone');
+    const emailEl = document.getElementById('leadEmail');
+    
+    if (!nameEl || !phoneEl || !emailEl) return false;
+
+    const name = nameEl.value.trim();
+    const phone = phoneEl.value.trim();
+    const email = emailEl.value.trim();
+    const actionType = document.querySelector('input[name="action_type"]:checked')?.value || 'buy';
+    
+    if (!name || (!phone && !email)) {
+        // Shake animation for validation
+        form.style.animation = 'shake 0.5s ease';
+        setTimeout(() => form.style.removeProperty('animation'), 500);
+        return false;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 0.5rem;"></i> Gönderiliyor...';
+    
+    try {
+        const res = await fetch('/api/v1/leads/public', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, email, action_type: actionType })
+        });
+        
+        if (res.ok) {
+            form.style.display = 'none';
+            successDiv.classList.add('active');
+        } else {
+            const err = await res.json();
+            alert(err.error || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i> Haber Ver';
+        }
+    } catch (err) {
+        alert('Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i> Haber Ver';
+    }
+    
+    return false;
+}
+
+// ═══════════════════════════════════════════════════
+
 document.addEventListener('DOMContentLoaded', () => {
     // Intro Transition
     const curtain = document.querySelector('.lux-curtain');
@@ -81,4 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof renderCollections === 'function') {
         renderCollections();
     }
+    
+    // 3-Mode System: Check site mode and render appropriate content
+    checkSiteModeAndRender();
 });

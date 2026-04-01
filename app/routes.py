@@ -1,7 +1,8 @@
 from flask import Blueprint, send_from_directory, request, jsonify
 import os
-from shared.database import get_db_connection
+from shared.database import get_db_connection, get_db, get_setting, set_setting
 from shared.page_service import PageService
+from shared.utils import sanitize_input
 
 main_bp = Blueprint('main', __name__)
 
@@ -70,6 +71,72 @@ def sitemap():
     sitemap_xml.append('</urlset>')
     
     return "\n".join(sitemap_xml), 200, {'Content-Type': 'application/xml'}
+
+# ========== SETTINGS API ==========
+@main_bp.route('/api/v1/settings/site_mode', methods=['GET'])
+def get_site_mode():
+    """Returns the current site mode."""
+    mode = get_setting('site_mode', 'placeholder')
+    return jsonify({'site_mode': mode})
+
+@main_bp.route('/api/v1/settings/site_mode', methods=['PUT'])
+def set_site_mode():
+    """Updates the site mode (admin only)."""
+    # Simple admin check via JWT or session
+    from modules.auth.service import AuthService
+    user = AuthService.get_current_user()
+    if not user or user.get('role') not in ['admin', 'super_admin']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    data = request.json
+    new_mode = data.get('site_mode', '').strip().lower()
+    if new_mode not in ['demo', 'placeholder', 'live']:
+        return jsonify({'error': 'Invalid mode. Must be: demo, placeholder, live'}), 400
+    
+    set_setting('site_mode', new_mode)
+    # Clear portfolio cache
+    try:
+        from shared.extensions import cache
+        cache.clear()
+    except Exception:
+        pass
+    
+    return jsonify({'status': 'updated', 'site_mode': new_mode})
+
+# ========== PUBLIC LEAD FORM ==========
+@main_bp.route('/api/v1/leads/public', methods=['POST'])
+def public_lead_form():
+    """Public lead form endpoint - no auth required."""
+    from shared.extensions import limiter
+    data = request.json or {}
+    
+    name = sanitize_input(data.get('name', '')).strip() if isinstance(data.get('name', ''), str) else ''
+    phone = sanitize_input(data.get('phone', '')).strip() if isinstance(data.get('phone', ''), str) else ''
+    email = sanitize_input(data.get('email', '')).strip() if isinstance(data.get('email', ''), str) else ''
+    action_type = data.get('action_type', '')  # buy, rent, sell
+    notes = sanitize_input(data.get('notes', '')).strip() if isinstance(data.get('notes', ''), str) else ''
+    
+    if not name or (not phone and not email):
+        return jsonify({'error': 'İsim ve en az bir iletişim bilgisi gereklidir.'}), 400
+    
+    # Map action_type to segment
+    segment_map = {
+        'buy': 'buyer',
+        'rent': 'buyer',
+        'sell': 'owner',
+        'lease': 'owner'
+    }
+    segment = segment_map.get(action_type, 'buyer')
+    
+    with get_db() as conn:
+        conn.execute(
+            '''INSERT INTO leads (name, phone, email, source, segment, action_type, notes, status)
+               VALUES (?, ?, ?, 'website', ?, ?, ?, 'new')''',
+            (name, phone, email, segment, action_type, notes)
+        )
+        conn.commit()
+    
+    return jsonify({'status': 'success', 'message': 'Bilgileriniz alındı. En kısa sürede sizinle iletişime geçeceğiz.'}), 201
 
 @main_bp.route('/<path:path>')
 def serve_file(path):

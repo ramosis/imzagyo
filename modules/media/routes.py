@@ -18,7 +18,11 @@ def upload_portfolio_media():
     file = request.files.get('file')
     if not all([portfolio_id, category, file]): return jsonify({'error': 'Missing fields'}), 400
     
-    result = process_and_save_media(file, portfolio_id, category)
+    try:
+        result = process_and_save_media(file, portfolio_id, category)
+    except ValueError as ve:
+        return jsonify({'error': str(ve)}), 400
+        
     with get_db() as conn:
         cur = conn.cursor()
         cur.execute('INSERT INTO portfoy_medya (portfolio_id, category, file_path, local_path) VALUES (?,?,?,?)',

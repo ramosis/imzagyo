@@ -7,14 +7,14 @@ from shared.database import get_db_connection
 from shared.extensions import limiter
 from shared.utils import sanitize_input
 from shared.schemas import user_schema, ValidationError
-from .service import AuthService, INNER_ROLES, get_jwt_secret
+from .service import AuthService, UnifiedAuthService, INNER_ROLES, get_jwt_secret
 from .repository import UserRepository
 from .decorators import require_permission, login_required, require_inner_circle
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['POST'])
-@limiter.limit("10 per minute")
+@limiter.limit("5 per minute")
 def login():
     data = request.json
     username = data.get('username')
@@ -31,10 +31,31 @@ def login():
     user_role = user['role']
     is_admin = user['is_admin']
     circle = "inner" if (user_role in INNER_ROLES or is_admin) else "outer"
-    token = f"token-{user['id']}"
+    authorized_apps = AuthService.get_app_route_for_role(user_role)
+    
+    payload = {
+        'user_id': user['id'],
+        'username': user['username'],
+        'role': user_role,
+        'circle': circle,
+        'app_route': authorized_apps,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
+    }
+    
+    token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
+    refresh_token = secrets.token_urlsafe(64)
+    expires_at = datetime.datetime.utcnow() + datetime.timedelta(days=7)
+    
+    with get_db_connection() as conn:
+        conn.execute(
+            'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+            (user['id'], refresh_token, expires_at.strftime('%Y-%m-%d %H:%M:%S'))
+        )
+        conn.commit()
     
     return jsonify({
         'token': token, 
+        'refresh_token': refresh_token,
         'role': user_role,
         'is_admin': is_admin,
         'circle': circle,
@@ -43,7 +64,7 @@ def login():
     }), 200
 
 @auth_bp.route('/mobile/login', methods=['POST'])
-@limiter.limit("10 per minute")
+@limiter.limit("5 per minute")
 def mobile_login():
     data = request.json
     username = data.get('username')
@@ -73,13 +94,23 @@ def mobile_login():
         'role': user_role,
         'circle': circle,
         'app_route': requested_app,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=30)
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
     }
     
     token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
+    refresh_token = secrets.token_urlsafe(64)
+    expires_at = datetime.datetime.utcnow() + datetime.timedelta(days=7)
+    
+    with get_db_connection() as conn:
+        conn.execute(
+            'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+            (user['id'], refresh_token, expires_at.strftime('%Y-%m-%d %H:%M:%S'))
+        )
+        conn.commit()
     
     return jsonify({
         'token': token, 
+        'refresh_token': refresh_token,
         'role': user_role,
         'is_admin': is_admin,
         'circle': circle,
@@ -87,6 +118,55 @@ def mobile_login():
         'username': user['username'],
         'app_route': authorized_apps
     }), 200
+
+@auth_bp.route('/refresh', methods=['POST'])
+@limiter.limit("10 per minute")
+def refresh_token():
+    data = request.json
+    r_token = data.get('refresh_token')
+    if not r_token:
+        return jsonify({'error': 'Refresh token missing'}), 400
+        
+    now = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    with get_db_connection() as conn:
+        record = conn.execute('SELECT * FROM refresh_tokens WHERE token = ? AND revoked = 0 AND expires_at > ?', (r_token, now)).fetchone()
+        
+        if not record:
+            return jsonify({'error': 'Invalid or expired refresh token'}), 401
+            
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (record['user_id'],)).fetchone()
+        if not user or not user['is_active']:
+            return jsonify({'error': 'User not found or inactive'}), 401
+            
+        user_role = user['role']
+        is_admin = user['is_admin']
+        circle = "inner" if (user_role in INNER_ROLES or is_admin) else "outer"
+        authorized_apps = AuthService.get_app_route_for_role(user_role)
+        
+        payload = {
+            'user_id': user['id'],
+            'username': user['username'],
+            'role': user_role,
+            'circle': circle,
+            'app_route': authorized_apps,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
+        }
+        
+        new_token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
+        
+    return jsonify({'token': new_token}), 200
+
+@auth_bp.route('/logout', methods=['POST'])
+@limiter.limit("5 per minute")
+def logout():
+    data = request.json or {}
+    r_token = data.get('refresh_token')
+    if r_token:
+        with get_db_connection() as conn:
+            conn.execute('UPDATE refresh_tokens SET revoked = 1 WHERE token = ?', (r_token,))
+            conn.commit()
+            
+    return jsonify({'message': 'Logged out successfully'}), 200
 
 @auth_bp.route('/request-reset', methods=['POST'])
 @limiter.limit("3 per hour")
@@ -213,14 +293,24 @@ def authorize(provider):
     user = UserRepository.get_by_id(user_id)
     
     user_role = user['role']
-    token = jwt.encode({
+    payload = {
         'user_id': user['id'],
         'username': user['username'],
         'role': user_role,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
-    }, get_jwt_secret(), algorithm="HS256")
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
+    }
+    token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
     
-    return redirect(f"/?login_success=1&token={token}&role={user_role}")
+    refresh_token = secrets.token_urlsafe(64)
+    expires_at = datetime.datetime.utcnow() + datetime.timedelta(days=7)
+    with get_db_connection() as conn:
+        conn.execute(
+            'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+            (user['id'], refresh_token, expires_at.strftime('%Y-%m-%d %H:%M:%S'))
+        )
+        conn.commit()
+    
+    return redirect(f"/?login_success=1&token={token}&refresh_token={refresh_token}&role={user_role}")
 
 # Verification Routes (Migrated from verification.py)
 @auth_bp.route('/verification/eids', methods=['POST'])
@@ -247,3 +337,37 @@ def check_eids_status(property_id):
         'is_verified': True,
         'last_verification': datetime.datetime.now().isoformat()
     }), 200
+
+# Identity Management Routes
+@auth_bp.route('/identities', methods=['GET'])
+@login_required
+def get_identities():
+    user = g.user
+    identities = UnifiedAuthService.get_user_identities(user['id'])
+    return jsonify(identities), 200
+
+@auth_bp.route('/identities/unlink/<int:identity_id>', methods=['POST'])
+@login_required
+def unlink_identity(identity_id):
+    user = g.user
+    try:
+        UnifiedAuthService.unlink_identity(user['id'], identity_id)
+        return jsonify({'message': 'Kimlik başarıyla ayrıldı.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@auth_bp.route('/identities/set-primary/<int:identity_id>', methods=['POST'])
+@login_required
+def set_primary_identity(identity_id):
+    user = g.user
+    try:
+        UnifiedAuthService.set_primary_identity(user['id'], identity_id)
+        return jsonify({'message': 'Ana kimlik güncellendi.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@auth_bp.route('/audit-log', methods=['GET'])
+@require_permission('admin')
+def get_audit_log():
+    logs = UnifiedAuthService.get_audit_logs()
+    return jsonify(logs), 200

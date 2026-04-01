@@ -297,8 +297,39 @@
             <!-- Scroll Indicator -->
             <div
                 class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce opacity-50">
-                <span class="text-[9px] text-white uppercase tracking-[0.3em] font-bold">Keşfet</span>
                 <div class="w-px h-12 bg-gradient-to-b from-gold to-transparent"></div>
+            </div>
+        </section>
+
+        <!-- Koleksiyon İlan Listesi veya Alt Bölümü -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" itemscope itemtype="https://schema.org/CollectionPage">
+            <!-- Liste -->
+            <div class="portfoy-grid hidden" id="koleksiyon-list"></div>
+
+            <!-- Sonuç Yoksa -->
+            <div id="koleksiyon-empty-geo" class="koleksiyon-empty-geo" style="display: block;">
+                <meta itemprop="name" content="Kütahya Lüks Koleksiyon İlanları">
+                <div class="text-center py-16 px-4 bg-gray-50 rounded-3xl border border-gray-100 mt-12 mx-auto max-w-4xl shadow-sm">
+                    <i class="fa-regular fa-star text-5xl text-gold mb-6 opacity-80" itemprop="image"></i>
+                    <h3 class="font-serif text-3xl text-navy mb-4">Bu Koleksiyon Hazırlanıyor</h3>
+                    <p class="text-gray-500 mb-8 max-w-lg mx-auto leading-relaxed">
+                        Kütahya ve çevresindeki en seçkin gayrimenkulleri sizin için özenle derliyoruz. 
+                        Bu özel koleksiyonda yer almak veya yeni portföyler eklendiğinde ilk haberdar olan siz olmak ister misiniz?
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 validate-geo-form">
+                        <button class="bg-navy text-white text-xs font-bold uppercase tracking-widest py-4 px-8 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-navy/20">
+                            <i class="fa-solid fa-bell mr-2"></i> Özel Davet İste
+                        </button>
+                        <a href="portal.html?action=yeni-ilan" class="bg-gold text-navy text-xs font-bold uppercase tracking-widest py-4 px-8 rounded-xl hover:bg-yellow-600 hover:text-white transition-all shadow-lg shadow-gold/20 flex items-center justify-center">
+                            <i class="fa-regular fa-gem mr-2"></i> Portföyünüzü Önerin
+                        </a>
+                    </div>
+                    
+                    <div class="mt-8 text-[11px] text-gray-400 font-bold tracking-widest uppercase">
+                        Kütahya Merkez • Tavşanlı • Gediz • Emet • Altıntaş
+                    </div>
+                </div>
             </div>
         </section>
 

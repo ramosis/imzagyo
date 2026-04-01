@@ -28,9 +28,12 @@ class LeadRepository:
     @staticmethod
     def create(data: Dict[str, Any]) -> int:
         with get_db() as conn:
-            columns = ', '.join(data.keys())
-            placeholders = ', '.join(['?' for _ in data])
-            cursor = conn.execute(f"INSERT INTO leads ({columns}) VALUES ({placeholders})", list(data.values()))
+            safe_data = {k: v for k, v in data.items() if str(k).isidentifier()}
+            if not safe_data: return 0
+            
+            columns = ', '.join(safe_data.keys())
+            placeholders = ', '.join(['?' for _ in safe_data])
+            cursor = conn.execute(f"INSERT INTO leads ({columns}) VALUES ({placeholders})", list(safe_data.values()))
             conn.commit()
             invalidate_entity_cache('lead')
             return cursor.lastrowid
@@ -38,9 +41,10 @@ class LeadRepository:
     @staticmethod
     def update(lead_id: int, data: Dict[str, Any]) -> bool:
         with get_db() as conn:
-            fields = [f"{k}=?" for k in data.keys()]
+            safe_data = {k: v for k, v in data.items() if str(k).isidentifier()}
+            fields = [f"{k}=?" for k in safe_data.keys()]
             if not fields: return False
-            values = list(data.values()) + [lead_id]
+            values = list(safe_data.values()) + [lead_id]
             cursor = conn.execute(f'UPDATE leads SET {", ".join(fields)} WHERE id=?', values)
             conn.commit()
             invalidate_entity_cache('lead')
@@ -64,9 +68,11 @@ class AppointmentRepository:
     @staticmethod
     def create(data: Dict[str, Any]) -> int:
         with get_db() as conn:
-            columns = ', '.join(data.keys())
-            placeholders = ', '.join(['?' for _ in data])
-            cursor = conn.execute(f"INSERT INTO appointments ({columns}) VALUES ({placeholders})", list(data.values()))
+            safe_data = {k: v for k, v in data.items() if str(k).isidentifier()}
+            if not safe_data: return 0
+            columns = ', '.join(safe_data.keys())
+            placeholders = ', '.join(['?' for _ in safe_data])
+            cursor = conn.execute(f"INSERT INTO appointments ({columns}) VALUES ({placeholders})", list(safe_data.values()))
             conn.commit()
             return cursor.lastrowid
 
@@ -81,9 +87,11 @@ class ContactRepository:
     @staticmethod
     def create(data: Dict[str, Any]) -> int:
         with get_db() as conn:
-            columns = ', '.join(data.keys())
-            placeholders = ', '.join(['?' for _ in data])
-            cursor = conn.execute(f"INSERT INTO contacts ({columns}) VALUES ({placeholders})", list(data.values()))
+            safe_data = {k: v for k, v in data.items() if str(k).isidentifier()}
+            if not safe_data: return 0
+            columns = ', '.join(safe_data.keys())
+            placeholders = ', '.join(['?' for _ in safe_data])
+            cursor = conn.execute(f"INSERT INTO contacts ({columns}) VALUES ({placeholders})", list(safe_data.values()))
             conn.commit()
             return cursor.lastrowid
 

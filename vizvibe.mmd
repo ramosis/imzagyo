@@ -1,11 +1,14 @@
 flowchart TD
     %% === PROJECT GOALS ===
     %% Ultimate Goal: Türkiye'nin en teknolojik ve şeffaf gayrimenkul yönetim platformu olmak.
-    %% Current Goal: Faz 20 (Sözleşme & Standartizasyon) tamamlandı. Tüm modüller Service/Repo yapısında.
+    %% Current Goal: Faz 22: Üç Modlu Site Yapısı ve Mahalle Modülü tamamlandı. Sistem yayına (Live) hazır.
 
     %% === START ===
-    %% @project_start [start, closed, 2026-03-01, user]
-    project_start("İmza GYO Başlangıç<br/><sub>Gayrimenkul portföy ve müşteri<br/>yönetim sistemi temel mimarisi<br/>oluşturuldu.</sub>")
+    %% @project_start [start, closed, 2026-01-09, user]
+    project_start("Project Start<br/><sub>Initial development phase of the<br/>İmza Gayrimenkul platform including<br/>core Flask setup and UI.</sub>")
+
+    %% @feature_phase21_ui_appointments [ai-task, closed, 2026-03-31, antigravity]
+    feature_phase21_ui_appointments("Appointments & UI Fixes<br/><sub>Implemented Neighborhood API,<br/>fixed mobile overflows, and<br/>applied text truncation across<br/>main pages for production.</sub>")
 
     %% @ultimate_goal [end, opened, 2026-06-01, user]
     ultimate_goal("Vizyon: Tam Otomasyon<br/><sub>Yapay zeka asistanı ile<br/>insansız operasyon ve<br/>maksimum satış dönüşümü.</sub>")
@@ -104,6 +107,18 @@ flowchart TD
     %% @feature_dynamic_storage [ai-task, closed, 2026-03-29, antigravity]
     feature_dynamic_storage("Dinamik Depolama & Ayarlar<br/><sub>Esnek StorageManager (Local/Drive/Cloud),<br/>Yönetim Paneli Ayar API'sı ve<br/>system_settings tablosu eklendi.</sub>")
 
+    %% @feature_google_oauth_prod [ai-task, closed, 2026-03-30, antigravity]
+    feature_google_oauth_prod("Google OAuth Canlı Yapılandırma<br/><sub>imzaemlak.com ve imzamahalle.com<br/>için Client ID/Secret ve CORS<br/>ayarları başarıyla tamamlandı.</sub>")
+
+    %% @feature_unified_identity [ai-task, closed, 2026-03-30, antigravity]
+    feature_unified_identity("Birleşik Kimlik Yönetimi<br/><sub>Sosyal hesaplar (Google/Facebook)<br/>ve e-posta girişleri tek kullanıcıda<br/>birleştirildi. Soft-delete ve Audit eklendi.</sub>")
+
+    %% @feature_security_audit [ai-task, closed, 2026-03-31, antigravity]
+    feature_security_audit("Faz 20: Security Audit<br/><sub>JWT 15dk kısaltıldı, Refresh Token eklendi.<br/>SQL Injection tam güvenliğe alındı.<br/>Global Limit: 100/m ve Login: 5/m.<br/>CSP, CORS ve magic-bytes eklendi.</sub>")
+
+    %% @feature_phase22_3mode_neighborhood [ai-task, closed, 2026-04-01, antigravity]
+    feature_phase22_3mode_neighborhood("Üç Modlu Site & Mahalle Rezervasyon<br/><sub>Implemented Demo/Placeholder/Live modes,<br/>neighborhood facility reservations,<br/>and advanced lead capture with<br/>segmented action types for production.</sub>")
+
     %% === CONNECTIONS ===
     project_start --> feature_apt_mgmt
     feature_apt_mgmt --> feature_lmetrics_intent
@@ -136,13 +151,16 @@ flowchart TD
     feature_modular_migration --> feature_phase20_standardization
     feature_phase20_standardization --> feature_ci_recovery
     feature_ci_recovery --> feature_dynamic_storage
-    feature_dynamic_storage --> feature_final_polish
-    feature_final_polish -.-> ultimate_goal
+    feature_dynamic_storage --> feature_google_oauth_prod
+    feature_google_oauth_prod --> feature_unified_identity
+    feature_security_audit --> feature_phase21_ui_appointments
+    feature_phase21_ui_appointments --> feature_phase22_3mode_neighborhood
+    feature_phase22_3mode_neighborhood --> ultimate_goal
     goal_security -.-> ultimate_goal
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        feature_dynamic_storage
+        feature_phase22_3mode_neighborhood
     end
 
     %% === STYLES ===
@@ -178,9 +196,13 @@ flowchart TD
     style feature_phase20_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_ci_recovery fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_dynamic_storage fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-
+    style feature_google_oauth_prod fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_unified_identity fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_security_audit fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     %% Recent node
-    style feature_dynamic_storage fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style feature_phase22_3mode_neighborhood fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    
+    style feature_phase22_3mode_neighborhood fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

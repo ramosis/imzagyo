@@ -11,7 +11,7 @@ import os
 socketio = SocketIO(cors_allowed_origins="*", message_queue=os.getenv("REDIS_URL", "redis://localhost:6379/0"))
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["10000 per day", "2000 per hour"],
+    default_limits=["10000 per day", "100 per minute"],
     storage_uri="memory://"
 )
 

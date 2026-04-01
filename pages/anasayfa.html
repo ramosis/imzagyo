@@ -86,6 +86,7 @@
     <script src="../static/js/imzalens/imza-lens.ui.js?v=1.4"></script>
     <script src="../static/js/imzalens/imza-lens-metrics.js?v=1.4"></script>
     <link rel="stylesheet" href="../static/css/fluid.css">
+    <link rel="stylesheet" href="../static/css/placeholders.css">
 
     <script>
         tailwind.config = {
@@ -1788,8 +1789,8 @@
                         <div class="w-10 h-10 md:w-12 md:h-12 bg-${data.color}${data.color === 'white' ? '/20 backdrop-blur-xl' : ''} rounded-2xl flex items-center justify-center text-${data.color === 'white' ? 'white' : 'navy'} mb-4 shadow-xl transform group-hover:-translate-y-2 transition-transform">
                             <i class="${data.icon} text-xl"></i>
                         </div>
-                        <h3 class="${data.featured ? 'text-3xl md:text-5xl' : 'text-2xl md:text-3xl'} font-serif font-bold text-${data.color === 'white' ? 'white' : 'gold'} mb-2 uppercase tracking-tight text-left">${data.title}</h3>
-                        <p class="text-[10px] md:text-sm text-gray-300 leading-relaxed font-light ${data.featured ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-500 text-left max-w-sm">${data.desc}</p>
+                        <h3 class="${data.featured ? 'text-3xl md:text-5xl' : 'text-2xl md:text-3xl'} font-serif font-bold text-${data.color === 'white' ? 'white' : 'gold'} mb-2 uppercase tracking-tight text-left truncate" title="${data.title}">${data.title}</h3>
+                        <p class="text-[10px] md:text-sm text-gray-300 leading-relaxed font-light ${data.featured ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-500 text-left max-w-sm line-clamp-2">${data.desc}</p>
                     </div>
                 </div>
             `).join('');

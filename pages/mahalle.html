@@ -153,6 +153,63 @@
         </div>
     </section>
 
+    <!-- PORTFOY GRID AND EMPTY STATE -->
+    <section class="py-24 px-6 max-w-7xl mx-auto" itemscope itemtype="https://schema.org/LocalBusiness">
+        <!-- Mahalle bazlı portföy gridi -->
+        <div id="mahalle-portfoyleri">
+            <div id="mahalle-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden"></div>
+
+            <div id="mahalle-empty-geo" class="mahalle-empty-geo" style="display: block;">
+                <!-- Local Schema Injection -->
+                <meta itemprop="name" content="Kütahya Mahalleleri Gayrimenkul İlanları">
+                <div itemprop="areaServed" itemscope itemtype="https://schema.org/City">
+                    <meta itemprop="name" content="Kütahya">
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-12 bg-white rounded-[3rem] p-10 shadow-xl shadow-navy/5 border border-gray-100">
+                    <div class="w-full md:w-1/2 rounded-[2rem] overflow-hidden relative group">
+                        <!-- Görsel SEO Optimizasyonu -->
+                        <img src="/static/images/neighborhood-kutahya.jpg" 
+                             onerror="this.src='https://images.unsplash.com/photo-1577413470719-f559286438ee?auto=format&fit=crop&w=800&q=80'" 
+                             alt="Kütahya ve İlçeleri Yaşam Alanları" 
+                             class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-110"
+                             itemprop="image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-navy/90 to-transparent flex items-end p-8">
+                            <div class="text-white">
+                                <span class="text-gold font-bold tracking-widest uppercase text-[10px] mb-2 block">Premium Mahalleler</span>
+                                <h3 class="font-serif text-2xl">Hayalinizdeki Mahalle Sizi Bekliyor</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-1/2 space-y-6">
+                        <h4 class="text-4xl font-serif text-navy tracking-tight" itemprop="description">
+                            <span class="text-gold italic">Bu Mahallede</span><br>Öne Çıkın
+                        </h4>
+                        <p class="text-gray-500 leading-relaxed font-light">
+                            Şu anda bu konumda (<em>Kütahya, Tavşanlı, Gediz vb.</em>) aktif bir ilan bulunmuyor.
+                            Ancak alıcıların <strong>%70'i</strong> lokasyon bazlı arama yapıyor. Mahallenizde satılık 
+                            veya kiralık mülkünüz varsa, doğrudan bölgeyi hedefleyen müşterilerle anında eşleşin.
+                        </p>
+                        
+                        <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                            <p class="text-xs font-bold text-navy uppercase tracking-widest mb-4">Size Sağlayacağımız Avantajlar:</p>
+                            <ul class="space-y-3 text-sm text-gray-600">
+                                <li class="flex items-center gap-3"><i class="fa-solid fa-check text-gold"></i> Mahalle odaklı dijital reklam kampanyası</li>
+                                <li class="flex items-center gap-3"><i class="fa-solid fa-check text-gold"></i> Profesyonel fotoğraf ve video çekimi</li>
+                                <li class="flex items-center gap-3"><i class="fa-solid fa-check text-gold"></i> Doğru fiyat tespiti ve bölge analizi</li>
+                            </ul>
+                        </div>
+                        
+                        <a href="portal.html?action=yeni-ilan" itemprop="url" class="inline-flex items-center justify-center gap-3 bg-navy text-white hover:bg-gold hover:text-navy px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-widest transition-all w-full md:w-auto shadow-xl shadow-navy/20">
+                            🏡 Mahallende İlan Ver <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- TOOLS GRID -->
     <section id="tools" class="py-24 px-6 max-w-7xl mx-auto">
         <div class="text-center mb-16">

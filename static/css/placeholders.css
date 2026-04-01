@@ -1,0 +1,384 @@
+/* =============================================================================
+   İmza Gayrimenkul - Placeholder & Geo-SEO Styles
+   3-Mode System: Demo / Placeholder (Lansman) / Live
+   ============================================================================= */
+
+/* ─── Empty State Geo Placeholder ─── */
+.empty-state-geo {
+    position: relative;
+    padding: clamp(2.5rem, 5vw, 5rem) clamp(1.5rem, 4vw, 3rem);
+    background: linear-gradient(135deg, #0a192f 0%, #112240 60%, #1a2f4d 100%);
+    border-radius: 2.5rem;
+    overflow: hidden;
+    text-align: center;
+    color: #e2e8f0;
+    border: 1px solid rgba(197, 160, 89, 0.15);
+    box-shadow: 0 20px 60px -10px rgba(10, 25, 47, 0.4);
+}
+
+.empty-state-geo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(197, 160, 89, 0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+
+.empty-state-geo__icon {
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    color: #c5a059;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 20px rgba(197, 160, 89, 0.3));
+    animation: geoIconPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes geoIconPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.08); opacity: 1; }
+}
+
+.empty-state-geo__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.empty-state-geo__subtitle {
+    font-size: clamp(0.8rem, 1.5vw, 1rem);
+    color: #94a3b8;
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+    font-weight: 300;
+}
+
+.empty-state-geo__stats {
+    display: flex;
+    justify-content: center;
+    gap: clamp(1.5rem, 3vw, 3rem);
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.empty-state-geo__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.empty-state-geo__stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 700;
+    color: #c5a059;
+}
+
+.empty-state-geo__stat-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: #64748b;
+    font-weight: 700;
+}
+
+/* ─── Lead Form (Haber Ver) ─── */
+.lead-form-wrapper {
+    position: relative;
+    z-index: 10;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.lead-form {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(197, 160, 89, 0.2);
+    border-radius: 1.5rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    transition: border-color 0.4s ease;
+}
+
+.lead-form:focus-within {
+    border-color: rgba(197, 160, 89, 0.5);
+    box-shadow: 0 0 40px rgba(197, 160, 89, 0.08);
+}
+
+.lead-form__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.lead-form__subtitle {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.lead-form__group {
+    margin-bottom: 1rem;
+}
+
+.lead-form__input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.3s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.lead-form__input::placeholder {
+    color: #64748b;
+}
+
+.lead-form__input:focus {
+    border-color: #c5a059;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
+}
+
+/* Action type radio options */
+.lead-form__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.lead-form__option {
+    flex: 1;
+    min-width: 120px;
+}
+
+.lead-form__option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.lead-form__option label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.6rem 0.8rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.lead-form__option label:hover {
+    border-color: rgba(197, 160, 89, 0.4);
+    color: #c5a059;
+}
+
+.lead-form__option input:checked + label {
+    background: rgba(197, 160, 89, 0.15);
+    border-color: #c5a059;
+    color: #c5a059;
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.1);
+}
+
+.lead-form__submit {
+    width: 100%;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, #c5a059, #d4b06a);
+    border: none;
+    border-radius: 0.75rem;
+    color: #0a192f;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.lead-form__submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(197, 160, 89, 0.3);
+}
+
+.lead-form__submit:active {
+    transform: translateY(0);
+}
+
+.lead-form__submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Success state */
+.lead-form__success {
+    display: none;
+    text-align: center;
+    padding: 2rem 1rem;
+    animation: fadeInUp 0.6s ease;
+}
+
+.lead-form__success.active {
+    display: block;
+}
+
+.lead-form__success-icon {
+    font-size: 3rem;
+    color: #4ade80;
+    margin-bottom: 1rem;
+}
+
+.lead-form__success-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.lead-form__success-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Admin Site Mode Toggle ─── */
+.site-mode-selector {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.site-mode-btn {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.site-mode-btn:hover {
+    color: #c5a059;
+}
+
+.site-mode-btn.active {
+    background: linear-gradient(135deg, #c5a059, #d4b06a);
+    color: #0a192f;
+    box-shadow: 0 4px 12px rgba(197, 160, 89, 0.2);
+}
+
+.site-mode-btn[data-mode="demo"].active {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: #fff;
+}
+
+.site-mode-btn[data-mode="placeholder"].active {
+    background: linear-gradient(135deg, #c5a059, #d4b06a);
+    color: #0a192f;
+}
+
+.site-mode-btn[data-mode="live"].active {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    color: #0a192f;
+}
+
+.site-mode-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* =============================================================================
+   Geographic SEO Empty States
+   ============================================================================= */
+
+/* Placeholder Ortak Sınıfları */
+.search-empty-geo, 
+.dashboard-empty-geo, 
+.koleksiyon-empty-geo, 
+.mahalle-empty-geo {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Arama Boş Durum */
+.search-empty-geo {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background: white;
+  border-radius: 2rem;
+  padding: 3rem;
+  border: 1px solid rgba(197, 160, 89, 0.2); /* Gold sınır */
+  box-shadow: 0 20px 40px rgba(26, 26, 46, 0.05); /* Navy gölge */
+}
+
+/* Hızlı Lokasyon Kartları */
+.quick-locations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.loc-search-card {
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.loc-search-card:hover {
+  background: white;
+  border-color: #c5a059;
+  box-shadow: 0 10px 20px rgba(197, 160, 89, 0.1);
+  transform: translateY(-5px);
+}
+

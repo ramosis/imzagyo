@@ -57,8 +57,23 @@ def init_db():
             username TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
             email TEXT UNIQUE,
+            email_verified BOOLEAN DEFAULT 0,
+            is_active BOOLEAN DEFAULT 1,
+            merged_into INTEGER,
             is_admin BOOLEAN DEFAULT 0,
             role TEXT NOT NULL CHECK(role IN ("admin","super_admin","broker","danisman","vip","kiraci","muteahhit","standart","employee","owner","tenant","partner"))
+        )
+    ''')
+    
+    # Refresh Tokens
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS refresh_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            token TEXT UNIQUE NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
+            revoked BOOLEAN DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
@@ -114,11 +129,15 @@ def init_db():
             mahalle_id TEXT, -- İmza Mahalle eşleşmesi için
             cephe TEXT, -- Kuzey, Güney, Doğu, Batı, vb.
             gunes_bilgisi TEXT, -- Metinsel güneş analizi
-            owner_id INTEGER REFERENCES users(id)
+            owner_id INTEGER REFERENCES users(id),
+            is_sample BOOLEAN DEFAULT 0
         )
     ''')
     
     # Yeni sütunları mevcut tabloya ekleme (Upgrade logic)
+    try:
+        cursor.execute('ALTER TABLE portfoyler ADD COLUMN is_sample BOOLEAN DEFAULT 0')
+    except sqlite3.OperationalError: pass
     try:
         cursor.execute('ALTER TABLE portfoyler ADD COLUMN cephe TEXT')
         cursor.execute('ALTER TABLE portfoyler ADD COLUMN gunes_bilgisi TEXT')
@@ -132,6 +151,20 @@ def init_db():
             cursor.execute(f'ALTER TABLE portfoyler ADD COLUMN {col} TEXT')
         except sqlite3.OperationalError:
             pass
+
+    # Neighborhood (Mahalle) Rezervasyonları
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS neighborhood_reservations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            facility_id TEXT NOT NULL,
+            date TEXT NOT NULL,
+            time_slot TEXT NOT NULL,
+            name TEXT NOT NULL,
+            user_id INTEGER,
+            status TEXT DEFAULT 'confirmed',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
 
     # Pipeline Aşamaları
     cursor.execute('''
@@ -557,20 +590,51 @@ def init_db():
 
     # (contract_templates and clauses moved/consolidated)
 
-        -- System Settings Table for configurable options
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS system_settings (
-                key TEXT PRIMARY KEY,
-                value TEXT NOT NULL,
-                category TEXT,
-                description TEXT,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        -- Seed default storage settings
-        cursor.execute("INSERT OR IGNORE INTO system_settings (key, value, category, description) VALUES ('storage_provider', 'local', 'storage', 'Provider for file storage (local, drive, cloud)')")
-        cursor.execute("INSERT OR IGNORE INTO system_settings (key, value, category, description) VALUES ('upload_path', 'static/uploads/contracts', 'storage', 'Base path for contract related uploads')")
+    # System Settings Table for configurable options
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS system_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            category TEXT,
+            description TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # User Identities Table (Unified Identity Management)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_identities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            provider VARCHAR(20) NOT NULL CHECK(provider IN ("local","google","facebook")),
+            provider_id VARCHAR(255),
+            email VARCHAR(255) NOT NULL,
+            is_verified BOOLEAN DEFAULT FALSE,
+            is_primary BOOLEAN DEFAULT FALSE,
+            deleted_at TIMESTAMP NULL
+        )
+    ''')
+    # Indexes for user_identities
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_identities_user ON user_identities(user_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_identities_email ON user_identities(email)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_identities_provider ON user_identities(provider, provider_id)')
+
+    # Auth Audit Log Table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS auth_audit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            action TEXT NOT NULL,
+            details TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_auth_audit_user ON auth_audit_log(user_id)')
+    
+    # Seed default storage settings
+    cursor.execute("INSERT OR IGNORE INTO system_settings (key, value, category, description) VALUES ('storage_provider', 'local', 'storage', 'Provider for file storage (local, drive, cloud)')")
+    cursor.execute("INSERT OR IGNORE INTO system_settings (key, value, category, description) VALUES ('upload_path', 'static/uploads/contracts', 'storage', 'Base path for contract related uploads')")
+    cursor.execute("INSERT OR IGNORE INTO system_settings (key, value, category, description) VALUES ('site_mode', 'placeholder', 'site', 'Site çalışma modu: demo, placeholder, live')")
 
 
     # (parties table moved to top)
@@ -606,7 +670,8 @@ def init_db():
             campaign_id TEXT, -- Aktif kampanya ID
             assigned_user_id INTEGER, -- Atanan Danışman
             status TEXT DEFAULT 'new',
-            pipeline_stage_id INTEGER, -- new, contacted, qualified, lost, converted
+            segment TEXT, -- 'yatirimci', 'butce_odakli', 'yasam_tarzi', 'acil', 'buyuk_balik', 'owner', 'buyer'
+            action_type TEXT, -- 'buy', 'rent', 'sell', 'lease'
             ai_score INTEGER DEFAULT 0, -- Yapay zeka öncelik puanı (0-100)
             segment TEXT, -- 'yatirimci', 'butce_odakli', 'yasam_tarzi', 'acil', 'buyuk_balik'
             score_x INTEGER DEFAULT 50, -- Alım Gücü (0-100)
@@ -1138,9 +1203,12 @@ def doldur_ornek_veriler():
     ]
     for p in portfoyler:
         cursor.execute('''
-            INSERT OR IGNORE INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, danisman_isim, danisman_unvan, danisman_resim)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO portfoyler (id, koleksiyon, baslik1, baslik2, lokasyon, refNo, fiyat, oda, alan, kat, ozellik_renk, bg_renk, btn_renk, icon_renk, resim_hero, resim_hikaye, hikaye, ozellikler, danisman_isim, danisman_unvan, danisman_resim, is_sample)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
         ''', (p['id'], p['koleksiyon'], p['baslik1'], p['baslik2'], p['lokasyon'], p['refNo'], p['fiyat'], p['oda'], p['alan'], p['kat'], p['ozellik_renk'], p['bg_renk'], p['btn_renk'], p['icon_renk'], p['resim_hero'], p['resim_hikaye'], p['hikaye'], p['ozellikler'], p['danisman_isim'], p['danisman_unvan'], p['danisman_resim']))
+
+    # Mark all existing portfoyler that were inserted by seed as sample
+    cursor.execute("UPDATE portfoyler SET is_sample = 1 WHERE is_sample IS NULL OR is_sample = 0")
 
     # 1.5 CONTRACT TEMPLATES (Crucial for service logic)
     cursor.execute('''
@@ -1181,6 +1249,24 @@ class AuditLogger:
             conn.close()
         except Exception as e:
             print(f"Audit Log Hatası: {e}")
+
+def get_setting(key, default=None):
+    """Retrieves a value from system_settings table."""
+    try:
+        with get_db() as conn:
+            row = conn.execute('SELECT value FROM system_settings WHERE key = ?', (key,)).fetchone()
+            return row['value'] if row else default
+    except Exception:
+        return default
+
+def set_setting(key, value):
+    """Updates or inserts a value in system_settings table."""
+    with get_db() as conn:
+        conn.execute(
+            'INSERT OR REPLACE INTO system_settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)',
+            (key, value)
+        )
+        conn.commit()
 
 if __name__ == "__main__":
     init_db()
