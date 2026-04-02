@@ -3,10 +3,12 @@
 Sunucu dizini artık daha profesyonel ve anonim bir yol olan `/opt/imzagyo` olarak güncellenmiştir.
 
 ## 🌍 Canlı Altyapı Bilgileri (AI Kopya Kağıdı)
-- **Ana Domain:** `https://imzagayrimenkul.com` (VIP & Yatırım)
+- **SSH Bağlantısı:** `ssh fatihselimkeskin@imza-web-server`
+- **Sunucu Dizini:** `/opt/imzagyo`
+- **Ana Domain:** `https://imzagayrimenkul.com` (VIP & Yatırım Portalı)
 - **Mahalle Portalı:** `https://imzamahalle.com`
-- **Backend Portu:** `8000` (Docker üzerinde çalışır)
-- **Bağlantı Protokolü:** Nginx -> Proxy Pass (127.0.0.1:8000)
+- **Backend Portu:** `8000` (Docker Konteynırı)
+- **Bağlantı Protokolü:** Nginx SSL (443) -> Proxy Pass (127.0.0.1:8000)
 
 ## 🚀 1. Otomatik Güncelleme (TAVSİYE EDİLEN)
 Artık sunucuda tek bir komutla tüm süreci (git pull + docker build + restart) yöneten bir script bulunmaktadır:
