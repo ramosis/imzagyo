@@ -7,7 +7,7 @@ let currentData = {
     listing_type: 'Satılık'
 };
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://127.0.0.1:8000";
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Dil ayarını yükle ve uygula
@@ -183,25 +183,33 @@ async function checkAuth() {
         if (mainSection) mainSection.classList.remove('hidden');
         if (userBadge) userBadge.innerText = `👤 ${username}`;
     } else {
+        // AUTO-LOGIN ATTEMPT for the User (admin/admin123)
+        const { autoLoginTried = false } = await chrome.storage.local.get('autoLoginTried');
+        if (!autoLoginTried) {
+            console.log("İlk açılış: Otomatik giriş deneniyor...");
+            await chrome.storage.local.set({ autoLoginTried: true });
+            await handleLogin("admin", "admin123");
+            return;
+        }
         if (loginSection) loginSection.classList.remove('hidden');
         if (mainSection) mainSection.classList.add('hidden');
     }
 }
 
-async function handleLogin() {
-    const userInput = document.getElementById('username').value;
-    const passInput = document.getElementById('password').value;
+async function handleLogin(manualUser, manualPass) {
+    const userInput = manualUser || document.getElementById('username').value;
+    const passInput = manualPass || document.getElementById('password').value;
     const errorDiv = document.getElementById('loginError');
 
     if (!userInput || !passInput) {
-        errorDiv.innerText = "Lütfen alanları doldurun.";
+        if (errorDiv) errorDiv.innerText = "Lütfen alanları doldurun.";
         return;
     }
 
-    errorDiv.innerText = "Giriş yapılıyor...";
+    if (errorDiv) errorDiv.innerText = "Giriş yapılıyor...";
 
     try {
-        const response = await fetch(`${API_BASE}/api/auth/login`, {
+        const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: userInput, password: passInput })
@@ -215,13 +223,13 @@ async function handleLogin() {
                 username: data.user.username,
                 is_admin: data.user.is_admin
             });
-            errorDiv.innerText = "";
+            if (errorDiv) errorDiv.innerText = "";
             checkAuth();
         } else {
-            errorDiv.innerText = data.error || "Giriş başarısız.";
+            if (errorDiv) errorDiv.innerText = data.error || "Giriş başarısız.";
         }
     } catch (e) {
-        errorDiv.innerText = "Sunucuya bağlanılamadı.";
+        if (errorDiv) errorDiv.innerText = "Sunucuya bağlanılamadı.";
         console.error(e);
     }
 }

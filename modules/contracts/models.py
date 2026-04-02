@@ -1,5 +1,5 @@
-from datetime import datetime
 from shared.extensions import db
+import datetime as dt
 
 class Contract(db.Model):
     __tablename__ = 'contracts'
@@ -45,8 +45,8 @@ class Contract(db.Model):
     
     # Meta
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=dt.datetime.utcnow, onupdate=dt.datetime.utcnow)
     
     # İlişkiler
     template = db.relationship('ContractTemplate', backref='contracts')
@@ -74,7 +74,7 @@ class ContractTemplate(db.Model):
     
     # Meta
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     
     def __repr__(self):
         return f'<ContractTemplate {self.name}>'
@@ -94,7 +94,7 @@ class ContractClause(db.Model):
     
     # Meta
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     
     def __repr__(self):
         return f'<ContractClause {self.title}>'
@@ -127,7 +127,7 @@ class PreparedContract(db.Model):
     signed_at = db.Column(db.DateTime)
     
     # Meta
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     
     contract = db.relationship('Contract', backref='prepared_versions')
 

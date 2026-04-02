@@ -1,4 +1,4 @@
-from flask import Blueprint, send_from_directory, request, jsonify
+from flask import Blueprint, send_from_directory, request, jsonify, current_app
 import os
 from shared.database import get_db_connection, get_db, get_setting, set_setting
 from shared.page_service import PageService
@@ -6,46 +6,56 @@ from shared.utils import sanitize_input
 
 main_bp = Blueprint('main', __name__)
 
+# Helper to get the correct path to the project root from modules/core/
+def get_root_path():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
 @main_bp.route('/')
 def index():
     host = request.headers.get('Host', '')
+    pages_dir = os.path.join(get_root_path(), 'pages')
     if 'imzamahalle.com' in host:
-        return send_from_directory('pages', 'mahalle.html')
-    return send_from_directory('pages', 'anasayfa.html')
+        return send_from_directory(pages_dir, 'mahalle.html')
+    return send_from_directory(pages_dir, 'anasayfa.html')
 
 @main_bp.route('/portal')
 def portal():
-    return send_from_directory('pages', 'portal.html')
+    pages_dir = os.path.join(get_root_path(), 'pages')
+    return send_from_directory(pages_dir, 'portal.html')
 
 @main_bp.route('/pipeline')
 def pipeline():
-    return send_from_directory('pages', 'pipeline.html')
+    pages_dir = os.path.join(get_root_path(), 'pages')
+    return send_from_directory(pages_dir, 'pipeline.html')
 
 @main_bp.route('/mahalle')
 def mahalle():
-    return send_from_directory('pages', 'mahalle.html')
+    pages_dir = os.path.join(get_root_path(), 'pages')
+    return send_from_directory(pages_dir, 'mahalle.html')
 
 @main_bp.route('/inspection')
 def inspection_page():
-    return send_from_directory('pages', 'inspection.html')
+    pages_dir = os.path.join(get_root_path(), 'pages')
+    return send_from_directory(pages_dir, 'inspection.html')
 
 @main_bp.route('/admin/analytics')
 def admin_analytics_page():
-    return send_from_directory('pages', 'admin-analytics.html')
+    pages_dir = os.path.join(get_root_path(), 'pages')
+    return send_from_directory(pages_dir, 'admin-analytics.html')
 
 @main_bp.route('/mls')
 def mls_page():
-    return send_from_directory('pages', 'mls.html')
+    pages_dir = os.path.join(get_root_path(), 'pages')
+    return send_from_directory(pages_dir, 'mls.html')
 
 @main_bp.route('/uploads/<path:filename>')
 def uploaded_file(filename):
-    # This assumes UPLOAD_FOLDER is configured in app.config
-    from flask import current_app
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
 
 @main_bp.route('/robots.txt')
 def robots():
-    return send_from_directory('static', 'robots.txt') # Assuming it's in static now
+    static_dir = os.path.join(get_root_path(), 'static')
+    return send_from_directory(static_dir, 'robots.txt')
 
 @main_bp.route('/sitemap.xml')
 def sitemap():
@@ -82,7 +92,6 @@ def get_site_mode():
 @main_bp.route('/api/v1/settings/site_mode', methods=['PUT'])
 def set_site_mode():
     """Updates the site mode (admin only)."""
-    # Simple admin check via JWT or session
     from modules.auth.service import AuthService
     user = AuthService.get_current_user()
     if not user or user.get('role') not in ['admin', 'super_admin']:
@@ -94,7 +103,6 @@ def set_site_mode():
         return jsonify({'error': 'Invalid mode. Must be: demo, placeholder, live'}), 400
     
     set_setting('site_mode', new_mode)
-    # Clear portfolio cache
     try:
         from shared.extensions import cache
         cache.clear()
@@ -107,25 +115,18 @@ def set_site_mode():
 @main_bp.route('/api/v1/leads/public', methods=['POST'])
 def public_lead_form():
     """Public lead form endpoint - no auth required."""
-    from shared.extensions import limiter
     data = request.json or {}
     
     name = sanitize_input(data.get('name', '')).strip() if isinstance(data.get('name', ''), str) else ''
     phone = sanitize_input(data.get('phone', '')).strip() if isinstance(data.get('phone', ''), str) else ''
     email = sanitize_input(data.get('email', '')).strip() if isinstance(data.get('email', ''), str) else ''
-    action_type = data.get('action_type', '')  # buy, rent, sell
+    action_type = data.get('action_type', '') 
     notes = sanitize_input(data.get('notes', '')).strip() if isinstance(data.get('notes', ''), str) else ''
     
     if not name or (not phone and not email):
         return jsonify({'error': 'İsim ve en az bir iletişim bilgisi gereklidir.'}), 400
     
-    # Map action_type to segment
-    segment_map = {
-        'buy': 'buyer',
-        'rent': 'buyer',
-        'sell': 'owner',
-        'lease': 'owner'
-    }
+    segment_map = {'buy': 'buyer', 'rent': 'buyer', 'sell': 'owner', 'lease': 'owner'}
     segment = segment_map.get(action_type, 'buyer')
     
     with get_db() as conn:
@@ -142,5 +143,5 @@ def public_lead_form():
 def serve_file(path):
     if not path or path == '/':
         return index()
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    base_dir = get_root_path()
     return PageService.serve_page(path, base_dir)

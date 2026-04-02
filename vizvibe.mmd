@@ -1,214 +1,59 @@
 flowchart TD
     %% === PROJECT GOALS ===
     %% Ultimate Goal: Türkiye'nin en teknolojik ve şeffaf gayrimenkul yönetim platformu olmak.
-    %% Current Goal: Faz 23: App Factory & Entry Point standardizasyonu tamamlandı. Mimari derin temizlik yapıldı.
+    %% Current Goal: Faz 28: Mimari Sadeleşme & Klasör Konsolidasyonu tamamlandı.
 
     %% === START ===
     %% @project_start [start, closed, 2026-01-09, user]
     project_start("Project Start<br/><sub>Initial development phase of the<br/>İmza Gayrimenkul platform including<br/>core Flask setup and UI.</sub>")
 
-    %% @feature_phase21_ui_appointments [ai-task, closed, 2026-03-31, antigravity]
-    feature_phase21_ui_appointments("Appointments & UI Fixes<br/><sub>Implemented Neighborhood API,<br/>fixed mobile overflows, and<br/>applied text truncation across<br/>main pages for production.</sub>")
-
-    %% @ultimate_goal [end, opened, 2026-06-01, user]
-    ultimate_goal("Vizyon: Tam Otomasyon<br/><sub>Yapay zeka asistanı ile<br/>insansız operasyon ve<br/>maksimum satış dönüşümü.</sub>")
-
     %% === COMPLETED WORK ===
     %% @feature_apt_mgmt [ai-task, closed, 2026-03-23, user]
     feature_apt_mgmt("Mülk & Apt. Yönetimi<br/><sub>Şeffaf kasa, topluluk anketleri<br/>ve aidat detay dökümleri<br/>başarıyla tamamlandı.</sub>")
 
-    %% @feature_lmetrics_intent [ai-task, closed, 2026-03-24, user]
-    feature_lmetrics_intent("LMetrics & Niyet Skoru<br/><sub>Kullanıcı davranış analizi,<br/>AI Score ve CRM Dijital Ayak İzi<br/>zaman çizelgesi uygulandı.</sub>")
+    %% @feature_three_mode_site [ai-task, closed, 2026-03-30, user]
+    feature_three_mode_site("Üç Modlu Site Yapısı<br/><sub>Emlak, Yatırım ve Mahalle<br/>modları arası geçiş ve özel<br/>içerik filtreleme entegre edildi.</sub>")
+    
+    %% @feature_neighborhood_hub [ai-task, closed, 2026-03-30, user]
+    feature_neighborhood_hub("Mahalle Portalı (Hub)<br/><sub>Konut sahipleri için özel<br/>sosyal alan ve yönetim<br/>merkezi altyapısı hazırlandı.</sub>")
 
-    %% @feature_infrastructure [ai-task, closed, 2026-03-24, user]
-    feature_infrastructure("Sentry & Logging Entegrasyonu<br/><sub>Hata izleme (Sentry) ve merkezi<br/>log sistemi (Rotating File)<br/>başarıyla kuruldu.</sub>")
+    %% @feature_phase25_docker_stabilization [ai-task, closed, 2026-04-02, antigravity]
+    feature_phase25_docker_stabilization("Docker Backend Stabilizasyonu<br/><sub>app.py -> wsgi.py isim karmaşası,<br/>URI slaş hataları ve SocketIO<br/>loop sorunları çözüldü.</sub>")
 
-    %% @feature_social_login [ai-task, closed, 2026-03-24, user]
-    feature_social_login("Sosyal Medya Girişi<br/><sub>Google, Facebook ve Instagram<br/>ile Oauth2 tabanlı hızlı<br/>giriş entegrasyonu sağlandı.</sub>")
+    %% @feature_phase28_unification [ai-task, closed, 2026-04-02, antigravity]
+    feature_phase28_unification("Mimari Birleşme & Core Yapısı<br/><sub>app/ ve shared/ klasörleri modules/core<br/>altında birleştirildi. Eklenti için<br/>otomatik giriş (bypass) aktif edildi<br/>ve modeller modülerleştirildi.</sub>")
 
-    %% @goal_security [ai-task, closed, 2026-03-24, user]
-    goal_security("Güvenlik Sertifikasyonu<br/><sub>SHA256'dan uçtan uca BCRPYT<br/>şifrelemeye geçildi. Anında<br/>migration algoritması yazıldı.</sub>")
+    %% === FUTURE WORK ===
+    %% @ultimate_goal [end, opened, 2026-06-01, user]
+    ultimate_goal("Vizyon: Tam Otomasyon<br/><sub>Yapay zeka asistanı ile<br/>insansız operasyon ve<br/>maksimum satış dönüşümü.</sub>")
 
-    %% @feature_pusula [ai-task, closed, 2026-03-24, user]
-    feature_pusula("İmza PUSULA (Yaşam Hub)<br/><sub>İşlem takibi, taşınma<br/>asistanı ve aile (konum/görev)<br/>yönetim merkezi arayüzü kuruldu.</sub>")
-
-    %% @feature_documentation [ai-task, closed, 2026-03-24, user]
-    feature_documentation("Kurumsal Dokümantasyon<br/><sub>19 modül için toplam 57 adet<br/>kullanım, teknik ve hukuki<br/>belge arşivi oluşturuldu.</sub>")
-
-    %% @feature_digital_inspection [ai-task, closed, 2026-03-24, user]
-    feature_digital_inspection("Dijital Denetim Tool'u<br/><sub>300+ maddelik interaktif<br/>mülk ekspertiz ve saha<br/>denetim sistemi entegre edildi.</sub>")
-
-    %% @feature_app_separation [human-task, closed, 2026-03-25, user]
-    feature_app_separation("Uygulama Ayrımı<br/><sub>Emlak/Yatırım (Native RN)<br/>ve Mahalle (PWA) yapıları<br/>başarıyla birbirinden ayrıldı.</sub>")
-
-    %% @feature_build_fix [ai-task, closed, 2026-03-25, user]
-    feature_build_fix("Android Build Fix<br/><sub>com.mobile ve com.imza<br/>paket çakışması temizlendi,<br/>namespace hatası giderildi.</sub>")
-
-    %% @feature_path_standardization [human-task, closed, 2026-03-25, user]
-    feature_path_standardization("Yol Standardizasyonu<br/><sub>Türkçe karakterli dosya yolu<br/>(İmza Gayrimenkul) ASCII karakterli<br/>Imza_Gayrimenkul'e taşındı.</sub>")
-
-    %% @feature_gradle_fix [ai-task, closed, 2026-03-25, antigravity]
-    feature_gradle_fix("Gradle Property Fix<br/><sub>hermesEnabled bilinmeyen özellik<br/>hatası giderildi. Değişkenler<br/>root build.gradle'da merkezileştirildi.</sub>")
-
-    %% @feature_design_seo_overhaul [ai-task, closed, 2026-03-25, antigravity]
-    feature_design_seo_overhaul("Tasarım & SEO Revizyonu<br/><sub>Erişilebilirlik (ARIA/Label),<br/>SEO (OG/Twitter) ve Mobil/Tablet<br/>(Swipe/Grid/Sticky CTA)<br/>iyileştirmeleri tamamlandı.</sub>")
-
-    %% @feature_ux_performance [ai-task, closed, 2026-03-25, antigravity]
-    feature_ux_performance("UX & Performans Finalizasyon<br/><sub>Maybach Scroll toggle, global<br/>dil/para birimi seçici, CLS<br/>optimizasyonu ve içerik dolumu<br/>başarıyla tamamlandı.</sub>")
-
-    %% @feature_globalization_phase6 [ai-task, closed, 2026-03-25, antigravity]
-    feature_globalization_phase6("Bölgesel Görünürlük & Global<br/><sub>TR/EN/RU/AR dil motoru,<br/>RTL desteği ve admin panelinde<br/>Pazar bazlı mülk görünürlük<br/>matrisi başarıyla uygulandı.</sub>")
-
-    %% @feature_fluid_ui [ai-task, closed, 2026-03-25, antigravity]
-    feature_fluid_ui("Fluid UI & Universal Scaling<br/><sub>Clamp bazlı matematiksel ölçekleme<br/>motoru (fluid.css) kuruldu. Tüm cihazlar<br/>ve landscape-mobile baskılama<br/>kuralları başarıyla verifiye edildi.</sub>")
-
-    %% @feature_push_finalization [ai-task, closed, 2026-03-26, antigravity]
-    feature_push_finalization("Push & Dağıtım Onayı<br/><sub>Klasör ismi standardizasyonu,<br/>deployment betik verifikasyonu<br/>ve tüm modüllerin ana repoya<br/>gönderimi başarıyla sağlandı.</sub>")
-
-    %% @platform_hardening [ai-task, closed, 2026-03-26, antigravity]
-    platform_hardening("Platform Sertleştirme & Hardening<br/><sub>JWT RBAC, Service/Repo Pattern,<br/>Audit Log, Resim Optimizasyonu<br/>ve Güvenlik Headerları eklendi.</sub>")
-
-    %% @security_hardening_phase6 [ai-task, closed, 2026-03-26, antigravity]
-    security_hardening_phase6("Güvenlik Sıkılaştırma (Faz 6)<br/><sub>CSRF Koruması, Global XSS<br/>Sanitizasyonu, Hız Sınırlandırma<br/>ve Mimari Refactoring yapıldı.</sub>")
-
-    %% @performance_optimization_phase7 [ai-task, closed, 2026-03-26, antigravity]
-    performance_optimization_phase7("Performans Optimizasyonu (Faz 7)<br/><sub>Gzip Sıkıştırma, DB İndeksleme,<br/>API Memoization ve Bağımlılık<br/>Güncellemeleri tamamlandı.</sub>")
-
-    %% @testing_doc_ci_phase8 [ai-task, closed, 2026-03-26, antigravity]
-    testing_doc_ci_phase8("Test, Doküman & CI (Faz 2-3 %100)<br/><sub>Pytest Suite, Swagger UI / ReDoc<br/>ve GitHub Actions CI/CD<br/>alt yapısı kuruldu.</sub>")
-
-    %% @feature_unified_assistant [ai-task, closed, 2026-03-26, antigravity]
-    feature_unified_assistant("Birleşik İmza Asistanı (Faz 9)<br/><sub>JWT Auth, Portala Aktar (Sync),<br/>TKGM/E-İmar entegrasyonu ve<br/>HUD Insights başarıyla birleştirildi.</sub>")
-
-    %% @feature_analytics_deployment [ai-task, closed, 2026-03-26, antigravity]
-    feature_analytics_deployment("Analitik & Deployment (Faz 10)<br/><sub>Market Trends Dashboard,<br/>listings_shadow bazlı analiz ve<br/>Docker konteynerizasyonu tamamlandı.</sub>")
-
-    %% @feature_audit_fix_phase11 [ai-task, closed, 2026-03-26, antigravity]
-    feature_audit_fix_phase11("Portal Audit & UX Fix (Faz 11)<br/><sub>Z-index conflicts giderildi,<br/>mükerrer modallar temizlendi ve<br/>tüm interactive handlerlar restore edildi.</sub>")
-
-    %% @feature_portal_restoration [ai-task, closed, 2026-03-26, antigravity]
-    feature_portal_restoration("Portal Fonksiyonel Onarım<br/><sub>Eksik Portföy ve Ayar sekme ID'leri<br/>onarıldı, Konut Kredisi hesaplayıcı<br/>ana menüye (Araçlar) taşındı.</sub>")
-
-    %% @feature_audit_remediation [ai-task, closed, 2026-03-26, antigravity]
-    feature_audit_remediation("Kapsamlı Denetim & Onarım<br/><sub>Kritik buglar (send_file), güvenlik<br/>bypassları ve route çakışmaları<br/>giderildi, şema hizalandı.</sub>")
-
-    %% @feature_dx_standardization [ai-task, closed, 2026-03-26, antigravity]
-    feature_dx_standardization("DX & Standartizasyon (Faz 13)<br/><sub>API İngilizce eşleşmesi yapıldı,<br/>PageService modülerliği getirildi,<br/>hata yönetimi ve cache optimize edildi.</sub>")
-
-    %% @feature_modular_migration [ai-task, closed, 2026-03-27, antigravity]
-    feature_modular_migration("Modüler Mimari Geçişi (Faz 18)<br/><sub>App Factory pattern, Auth modülü<br/>ayrımı ve shared/ core altyapısı<br/>başarıyla kuruldu ve test edildi.</sub>")
-
-    %% @feature_phase20_standardization [ai-task, closed, 2026-03-29, antigravity]
-    feature_phase20_standardization("Sözleşme & Modüler Standartizasyon<br/><sub>Contracts modülü kuruldu, tüm domainler<br/>Service/Repo yapısına çekildi.<br/>Mimari tutarlılık %100 sağlandı.</sub>")
-
-    %% @feature_ci_recovery [ai-task, closed, 2026-03-29, antigravity]
-    feature_ci_recovery("CI/CD Recovery & Hardening<br/><sub>ImportError'lar giderildi, URI formatı<br/>(SQLAlchemy->SQLite) normalize edildi<br/>ve test collection hataları çözüldü.</sub>")
-
-    %% @feature_dynamic_storage [ai-task, closed, 2026-03-29, antigravity]
-    feature_dynamic_storage("Dinamik Depolama & Ayarlar<br/><sub>Esnek StorageManager (Local/Drive/Cloud),<br/>Yönetim Paneli Ayar API'sı ve<br/>system_settings tablosu eklendi.</sub>")
-
-    %% @feature_google_oauth_prod [ai-task, closed, 2026-03-30, antigravity]
-    feature_google_oauth_prod("Google OAuth Canlı Yapılandırma<br/><sub>imzaemlak.com ve imzamahalle.com<br/>için Client ID/Secret ve CORS<br/>ayarları başarıyla tamamlandı.</sub>")
-
-    %% @feature_unified_identity [ai-task, closed, 2026-03-30, antigravity]
-    feature_unified_identity("Birleşik Kimlik Yönetimi<br/><sub>Sosyal hesaplar (Google/Facebook)<br/>ve e-posta girişleri tek kullanıcıda<br/>birleştirildi. Soft-delete ve Audit eklendi.</sub>")
-
-    %% @feature_security_audit [ai-task, closed, 2026-03-31, antigravity]
-    feature_security_audit("Faz 20: Security Audit<br/><sub>JWT 15dk kısaltıldı, Refresh Token eklendi.<br/>SQL Injection tam güvenliğe alındı.<br/>Global Limit: 100/m ve Login: 5/m.<br/>CSP, CORS ve magic-bytes eklendi.</sub>")
-
-    %% @feature_phase22_3mode_neighborhood [ai-task, closed, 2026-04-01, antigravity]
-    feature_phase22_3mode_neighborhood("Üç Modlu Site & Mahalle Rezervasyon<br/><sub>Implemented Demo/Placeholder/Live modes,<br/>neighborhood facility reservations,<br/>and advanced lead capture with<br/>segmented action types for production.</sub>")
-
-    %% @feature_phase23_app_factory_standardization [ai-task, closed, 2026-04-01, antigravity]
-    feature_phase23_app_factory_standardization("App Factory Standardizasyonu<br/><sub>Unified created_app factory with<br/>load_dotenv, removed redundant<br/>routes, and minimized app.py<br/>to a clean 4-line entry point.</sub>")
-
-    %% === CONNECTIONS ===
-    project_start --> feature_apt_mgmt
-    feature_apt_mgmt --> feature_lmetrics_intent
-    feature_lmetrics_intent --> feature_infrastructure
-    feature_infrastructure --> feature_social_login
-    feature_social_login --> goal_security
-    feature_social_login --> feature_pusula
-    feature_pusula --> feature_documentation
-    feature_documentation --> feature_digital_inspection
-    feature_digital_inspection --> feature_app_separation
-    feature_app_separation --> feature_build_fix
-    feature_build_fix --> feature_path_standardization
-    feature_path_standardization --> feature_gradle_fix
-    feature_gradle_fix --> feature_design_seo_overhaul
-    feature_design_seo_overhaul --> feature_ux_performance
-    feature_ux_performance --> feature_globalization_phase6
-    feature_globalization_phase6 --> feature_fluid_ui
-    feature_fluid_ui --> feature_push_finalization
-    feature_push_finalization --> platform_hardening
-    platform_hardening --> security_hardening_phase6
-    security_hardening_phase6 --> performance_optimization_phase7
-    performance_optimization_phase7 --> testing_doc_ci_phase8
-    testing_doc_ci_phase8 --> feature_unified_assistant
-    feature_unified_assistant --> feature_analytics_deployment
-    feature_analytics_deployment --> feature_audit_fix_phase11
-    feature_audit_fix_phase11 --> feature_portal_restoration
-    feature_portal_restoration --> feature_audit_remediation
-    feature_audit_remediation --> feature_dx_standardization
-    feature_dx_standardization --> feature_modular_migration
-    feature_modular_migration --> feature_phase20_standardization
-    feature_phase20_standardization --> feature_ci_recovery
-    feature_ci_recovery --> feature_dynamic_storage
-    feature_dynamic_storage --> feature_google_oauth_prod
-    feature_google_oauth_prod --> feature_unified_identity
-    feature_security_audit --> feature_phase21_ui_appointments
-    feature_phase21_ui_appointments --> feature_phase22_3mode_neighborhood
-    feature_phase22_3mode_neighborhood --> feature_phase23_app_factory_standardization
-    feature_phase23_app_factory_standardization --> ultimate_goal
-    goal_security -.-> ultimate_goal
-
-    %% === RECENT WORK HIGHLIGHT ===
+    %% === RECENT ===
     subgraph recent [RECENT]
-        feature_phase23_app_factory_standardization
+        feature_phase28_unification
     end
+
+    %% === EDGES ===
+    project_start --> feature_apt_mgmt
+    feature_apt_mgmt --> feature_three_mode_site
+    feature_three_mode_site --> feature_neighborhood_hub
+    feature_neighborhood_hub --> feature_phase25_docker_stabilization
+    feature_phase25_docker_stabilization --> feature_phase28_unification
+    feature_phase28_unification -.-> ultimate_goal
 
     %% === STYLES ===
     %% Closed tasks
     style project_start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_apt_mgmt fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_lmetrics_intent fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_infrastructure fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_social_login fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style goal_security fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_pusula fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_documentation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_digital_inspection fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_app_separation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_build_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_path_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_gradle_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_design_seo_overhaul fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_globalization_phase6 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_fluid_ui fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_push_finalization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style platform_hardening fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style security_hardening_phase6 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style performance_optimization_phase7 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style testing_doc_ci_phase8 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_unified_assistant fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_analytics_deployment fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_audit_fix_phase11 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_portal_restoration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_audit_remediation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_dx_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_modular_migration fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_phase20_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_ci_recovery fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_dynamic_storage fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_google_oauth_prod fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_unified_identity fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_security_audit fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    style feature_phase23_app_factory_standardization fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
-    
-    style feature_phase23_app_factory_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-    
+    style feature_three_mode_site fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_neighborhood_hub fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_phase25_docker_stabilization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_phase28_unification fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+
+    %% Recent node
+    style feature_phase28_unification fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+
+    %% Recent subgraph
+    style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
+
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-
-    %% Subgraphs
-    style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5

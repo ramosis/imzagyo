@@ -4,11 +4,13 @@ from flask_caching import Cache
 from flask_babel import Babel
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_socketio import SocketIO
 import os
 
 # Initialize extensions without app
-socketio = SocketIO(cors_allowed_origins="*", message_queue=os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+# Disabled Redis message queue for now due to infrastructure lack in docker-compose.yml
+socketio = SocketIO(cors_allowed_origins="*")
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["10000 per day", "100 per minute"],
@@ -19,3 +21,4 @@ cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
 babel = Babel()
 csrf = CSRFProtect()
 db = SQLAlchemy()
+migrate = Migrate()

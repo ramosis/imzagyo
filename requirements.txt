@@ -3,7 +3,7 @@ flask-compress
 flask-cors
 python-dotenv
 google-generativeai
-pyjwt
+PyJWT
 passlib
 bcrypt
 bleach
@@ -29,3 +29,9 @@ beautifulsoup4
 pdfkit
 html5lib
 requests
+authlib
+Pillow
+flask-mail
+cloudinary
+filetype
+gunicorn

@@ -22,11 +22,10 @@ RUN mkdir -p uploads data && chmod -R 777 uploads data
 # Uygulama portunu (8000) dışarı aç
 EXPOSE 8000
 
-# Healthcheck: Uygulama sağlığını kontrol et
+# Healthcheck: Uygulama sağliğini kontrol et
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8000/ || exit 1
 
 # Uygulamayı başlat
-# Gunicorn veya benzeri bir WSGI sunucu prodüksiyon için daha iyidir, 
-# ancak şimdilik flask'in kendi sunucusunu (debug=False) kullanabiliriz.
-CMD ["python", "app.py"]
+# Üretim ortamı için Gunicorn kullanıyoruz. 4 worker ile concurrency sağliyoruz.
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "wsgi:app"]

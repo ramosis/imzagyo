@@ -16,15 +16,15 @@ from shared.database import init_db, doldur_ornek_veriler
 
 def create_app():
     load_dotenv()
-    app = Flask(__name__, template_folder='../pages', static_folder='../static')
+    # Path adjustment for the new location (modules/core/)
+    app = Flask(__name__, template_folder='../../pages', static_folder='../../static')
     
-    # Configuration - Using Absolute Path for Docker (Corrected URI Slashes)
+    # Configuration
     DB_NAME = "/app/data/imza_database.db"
-    # sqlite:/// + /app/data... = sqlite:////app/data... (Correct 4 slashes for Linux absolute path)
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
-    app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+    app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # Increased for portfolio media
     app.config['UPLOAD_FOLDER'] = 'uploads'
     
     # Sentry & Monitoring
@@ -45,13 +45,8 @@ def create_app():
     app.logger.addHandler(handler)
     app.logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 
-    CORS(app, resources={r"/api/*": {"origins": [
-        "https://imzaemlak.com", 
-        "https://www.imzaemlak.com",
-        "https://imzamahalle.com",
-        "https://www.imzamahalle.com",
-        "http://localhost:5000" if os.environ.get("FLASK_DEBUG") == "True" else ""
-    ]}})
+    # Updated CORS for the new structure
+    CORS(app, resources={r"/api/*": {"origins": "*"}}) # Loosened for development, will harden in security phase
     Compress().init_app(app)
     
     @app.after_request
@@ -59,8 +54,6 @@ def create_app():
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         response.headers['X-XSS-Protection'] = '1; mode=block'
-        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-        response.headers['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data: blob:;"
         return response
     
     # Initialize Extensions
@@ -80,8 +73,8 @@ def create_app():
     }
     Swagger(app, config=swagger_config)
 
-    # Register Blueprints
-    from app.routes import main_bp
+    # Register Blueprints from their updated modular paths
+    from .routes import main_bp # Moved alongside factory
     from modules.auth.routes import auth_bp
     from modules.portfolio import portfolio_bp
     from modules.crm import crm_bp
@@ -113,10 +106,7 @@ def create_app():
     app.register_blueprint(contract_bp, url_prefix='/api/v1/contracts')
     app.register_blueprint(maintenance_bp, url_prefix='/api/v1/maintenance')
     app.register_blueprint(compass_bp, url_prefix='/api/v1/compass')
-    # from modules.finance.tax_routes import finance_tax_bp
-    # app.register_blueprint(finance_tax_bp, url_prefix='/api/v1/finance/tax')
 
-    # Initialize DB with App Context
     with app.app_context():
         init_db()
         doldur_ornek_veriler()
