@@ -12,7 +12,7 @@ def test_login_success(client, app):
     assert response.status_code == 200
     data = response.get_json()
     assert 'token' in data
-    assert data['role'] == 'admin'
+    assert data['role'] == 'super_admin'
 
 def test_login_invalid_credentials(client):
     """Test login with wrong password."""
