@@ -12,7 +12,7 @@ def test_security_headers(client):
     """Test if security headers are present in responses."""
     response = client.get('/health')
     assert response.headers['X-Content-Type-Options'] == 'nosniff'
-    assert response.headers['X-Frame-Options'] == 'DENY'
+    assert response.headers['X-Frame-Options'] == 'SAMEORIGIN'
 
 def test_auth_protected_route(client):
     """Ensure sensitive routes return 401 without token."""

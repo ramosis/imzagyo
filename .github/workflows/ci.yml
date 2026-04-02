@@ -34,4 +34,4 @@ jobs:
         FLASK_SECRET_KEY: "test-key-ci"
         DATABASE_URL: "sqlite:///:memory:"
       run: |
-        python -m pytest tests/ -v --cov=app --cov=modules --cov=shared
+        python -m pytest tests/ -v --cov=modules --cov=shared

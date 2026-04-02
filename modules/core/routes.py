@@ -10,6 +10,10 @@ main_bp = Blueprint('main', __name__)
 def get_root_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
+@main_bp.route('/health')
+def health_check():
+    return jsonify({'status': 'healthy'}), 200
+
 @main_bp.route('/')
 def index():
     host = request.headers.get('Host', '')

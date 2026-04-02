@@ -16,7 +16,7 @@ def app():
     from shared import database
     database.DB_NAME = db_path
     
-    from app.factory import create_app
+    from modules.core.factory import create_app
     app = create_app()
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
