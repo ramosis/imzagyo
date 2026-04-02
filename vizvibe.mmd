@@ -26,13 +26,22 @@ flowchart TD
     %% @feature_phase28_stabilization [ai-task, closed, 2026-04-02, antigravity]
     feature_phase28_stabilization("Faz 28 Stabilizasyonu<br/><sub>Döngüsel bağımlılıklar kırıldı,<br/>Gunicorn kilitleri (factory) açıldı,<br/>CI izinleri ve yolları düzeltildi.<br/>12/12 Test TAM YEŞİL yandı.</sub>")
 
+    %% @feature_domain_cleanup [ai-task, closed, 2026-04-02, antigravity]
+    feature_domain_cleanup("Kimlik Restorasyonu Operasyonu<br/><sub>imzagayrimenkul.com sızıntıları<br/>temizlendi, imzaemlak.com projenin<br/>tüm DNA'sına mühürlendi.</sub>")
+
+    %% @feature_sentry_safe_init [ai-task, closed, 2026-04-03, antigravity]
+    feature_sentry_safe_init("Sentry Güvenli Başlatma<br/><sub>Geçersiz DSN kaynaklı sunucu<br/>çökme hatası (BadDsn) giderildi.<br/>Uygulama artık hatalı konfigürasyonla<br/>çökmeden ayağa kalkabilir.</sub>")
+
     %% === FUTURE WORK ===
+    %% @phase_29_postgresql [ai-task, opened, 2026-04-10, antigravity]
+    phase_29_postgresql("Faz 29: Postgres & Migrasyon<br/><sub>SQLite'tan PostgreSQL'e geçiş,<br/>veritabanı normalizasyonu ve<br/>performans optimizasyonu.</sub>")
+
     %% @ultimate_goal [end, opened, 2026-06-01, user]
     ultimate_goal("Vizyon: Tam Otomasyon<br/><sub>Yapay zeka asistanı ile<br/>insansız operasyon ve<br/>maksimum satış dönüşümü.</sub>")
 
     %% === RECENT ===
     subgraph recent [RECENT]
-        feature_phase28_stabilization
+        feature_sentry_safe_init
     end
 
     %% === EDGES ===
@@ -42,7 +51,10 @@ flowchart TD
     feature_neighborhood_hub --> feature_phase25_docker_stabilization
     feature_phase25_docker_stabilization --> feature_phase28_unification
     feature_phase28_unification --> feature_phase28_stabilization
-    feature_phase28_stabilization -.-> ultimate_goal
+    feature_phase28_stabilization --> feature_domain_cleanup
+    feature_domain_cleanup --> feature_sentry_safe_init
+    feature_sentry_safe_init -.-> phase_29_postgresql
+    phase_29_postgresql -.-> ultimate_goal
 
     %% === STYLES ===
     %% Closed tasks
@@ -53,12 +65,15 @@ flowchart TD
     style feature_phase25_docker_stabilization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_phase28_unification fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_phase28_stabilization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_domain_cleanup fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style feature_sentry_safe_init fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
     %% Recent node
-    style feature_phase28_stabilization fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style feature_sentry_safe_init fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style phase_29_postgresql fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

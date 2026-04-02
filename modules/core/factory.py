@@ -30,14 +30,19 @@ def create_app(init_database=False):
     app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # Increased for portfolio media
     app.config['UPLOAD_FOLDER'] = 'uploads'
     
-    # Sentry & Monitoring
-    if os.getenv("SENTRY_DSN"):
-        sentry_sdk.init(
-            dsn=os.getenv("SENTRY_DSN"),
-            integrations=[FlaskIntegration()],
-            traces_sample_rate=0.2,
-            environment="production" if os.getenv("FLASK_DEBUG") == "False" else "development",
-        )
+    # Sentry & Monitoring (Robust initialization to prevent app crash)
+    sentry_dsn = os.getenv("SENTRY_DSN")
+    if sentry_dsn:
+        try:
+            sentry_sdk.init(
+                dsn=sentry_dsn,
+                integrations=[FlaskIntegration()],
+                traces_sample_rate=0.2,
+                environment="production" if os.getenv("FLASK_DEBUG") == "False" else "development",
+            )
+            app.logger.info("Sentry başarıyla başlatıldı.")
+        except Exception as e:
+            app.logger.warning(f"Sentry başlatılamadı (Geçersiz DSN: {sentry_dsn}). Hata: {e}")
 
     # Logging (Dynamic logs directory)
     log_dir = os.environ.get("LOG_DIR", os.path.join(os.getcwd(), "logs"))
