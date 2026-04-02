@@ -1,26 +1,25 @@
 import os
 import datetime
 from flask import request, jsonify, g
-import google.generativeai as genai
+from google import genai
 from shared.database import get_db
 from modules.auth.decorators import require_inner_circle, login_required
 from . import ai_bp
 
-def get_ai_model():
+def get_ai_client():
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key: return None
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel('gemini-1.5-flash')
+    return genai.Client(api_key=api_key)
 
 @ai_bp.route('/generate-summary', methods=['POST'])
 @require_inner_circle
 def generate_summary():
     data = request.json
-    model = get_ai_model()
-    if not model: return jsonify({"error": "AI Key missing"}), 500
+    client = get_ai_client()
+    if not client: return jsonify({"error": "AI Key missing"}), 500
     
     prompt = f"Lüks emlak uzmanı mısın? Şu özellikler için 2-3 paragraflık ilan açıklaması yaz: {data}"
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
     return jsonify({"story": response.text.strip()}), 200
 
 @ai_bp.route('/analyze-investor', methods=['POST'])
@@ -51,11 +50,11 @@ def collect_interaction():
     return jsonify({"status": "success"}), 201
 
 def translate_content(text, target_lang):
-    model = get_ai_model()
-    if not model: return text
+    client = get_ai_client()
+    if not client: return text
     try:
         prompt = f"Sen profesyonel bir gayrimenkul çevirmenisin. Aşağıdaki Türkçe metni {target_lang} diline çevir: {text}"
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
         return response.text.strip()
     except: return text
 

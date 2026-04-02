@@ -104,3 +104,40 @@ class PipelineRepository:
         db.session.add(history)
         db.session.commit()
         return True
+
+class ContactRepository:
+    """Handles database operations for Contacts using SQLAlchemy ORM."""
+    
+    @staticmethod
+    def get_all() -> List[Contact]:
+        return Contact.query.order_by(Contact.name).all()
+
+    @staticmethod
+    def get_by_id(contact_id: int) -> Optional[Contact]:
+        return db.session.get(Contact, contact_id)
+
+    @staticmethod
+    def create(data: Dict[str, Any]) -> Contact:
+        contact = Contact(**data)
+        db.session.add(contact)
+        db.session.commit()
+        return contact
+
+    @staticmethod
+    def update(contact_id: int, data: Dict[str, Any]) -> Optional[Contact]:
+        contact = db.session.get(Contact, contact_id)
+        if contact:
+            for key, value in data.items():
+                if hasattr(contact, key):
+                    setattr(contact, key, value)
+            db.session.commit()
+        return contact
+
+    @staticmethod
+    def delete(contact_id: int) -> bool:
+        contact = db.session.get(Contact, contact_id)
+        if contact:
+            db.session.delete(contact)
+            db.session.commit()
+            return True
+        return False

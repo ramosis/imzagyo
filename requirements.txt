@@ -2,7 +2,7 @@ flask
 flask-compress
 flask-cors
 python-dotenv
-google-generativeai
+google-genai
 PyJWT
 passlib
 bcrypt
