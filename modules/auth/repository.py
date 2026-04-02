@@ -1,6 +1,6 @@
 from typing import Optional, List, Dict, Any
 from shared.database import get_db
-from .service import AuthService
+# from .service import AuthService  # REMOVED TO BREAK CIRCULAR IMPORT
 
 class UserRepository:
     @staticmethod
@@ -22,6 +22,7 @@ class UserRepository:
             role = data.get('role')
             email = data.get('email')
             raw_password = data.get('password') or data.get('password_hash')
+            from .service import AuthService
             pwd_hash = AuthService.hash_password(raw_password)
             is_admin = data.get('is_admin', 0)
             
@@ -67,6 +68,7 @@ class UserRepository:
                 
             raw_password = data.get('password') or data.get('password_hash')
             if raw_password:
+                from .service import AuthService
                 fields.append("password_hash=?")
                 values.append(AuthService.hash_password(raw_password))
             
@@ -117,6 +119,7 @@ class UserRepository:
                 username = f"{base_username}{counter}"
                 counter += 1
             
+            from .service import AuthService
             pwd_hash = AuthService.hash_password(secrets.token_hex(16))
             cursor = conn.cursor()
             cursor.execute('''
