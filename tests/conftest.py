@@ -11,16 +11,14 @@ def app():
 
     # Setup temporary database
     db_fd, db_path = tempfile.mkstemp()
-    
-    # LATE IMPORTS to ensure DB_NAME can be overridden
-    from shared import database
-    database.DB_NAME = db_path
+    test_db_url = f"sqlite:///{db_path}"
+    os.environ['DATABASE_URL'] = test_db_url
     
     from modules.core.factory import create_app
     app = create_app()
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
+    app.config['SQLALCHEMY_DATABASE_URI'] = test_db_url
     app.config['WTF_CSRF_ENABLED'] = False
 
     with app.app_context():

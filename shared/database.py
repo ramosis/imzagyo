@@ -43,15 +43,21 @@ def doldur_ornek_veriler():
 
 # Legacy sqlite3 helpers (Keeping for strict backward compatibility where ORM is not yet fully used)
 import sqlite3
-DB_URL = os.environ.get("DATABASE_URL", "/app/data/imza_database.db")
-DB_NAME = DB_URL.replace("sqlite://", "").lstrip("/")
-if "/app/" in DB_URL or DB_URL.startswith("sqlite:////"):
-    DB_NAME = "/" + DB_NAME
+
+def get_db_name():
+    db_url = os.environ.get("DATABASE_URL", "/app/data/imza_database.db")
+    if db_url.startswith("sqlite:///"):
+        # Handle absolute path with 3 or 4 slashes
+        path = db_url.replace("sqlite:///", "")
+        # On Linux/Docker, if it started with ////, path still starts with /
+        return path
+    return db_url
 
 def get_db_connection():
-    if DB_NAME != ":memory:":
-        os.makedirs(os.path.dirname(DB_NAME), exist_ok=True)
-    conn = sqlite3.connect(DB_NAME)
+    db_name = get_db_name()
+    if db_name != ":memory:" and os.path.dirname(db_name):
+        os.makedirs(os.path.dirname(db_name), exist_ok=True)
+    conn = sqlite3.connect(db_name)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn

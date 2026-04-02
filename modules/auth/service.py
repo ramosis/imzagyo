@@ -4,9 +4,10 @@ import hashlib
 import jwt
 import bcrypt
 from flask import request, jsonify, g
-from shared.database import get_db_connection
 from shared.extensions import limiter
 import json
+
+# from shared.database import get_db_connection  # REMOVED TO BREAK CIRCULAR IMPORT
 
 def get_jwt_secret():
     return os.environ.get("JWT_SECRET", "dev-secret-key")
@@ -54,6 +55,7 @@ class AuthService:
                 if user_id:
                     # Seamless Migration
                     new_hash = AuthService.hash_password(plain_password)
+                    from shared.database import get_db_connection
                     with get_db_connection() as conn:
                         conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (new_hash, user_id))
                         # conn.commit() - get_db context manager handles commit
@@ -72,6 +74,7 @@ class AuthService:
                 payload = jwt.decode(jwt_token, get_jwt_secret(), algorithms=["HS256"])
                 user_id = payload.get('user_id')
                 if user_id:
+                    from shared.database import get_db_connection
                     with get_db_connection() as conn:
                         user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
                         if user:
@@ -118,6 +121,7 @@ def setup_oauth(app):
 class UnifiedAuthService:
     @staticmethod
     def audit_log(user_id: int, action: str, details: dict):
+        from shared.database import get_db_connection
         with get_db_connection() as conn:
             conn.execute('''
                 INSERT INTO auth_audit_log (user_id, action, details)
@@ -126,6 +130,7 @@ class UnifiedAuthService:
 
     @staticmethod
     def link_identity(user_id: int, provider: str, provider_id: str, email: str, is_verified: bool = False):
+        from shared.database import get_db_connection
         with get_db_connection() as conn:
             # Check if this provider_id is already linked to another user
             existing = conn.execute(
@@ -151,6 +156,7 @@ class UnifiedAuthService:
 
     @staticmethod
     def unlink_identity(user_id: int, identity_id: int):
+        from shared.database import get_db_connection
         with get_db_connection() as conn:
             identity = conn.execute(
                 'SELECT * FROM user_identities WHERE id = ? AND user_id = ? AND deleted_at IS NULL', 
@@ -173,6 +179,7 @@ class UnifiedAuthService:
 
     @staticmethod
     def set_primary_identity(user_id: int, identity_id: int):
+        from shared.database import get_db_connection
         with get_db_connection() as conn:
             # Önce kimlik bu kullanıcıya mı ait kontrol et
             identity = conn.execute(
@@ -191,6 +198,7 @@ class UnifiedAuthService:
 
     @staticmethod
     def get_user_identities(user_id: int):
+        from shared.database import get_db_connection
         with get_db_connection() as conn:
             rows = conn.execute(
                 'SELECT id, provider, provider_id, email, is_verified, is_primary, deleted_at FROM user_identities WHERE user_id = ? AND deleted_at IS NULL',
@@ -200,6 +208,7 @@ class UnifiedAuthService:
             
     @staticmethod
     def get_audit_logs(user_id: int = None, limit: int = 50):
+        from shared.database import get_db_connection
         with get_db_connection() as conn:
             if user_id:
                 rows = conn.execute(

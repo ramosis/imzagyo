@@ -1,6 +1,6 @@
 from flask import Blueprint, send_from_directory, request, jsonify, current_app
 import os
-from shared.database import get_db_connection, get_db, get_setting, set_setting
+# from shared.database import get_db_connection, get_db, get_setting, set_setting  # REMOVED TO BREAK CIRCULAR IMPORT
 from shared.page_service import PageService
 from shared.utils import sanitize_input
 
@@ -63,6 +63,7 @@ def robots():
 
 @main_bp.route('/sitemap.xml')
 def sitemap():
+    from shared.database import get_db_connection
     with get_db_connection() as conn:
         portfoyler = conn.execute('SELECT id FROM portfoyler').fetchall()
 
@@ -90,6 +91,7 @@ def sitemap():
 @main_bp.route('/api/v1/settings/site_mode', methods=['GET'])
 def get_site_mode():
     """Returns the current site mode."""
+    from shared.database import get_setting
     mode = get_setting('site_mode', 'placeholder')
     return jsonify({'site_mode': mode})
 
@@ -106,6 +108,7 @@ def set_site_mode():
     if new_mode not in ['demo', 'placeholder', 'live']:
         return jsonify({'error': 'Invalid mode. Must be: demo, placeholder, live'}), 400
     
+    from shared.database import set_setting
     set_setting('site_mode', new_mode)
     try:
         from shared.extensions import cache
@@ -133,6 +136,7 @@ def public_lead_form():
     segment_map = {'buy': 'buyer', 'rent': 'buyer', 'sell': 'owner', 'lease': 'owner'}
     segment = segment_map.get(action_type, 'buyer')
     
+    from shared.database import get_db
     with get_db() as conn:
         conn.execute(
             '''INSERT INTO leads (name, phone, email, source, segment, action_type, notes, status)

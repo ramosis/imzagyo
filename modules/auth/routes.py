@@ -3,7 +3,9 @@ import datetime
 import secrets
 import jwt
 from flask import Blueprint, request, jsonify, g
-from shared.database import get_db_connection
+import datetime
+from flask import Blueprint, request, jsonify, g
+# from shared.database import get_db_connection  # REMOVED TO BREAK CIRCULAR IMPORT
 from shared.extensions import limiter
 from shared.utils import sanitize_input
 from shared.schemas import user_schema, ValidationError
@@ -12,6 +14,10 @@ from .repository import UserRepository
 from .decorators import require_permission, login_required, require_inner_circle
 
 auth_bp = Blueprint('auth', __name__)
+
+def db_conn():
+    from shared.database import get_db_connection
+    return get_db_connection()
 
 @auth_bp.route('/login', methods=['POST'])
 @limiter.limit("5 per minute")
@@ -22,7 +28,7 @@ def login():
     if not username or not password:
         return jsonify({'error': 'Missing credentials'}), 400
     
-    with get_db_connection() as conn:
+    with db_conn() as conn:
         user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
     
     if user is None or not AuthService.verify_password(password, user['password_hash'], user['id']):
@@ -46,7 +52,7 @@ def login():
     refresh_token = secrets.token_urlsafe(64)
     expires_at = datetime.datetime.utcnow() + datetime.timedelta(days=7)
     
-    with get_db_connection() as conn:
+    with db_conn() as conn:
         conn.execute(
             'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
             (user['id'], refresh_token, expires_at.strftime('%Y-%m-%d %H:%M:%S'))
@@ -74,7 +80,7 @@ def mobile_login():
     if not username or not password or not requested_app:
         return jsonify({'error': 'Missing credentials or app_type'}), 400
         
-    with get_db_connection() as conn:
+    with db_conn() as conn:
         user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
     
     if user is None or not AuthService.verify_password(password, user['password_hash'], user['id']):
@@ -101,7 +107,7 @@ def mobile_login():
     refresh_token = secrets.token_urlsafe(64)
     expires_at = datetime.datetime.utcnow() + datetime.timedelta(days=7)
     
-    with get_db_connection() as conn:
+    with db_conn() as conn:
         conn.execute(
             'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
             (user['id'], refresh_token, expires_at.strftime('%Y-%m-%d %H:%M:%S'))
@@ -128,7 +134,7 @@ def refresh_token():
         return jsonify({'error': 'Refresh token missing'}), 400
         
     now = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-    with get_db_connection() as conn:
+    with db_conn() as conn:
         record = conn.execute('SELECT * FROM refresh_tokens WHERE token = ? AND revoked = 0 AND expires_at > ?', (r_token, now)).fetchone()
         
         if not record:
@@ -162,7 +168,7 @@ def logout():
     data = request.json or {}
     r_token = data.get('refresh_token')
     if r_token:
-        with get_db_connection() as conn:
+        with db_conn() as conn:
             conn.execute('UPDATE refresh_tokens SET revoked = 1 WHERE token = ?', (r_token,))
             conn.commit()
             
@@ -176,7 +182,7 @@ def request_reset():
     if not email:
         return jsonify({'error': 'E-posta adresi gerekli'}), 400
         
-    with get_db_connection() as conn:
+    with db_conn() as conn:
         user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
         if user:
             token = secrets.token_urlsafe(32)
@@ -200,7 +206,7 @@ def reset_password():
     if not token or not new_password:
         return jsonify({'error': 'Token ve yeni şifre gereklidir'}), 400
         
-    with get_db_connection() as conn:
+    with db_conn() as conn:
         now = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         reset_req = conn.execute('''
             SELECT * FROM password_resets 
@@ -303,7 +309,7 @@ def authorize(provider):
     
     refresh_token = secrets.token_urlsafe(64)
     expires_at = datetime.datetime.utcnow() + datetime.timedelta(days=7)
-    with get_db_connection() as conn:
+    with db_conn() as conn:
         conn.execute(
             'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
             (user['id'], refresh_token, expires_at.strftime('%Y-%m-%d %H:%M:%S'))
