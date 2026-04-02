@@ -7,7 +7,7 @@ let currentData = {
     listing_type: 'Satılık'
 };
 
-const API_BASE = "https://imzagayrimenkul.com";
+const API_BASE = "https://imzaemlak.com";
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Dil ayarını yükle ve uygula

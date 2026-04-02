@@ -22,7 +22,7 @@ echo "[2/5] Geçici HTTP konfigürasyonu kuruluyor..."
 cat <<EOF | sudo tee /etc/nginx/sites-available/imza_temp
 server {
     listen 80;
-    server_name imzaemlak.com www.imzaemlak.com imzamahalle.com www.imzamahalle.com imzagayrimenkul.com www.imzagayrimenkul.com;
+    server_name imzaemlak.com www.imzaemlak.com imzamahalle.com www.imzamahalle.com;
     
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;

@@ -11,7 +11,7 @@
     "tabs"
   ],
   "host_permissions": [
-    "https://imzagayrimenkul.com/*"
+    "https://imzaemlak.com/*"
   ],
   "background": {
     "service_worker": "background.js"

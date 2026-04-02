@@ -17,7 +17,7 @@
 set -euo pipefail
 
 # --- Configuration ---
-DOMAIN="${1:-imzagayrimenkul.com}"
+DOMAIN="${1:-imzaemlak.com}"
 APP_DIR="/opt/imzagyo"
 CERTBOT_WEBROOT="/var/www/certbot"
 EMAIL="${2:-admin@$DOMAIN}"

@@ -26,6 +26,7 @@ def init_db():
                 password_hash=hashed_pw, 
                 role='super_admin', 
                 is_admin=True,
+                email='admin@imzaemlak.com',
                 email_verified=True
             )
             db.session.add(admin)
@@ -45,7 +46,8 @@ def doldur_ornek_veriler():
 import sqlite3
 
 def get_db_name():
-    db_url = os.environ.get("DATABASE_URL", "/app/data/imza_database.db")
+    default_db = os.path.join(os.getcwd(), "data", "imza_database.db")
+    db_url = os.environ.get("DATABASE_URL", default_db)
     if db_url.startswith("sqlite:///"):
         # Handle absolute path with 3 or 4 slashes
         path = db_url.replace("sqlite:///", "")

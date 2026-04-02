@@ -6,9 +6,9 @@ import os
 # E-posta Ayarları (Varsayılanlar .env'den alınmalıdır)
 SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
-SMTP_USER = os.environ.get("SMTP_USER", "info@imzagayrimenkul.com")
+SMTP_USER = os.environ.get("SMTP_USER", "info@imzaemlak.com")
 SMTP_PASS = os.environ.get("SMTP_PASS", "oyqb jcoa exbc bizc")
-MAIL_FROM = os.environ.get("MAIL_FROM", "İmza Gayrimenkul <info@imzagayrimenkul.com>")
+MAIL_FROM = os.environ.get("MAIL_FROM", "İmza Gayrimenkul <info@imzaemlak.com>")
 
 def send_email(subject, recipient, body_html):
     """
@@ -36,7 +36,7 @@ def send_password_reset_email(email, token, username):
     """
     Şifre sıfırlama e-postası şablonunu hazırlar ve gönderir.
     """
-    reset_url = f"https://imzagayrimenkul.com/reset-password?token={token}"
+    reset_url = f"https://imzaemlak.com/reset-password?token={token}"
     
     html = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">

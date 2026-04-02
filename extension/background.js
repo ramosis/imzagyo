@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-const API_BASE = "https://imzagayrimenkul.com";
+const API_BASE = "https://imzaemlak.com";
 
 async function fetchValuation(data) {
     try {
