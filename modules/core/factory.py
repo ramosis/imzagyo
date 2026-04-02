@@ -21,7 +21,7 @@ def create_app():
     
     # Configuration
     DB_NAME = "/app/data/imza_database.db"
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}"
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", f"sqlite:///{DB_NAME}")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
     app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # Increased for portfolio media
