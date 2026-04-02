@@ -19,8 +19,11 @@ def create_app(init_database=False):
     # Path adjustment for the new location (modules/core/)
     app = Flask(__name__, template_folder='../../pages', static_folder='../../static')
     
-    # Configuration
-    DB_NAME = "/app/data/imza_database.db"
+    # Configuration (Dynamic paths for local, CI, and Docker)
+    DB_DIR = os.environ.get("DB_DIR", os.path.join(os.getcwd(), "data"))
+    os.makedirs(DB_DIR, exist_ok=True)
+    DB_NAME = os.path.join(DB_DIR, "imza_database.db")
+    
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", f"sqlite:///{DB_NAME}")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
@@ -36,8 +39,8 @@ def create_app(init_database=False):
             environment="production" if os.getenv("FLASK_DEBUG") == "False" else "development",
         )
 
-    # Logging
-    log_dir = "/app/logs"
+    # Logging (Dynamic logs directory)
+    log_dir = os.environ.get("LOG_DIR", os.path.join(os.getcwd(), "logs"))
     os.makedirs(log_dir, exist_ok=True)
     handler = RotatingFileHandler(os.path.join(log_dir, "app.log"), maxBytes=5*1024*1024, backupCount=5)
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
