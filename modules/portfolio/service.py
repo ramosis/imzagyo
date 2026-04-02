@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from shared.utils import sanitize_input, sanitize_html
 from shared.schemas import portfolio_schema
-from modules.ai.routes import translate_content
+# from modules.ai.routes import translate_content  # REMOVED TO BREAK CIRCULAR IMPORT
 from .repository import PortfolioRepository
 
 class PortfolioService:
@@ -15,6 +15,7 @@ class PortfolioService:
         target_fields = ['baslik1', 'baslik2', 'lokasyon', 'hikaye']
         for field in target_fields:
             if field in validated_data:
+                from modules.ai.routes import translate_content
                 source = validated_data[field]
                 validated_data[f'{field}_en'] = translate_content(source, 'İngilizce')
                 validated_data[f'{field}_ar'] = translate_content(source, 'Arapça')

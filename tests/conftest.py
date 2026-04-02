@@ -15,7 +15,7 @@ def app():
     os.environ['DATABASE_URL'] = test_db_url
     
     from modules.core.factory import create_app
-    app = create_app()
+    app = create_app(init_database=True)
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = test_db_url

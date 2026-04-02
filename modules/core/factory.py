@@ -14,7 +14,7 @@ from shared.extensions import db, cache, limiter, babel, csrf, socketio, migrate
 import shared.models # Ensure all models are loaded
 from shared.database import init_db, doldur_ornek_veriler
 
-def create_app():
+def create_app(init_database=False):
     load_dotenv()
     # Path adjustment for the new location (modules/core/)
     app = Flask(__name__, template_folder='../../pages', static_folder='../../static')
@@ -107,8 +107,9 @@ def create_app():
     app.register_blueprint(maintenance_bp, url_prefix='/api/v1/maintenance')
     app.register_blueprint(compass_bp, url_prefix='/api/v1/compass')
 
-    with app.app_context():
-        init_db()
-        doldur_ornek_veriler()
+    if init_database:
+        with app.app_context():
+            init_db()
+            doldur_ornek_veriler()
         
     return app
