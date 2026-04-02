@@ -2,6 +2,12 @@
 
 Sunucu dizini artık daha profesyonel ve anonim bir yol olan `/opt/imzagyo` olarak güncellenmiştir.
 
+## 🌍 Canlı Altyapı Bilgileri (AI Kopya Kağıdı)
+- **Ana Domain:** `https://imzagayrimenkul.com` (VIP & Yatırım)
+- **Mahalle Portalı:** `https://imzamahalle.com`
+- **Backend Portu:** `8000` (Docker üzerinde çalışır)
+- **Bağlantı Protokolü:** Nginx -> Proxy Pass (127.0.0.1:8000)
+
 ## 🚀 1. Otomatik Güncelleme (TAVSİYE EDİLEN)
 Artık sunucuda tek bir komutla tüm süreci (git pull + docker build + restart) yöneten bir script bulunmaktadır:
 
@@ -29,6 +35,22 @@ sudo docker-compose up -d --build
 sudo cp deploy/nginx.conf /etc/nginx/sites-available/imzagayrimenkul
 sudo systemctl reload nginx
 ```
+
+## 🛠️ 3. Çevresel Değişkenler (.env) Onarımı
+Eğer `.env` dosyası eksikse veya "Permission Denied" hatası alıyorsanız:
+
+```bash
+# Varsa hatalı klasörü sil ve şablonu kopyala
+sudo rm -rf .env && sudo cp .env.example .env
+
+# Dosyayı düzenle (Mühürleme)
+sudo nano .env
+```
+
+> [!IMPORTANT]
+> **Kritik Anahtarlar (AI Referans):**
+> - `FLASK_APP=wsgi.py` (Faz 28 sonrası giriş noktası)
+> - `FLASK_SECRET_KEY` ve `JWT_SECRET` (Eklenti yetkilendirmesi için)
 
 ## 👥 Örnek Kullanıcı Bilgileri
 
