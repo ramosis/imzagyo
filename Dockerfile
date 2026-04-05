@@ -28,5 +28,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Uygulamayı başlat
 # Üretim ortamı için Gunicorn kullanıyoruz. 1GB RAM kısıtı nedeniyle 
-# 2 adet Gevent worker kullanarak stabiliteyi sağlıyoruz.
-CMD ["gunicorn", "-w", "2", "-k", "gevent", "-b", "0.0.0.0:8000", "wsgi:app"]
+# 1 adet Gevent worker kullanarak maksimum stabiliteyi sağlıyoruz.
+CMD ["gunicorn", "-w", "1", "-k", "gevent", "-b", "0.0.0.0:8000", "wsgi:app"]
