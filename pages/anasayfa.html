@@ -76,17 +76,17 @@
     }
     </script>
 
-    <script src="../js/i18n.js"></script>
-    <script src="../js/currency.js"></script>
-    <script src="../js/mobile_polish.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/currency.js"></script>
+    <script src="/static/js/mobile_polish.js"></script>
     
     <!-- İMZA LENS: AKILLI KARŞILAMA VE ANALİZ KÜTÜPHANESİ -->
-    <link rel="stylesheet" href="../static/js/imzalens/imza-lens.css?v=1.4">
-    <script src="../static/js/imzalens/imza-lens.core.js?v=1.4"></script>
-    <script src="../static/js/imzalens/imza-lens.ui.js?v=1.4"></script>
-    <script src="../static/js/imzalens/imza-lens-metrics.js?v=1.4"></script>
-    <link rel="stylesheet" href="../static/css/fluid.css">
-    <link rel="stylesheet" href="../static/css/placeholders.css">
+    <link rel="stylesheet" href="/static/js/imzalens/imza-lens.css?v=1.4">
+    <script src="/static/js/imzalens/imza-lens.core.js?v=1.4"></script>
+    <script src="/static/js/imzalens/imza-lens.ui.js?v=1.4"></script>
+    <script src="/static/js/imzalens/imza-lens-metrics.js?v=1.4"></script>
+    <link rel="stylesheet" href="/static/css/fluid.css">
+    <link rel="stylesheet" href="/static/css/placeholders.css">
 
     <script>
         tailwind.config = {
@@ -320,6 +320,11 @@
             justify-content: center;
         }
 
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 6rem; /* h-24 equivalent */
+        }
+        
         .lux-curtain.hidden {
             opacity: 0;
             visibility: hidden; /* Butonlara tıklamayı engellememesi için */
@@ -1826,7 +1831,7 @@
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('../sw.js')
+                navigator.serviceWorker.register('/sw.js')
                     .then(reg => console.log('Service Worker kayıtlı', reg))
                     .catch(err => console.log('SW hatası', err));
             });

@@ -32,8 +32,11 @@ flowchart TD
     %% @feature_sentry_safe_init [ai-task, closed, 2026-04-03, antigravity]
     feature_sentry_safe_init("Sentry Güvenli Başlatma<br/><sub>Geçersiz DSN kaynaklı sunucu<br/>çökme hatası (BadDsn) giderildi.<br/>Uygulama artık hatalı konfigürasyonla<br/>çökmeden ayağa kalkabilir.</sub>")
 
-    %% @performance_investigation [ai-task, opened, 2026-04-05, antigravity]
-    performance_investigation("CPU Performans Analizi<br/><sub>Son 10 commit sonrası %97'ye<br/>fırlayan CPU kullanımı için kök<br/>neden analizi ve optimizasyon<br/>çalışması başlatıldı.</sub>")
+    %% @performance_investigation [ai-task, closed, 2026-04-05, antigravity]
+    performance_investigation("CPU & Stabilite Çözümü<br/><sub>Gevent worker yapısına geçildi,<br/>monkey-patching uygulandı ve<br/>CPU spike sorunları giderildi.<br/>Sistem 1GB RAM ile stabil.</sub>")
+
+    %% @ui_stabilization [ai-task, opened, 2026-04-05, antigravity]
+    ui_stabilization("UI & Asset Stabilizasyonu<br/><sub>404/405 hataları gideriliyor,<br/>asset yolları mutlaklaştırılıyor ve<br/>bekleme ekranı geri getiriliyor.</sub>")
 
     %% === FUTURE WORK ===
     %% @phase_29_postgresql [ai-task, opened, 2026-04-10, antigravity]
@@ -44,7 +47,7 @@ flowchart TD
 
     %% === RECENT ===
     subgraph recent [RECENT]
-        performance_investigation
+        ui_stabilization
     end
 
     %% === EDGES ===
@@ -53,11 +56,13 @@ flowchart TD
     feature_three_mode_site --> feature_neighborhood_hub
     feature_neighborhood_hub --> feature_phase25_docker_stabilization
     feature_phase25_docker_stabilization --> feature_phase28_unification
+    feature_phase25_docker_stabilization --> ui_stabilization
     feature_phase28_unification --> feature_phase28_stabilization
     feature_phase28_stabilization --> feature_domain_cleanup
     feature_domain_cleanup --> feature_sentry_safe_init
     feature_sentry_safe_init --> performance_investigation
-    performance_investigation -.-> phase_29_postgresql
+    performance_investigation --> ui_stabilization
+    ui_stabilization -.-> phase_29_postgresql
     phase_29_postgresql -.-> ultimate_goal
 
     %% === STYLES ===
@@ -71,9 +76,10 @@ flowchart TD
     style feature_phase28_stabilization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_domain_cleanup fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_sentry_safe_init fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style performance_investigation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
     %% Recent node
-    style performance_investigation fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style ui_stabilization fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
@@ -81,4 +87,5 @@ flowchart TD
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
     style phase_29_postgresql fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style performance_investigation fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style ui_stabilization fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+

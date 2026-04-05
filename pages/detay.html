@@ -22,7 +22,7 @@
     <!-- Structured Data Placeholder -->
     <script type="application/ld+json" id="listing-schema"></script>
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="../static/css/fluid.css">
+    <link rel="stylesheet" href="/static/css/fluid.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -158,6 +158,10 @@
             justify-content: center;
         }
 
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 6rem; /* h-24 equivalent */
+        }
         .lux-curtain.hidden {
             opacity: 0;
         }
@@ -711,7 +715,9 @@
             else if (touchEndY - touchStartY > 50) goToSection(currentSectionIndex - 1);
         });
     </script>
-    <script src="../static/js/imza-settings.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/currency.js"></script>
+    <script src="/static/js/imza-settings.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             applyMaybachSettings();

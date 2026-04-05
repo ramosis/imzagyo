@@ -87,6 +87,26 @@ def sitemap():
     
     return "\n".join(sitemap_xml), 200, {'Content-Type': 'application/xml'}
 
+@main_bp.route('/manifest.json')
+def serve_manifest():
+    return send_from_directory(os.path.join(get_root_path(), 'static'), 'manifest.json')
+
+@main_bp.route('/sw.js')
+def serve_sw():
+    return send_from_directory(os.path.join(get_root_path(), 'static'), 'sw.js')
+
+@main_bp.route('/favicon.ico')
+def serve_favicon():
+    return send_from_directory(os.path.join(get_root_path(), 'static'), 'favicon.ico')
+
+# ========== TRACKING API (IMZA LENS) ==========
+@main_bp.route('/api/tracking/sync', methods=['POST'])
+def tracking_sync():
+    """Stub for İmza Lens tracking data. Prevents 405 error and handles metric sync."""
+    data = request.json or {}
+    # Future: Save metrics to database if needed
+    return jsonify({'status': 'synced', 'received': len(data.get('events', []))}), 200
+
 # ========== SETTINGS API ==========
 @main_bp.route('/api/v1/settings/site_mode', methods=['GET'])
 def get_site_mode():
