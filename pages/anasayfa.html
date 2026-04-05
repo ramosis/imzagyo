@@ -142,12 +142,7 @@
                 flex-direction: column;
                 justify-content: center;
                 overflow: hidden;
-            }
-
-            section.snap-section,
-            footer.snap-section {
-                padding-top: 6rem;
-                /* Header payı */
+                padding-top: 6rem; /* Header clearance */
             }
         }
 
@@ -534,7 +529,7 @@
         class="fixed inset-0 z-[110] bg-navy/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
 
     <!-- Ana Kaydırma Sarmalayıcı -->
-    <div class="main-wrapper pt-24 md:pt-[98px]" id="mainWrapper">
+    <div class="main-wrapper" id="mainWrapper">
 
         <!-- Section 1: Intro (Hero + Partners + Bar) -->
         <div class="intro-screen flex flex-col min-h-screen">
@@ -612,14 +607,13 @@
         </div>
         <section id="seriler" class="snap-section bg-white border-b border-gray-100 text-navy">
             <div class="w-full text-center px-fluid-screen">
-                <div class="mb-10 md:mb-12 text-center">
-                    <h2 class="text-fluid-4xl font-bold font-serif mb-4 uppercase tracking-tighter">Yaşam Koleksiyonları</h2>
+                <div class="mb-6 md:mb-8 text-center px-4">
+                    <h2 class="text-fluid-3xl md:text-fluid-4xl font-bold font-serif mb-2 uppercase tracking-tight leading-tight">Yaşam Koleksiyonları</h2>
                     <div class="w-16 h-1 bg-gold mx-auto mb-4"></div>
-                    <p class="text-gray-400 text-sm max-w-lg mx-auto font-light">Gayrimenkul dünyasında üç farklı
-                        vizyon, binlerce farklı hikaye.</p>
+                    <p class="text-gray-400 text-[10px] md:text-sm max-w-lg mx-auto font-light leading-relaxed">Gayrimenkul dünyasında üç farklı vizyon, binlerce farklı hikaye.</p>
                 </div>
 
-                <div class="flex md:grid md:grid-cols-2 lg:grid-cols-3 md:grid-flow-dense gap-6 md:gap-8 lg:gap-10 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory no-scrollbar pb-12 -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth" id="collections-grid">
+                <div class="flex md:grid md:grid-cols-2 lg:grid-cols-3 md:grid-flow-dense gap-4 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory no-scrollbar pb-8 -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth md:max-h-[60vh]" id="collections-grid">
                     <!-- Dinamik olarak JS ile doldurulacak -->
                 </div>
             </div>
@@ -1787,7 +1781,7 @@
             grid.innerHTML = Object.entries(collectionData).map(([key, data]) => `
                 <div onclick="ImzaLens.track('${key}', 24000000); luxNavigate('koleksiyon.html?tip=${key}')"
                     data-imza-lens-track="${key}"
-                    class="relative ${data.featured ? 'h-[350px] md:h-full md:row-span-2 md:col-span-2' : 'h-[350px] md:h-[300px]'} rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl flex-shrink-0 w-[85%] md:w-auto snap-center bento-card">
+                    class="relative ${data.featured ? 'h-[320px] md:h-[450px] lg:h-full md:row-span-2 md:col-span-2' : 'h-[320px] md:h-[210px] lg:h-[220px]'} rounded-[2rem] md:rounded-[2.5rem] overflow-hidden group cursor-pointer shadow-2xl flex-shrink-0 w-[85%] md:w-auto snap-center bento-card">
                     <img src="${data.img}" alt="${data.title} Koleksiyonu"
                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
                     <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/20 to-transparent text-left"></div>
