@@ -24,7 +24,19 @@ def create_app(init_database=False):
     os.makedirs(DB_DIR, exist_ok=True)
     DB_NAME = os.path.join(DB_DIR, "imza_database.db")
     
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", f"sqlite:///{DB_NAME}")
+    # Robust SQLAlchemy URI construction
+    db_env_url = os.environ.get("DATABASE_URL")
+    if db_env_url and db_env_url.strip():
+        # User provided an explicit URL (Postgres, remote SQLite, or other)
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_env_url.strip()
+    else:
+        # Fallback to local SQLite with absolute path (guaranteed 4 slashes on Linux)
+        abs_db_path = os.path.abspath(DB_NAME)
+        # SQLite absolute paths on Linux: sqlite:////tmp/db.sqlite
+        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{abs_db_path}"
+        if not abs_db_path.startswith('/'): # Standardizing for Unix absolute paths
+             # Windows style or other - SQLAlchemy handles sqlite:///C:\...
+             pass
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
     app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # Increased for portfolio media

@@ -35,3 +35,5 @@ flask-mail
 cloudinary
 filetype
 gunicorn
+gevent
+gevent-websocket
