@@ -49,14 +49,27 @@ def collect_interaction():
         conn.commit()
     return jsonify({"status": "success"}), 201
 
+_translation_cache = {}
+
 def translate_content(text, target_lang):
+    """Translates content using Gemini, with in-memory caching."""
+    if not text: return ""
+    
+    cache_key = f"{target_lang}:{text[:50]}" # Simple key for caching
+    if cache_key in _translation_cache:
+        return _translation_cache[cache_key]
+
     client = get_ai_client()
     if not client: return text
     try:
         prompt = f"Sen profesyonel bir gayrimenkul çevirmenisin. Aşağıdaki Türkçe metni {target_lang} diline çevir: {text}"
         response = client.models.generate_content(model='gemini-1.5-flash', contents=prompt)
-        return response.text.strip()
-    except: return text
+        result = response.text.strip()
+        _translation_cache[cache_key] = result
+        return result
+    except Exception as e:
+        print(f"AI Translation Error: {e}")
+        return text
 
 def calculate_intent_score(session_id):
     with get_db() as conn:

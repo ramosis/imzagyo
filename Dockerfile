@@ -27,5 +27,6 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8000/ || exit 1
 
 # Uygulamayı başlat
-# Üretim ortamı için Gunicorn kullanıyoruz. 4 worker ile concurrency sağliyoruz.
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "wsgi:app"]
+# Üretim ortamı için Gunicorn kullanıyoruz. Asenkron Eventlet worker'lar ile 
+# SocketIO ve AI çağrısı yapan süreçler için yüksek concurrency sağlıyoruz.
+CMD ["gunicorn", "-w", "4", "-k", "eventlet", "-b", "0.0.0.0:8000", "wsgi:app"]

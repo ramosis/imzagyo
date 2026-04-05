@@ -32,6 +32,9 @@ flowchart TD
     %% @feature_sentry_safe_init [ai-task, closed, 2026-04-03, antigravity]
     feature_sentry_safe_init("Sentry Güvenli Başlatma<br/><sub>Geçersiz DSN kaynaklı sunucu<br/>çökme hatası (BadDsn) giderildi.<br/>Uygulama artık hatalı konfigürasyonla<br/>çökmeden ayağa kalkabilir.</sub>")
 
+    %% @performance_investigation [ai-task, opened, 2026-04-05, antigravity]
+    performance_investigation("CPU Performans Analizi<br/><sub>Son 10 commit sonrası %97'ye<br/>fırlayan CPU kullanımı için kök<br/>neden analizi ve optimizasyon<br/>çalışması başlatıldı.</sub>")
+
     %% === FUTURE WORK ===
     %% @phase_29_postgresql [ai-task, opened, 2026-04-10, antigravity]
     phase_29_postgresql("Faz 29: Postgres & Migrasyon<br/><sub>SQLite'tan PostgreSQL'e geçiş,<br/>veritabanı normalizasyonu ve<br/>performans optimizasyonu.</sub>")
@@ -41,7 +44,7 @@ flowchart TD
 
     %% === RECENT ===
     subgraph recent [RECENT]
-        feature_sentry_safe_init
+        performance_investigation
     end
 
     %% === EDGES ===
@@ -53,7 +56,8 @@ flowchart TD
     feature_phase28_unification --> feature_phase28_stabilization
     feature_phase28_stabilization --> feature_domain_cleanup
     feature_domain_cleanup --> feature_sentry_safe_init
-    feature_sentry_safe_init -.-> phase_29_postgresql
+    feature_sentry_safe_init --> performance_investigation
+    performance_investigation -.-> phase_29_postgresql
     phase_29_postgresql -.-> ultimate_goal
 
     %% === STYLES ===
@@ -69,7 +73,7 @@ flowchart TD
     style feature_sentry_safe_init fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
     %% Recent node
-    style feature_sentry_safe_init fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style performance_investigation fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
@@ -77,3 +81,4 @@ flowchart TD
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
     style phase_29_postgresql fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style performance_investigation fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
