@@ -322,7 +322,7 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 6rem; /* h-24 equivalent */
+            scroll-padding-top: 100px; /* Header clearing */
         }
         
         .lux-curtain.hidden {
@@ -534,12 +534,13 @@
         class="fixed inset-0 z-[110] bg-navy/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
 
     <!-- Ana Kaydırma Sarmalayıcı -->
-    <div class="main-wrapper" id="mainWrapper">
+    <div class="main-wrapper pt-24 md:pt-[98px]" id="mainWrapper">
 
         <!-- Section 1: Intro (Hero + Partners + Bar) -->
         <div class="intro-screen flex flex-col min-h-screen">
             <!-- Hero Slider -->
-            <section class="relative pt-24 overflow-hidden bg-navy text-white hero-dynamic flex items-center flex-grow min-h-[500px] md:min-h-[600px] lg:min-h-[700px] xl:min-h-[800px]"
+            <!-- Hero Slider (Pushed below header by main-padding) -->
+            <section class="relative overflow-hidden bg-navy text-white hero-dynamic flex items-center flex-grow min-h-[500px] md:min-h-[600px] lg:min-h-[700px] xl:min-h-[800px]"
                 id="heroSlider">
 
                 <div id="hero-slides-wrapper" class="absolute inset-0 z-0">
