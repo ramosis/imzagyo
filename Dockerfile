@@ -27,6 +27,6 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8000/ || exit 1
 
 # Uygulamayı başlat
-# Üretim ortamı için Gunicorn kullanıyoruz. Asenkron Gevent worker'lar ile 
-# SocketIO ve AI çağrısı yapan süreçler için istikrarlı concurrency sağlıyoruz.
-CMD ["gunicorn", "-w", "4", "-k", "gevent", "-b", "0.0.0.0:8000", "wsgi:app"]
+# Üretim ortamı için Gunicorn kullanıyoruz. 1GB RAM kısıtı nedeniyle 
+# 2 adet Gevent worker kullanarak stabiliteyi sağlıyoruz.
+CMD ["gunicorn", "-w", "2", "-k", "gevent", "-b", "0.0.0.0:8000", "wsgi:app"]
