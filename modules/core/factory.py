@@ -24,19 +24,21 @@ def create_app(init_database=False):
     os.makedirs(DB_DIR, exist_ok=True)
     DB_NAME = os.path.join(DB_DIR, "imza_database.db")
     
-    # Robust SQLAlchemy URI construction
-    db_env_url = os.environ.get("DATABASE_URL")
-    if db_env_url and db_env_url.strip():
-        # User provided an explicit URL (Postgres, remote SQLite, or other)
-        app.config['SQLALCHEMY_DATABASE_URI'] = db_env_url.strip()
-    else:
+    # Robust SQLAlchemy URI construction with strict validation
+    db_env_url = os.environ.get("DATABASE_URL", "").strip()
+    
+    # If the URL is empty or looks like a placeholder (doesn't contain ://), use fallback
+    if not db_env_url or "://" not in db_env_url:
         # Fallback to local SQLite with absolute path (guaranteed 4 slashes on Linux)
         abs_db_path = os.path.abspath(DB_NAME)
-        # SQLite absolute paths on Linux: sqlite:////tmp/db.sqlite
+        # SQLite absolute paths on Linux: sqlite:////app/data/imza_database.db
         app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{abs_db_path}"
-        if not abs_db_path.startswith('/'): # Standardizing for Unix absolute paths
-             # Windows style or other - SQLAlchemy handles sqlite:///C:\...
-             pass
+        app.logger.info(f"Using default SQLite path: {app.config['SQLALCHEMY_DATABASE_URI']}")
+    else:
+        # User provided an explicit valid-looking URL
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_env_url
+        app.logger.info("Using DATABASE_URL from environment.")
+        
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
     app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # Increased for portfolio media
@@ -44,7 +46,7 @@ def create_app(init_database=False):
     
     # Sentry & Monitoring (Robust initialization to prevent app crash)
     sentry_dsn = os.getenv("SENTRY_DSN")
-    if sentry_dsn:
+    if sentry_dsn and "your-dsn" not in sentry_dsn: # Ignore placeholders
         try:
             sentry_sdk.init(
                 dsn=sentry_dsn,
@@ -55,6 +57,8 @@ def create_app(init_database=False):
             app.logger.info("Sentry başarıyla başlatıldı.")
         except Exception as e:
             app.logger.warning(f"Sentry başlatılamadı (Geçersiz DSN: {sentry_dsn}). Hata: {e}")
+    else:
+        app.logger.info("Sentry initialization skipped (DSN missing or placeholder).")
 
     # Logging (Dynamic logs directory)
     log_dir = os.environ.get("LOG_DIR", os.path.join(os.getcwd(), "logs"))
