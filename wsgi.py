@@ -1,7 +1,9 @@
-""" 
-İmza Gayrimenkul - WSGI Application Entry Point
-Uygulama artık tam App Factory pattern ve modüler Core yapısını kullanıyor. (Phase 28 Unification)
-"""
+try:
+    from gevent import monkey
+    monkey.patch_all()
+except ImportError:
+    pass
+
 from modules.core.factory import create_app
 from shared.extensions import socketio
 import os
