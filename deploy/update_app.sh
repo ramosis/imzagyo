@@ -12,7 +12,11 @@ echo "----------------------------------------------------"
 # 1. Klasör ve Git Güncelleme
 echo "[1/4] Kodlar GitHub'dan çekiliyor..."
 cd /opt/imzagyo
-sudo git pull origin main
+sudo git fetch --all && sudo git reset --hard origin/main
+
+# 1.1 Veritabanı İndekslemesi (Performans için)
+echo "[1.1/4] Veritabanı performans indeksleri oluşturuluyor..."
+sudo python3 scripts/optimize_db.py || echo "⚠️ İndeksleme atlandı (Hata veya dosya yok)"
 
 # 2. Docker Konteyner Temizliği (Port Çakışmasını Önlemek İçin)
 echo "[2/4] Eski kalıntılar temizleniyor..."

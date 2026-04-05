@@ -9,9 +9,10 @@ Sunucu dizini artık daha profesyonel ve anonim bir yol olan `/opt/imzagyo` olar
 - **Mahalle Portalı:** `https://imzamahalle.com`
 - **Backend Portu:** `8000` (Docker Konteynırı)
 - **Bağlantı Protokolü:** Nginx SSL (443) -> Proxy Pass (127.0.0.1:8000)
+- **RAM Kısıtı:** 1GB (Bu nedenle Swap alanı ve -w 1 konfigürasyonu kritiktir).
 
 ## 🚀 1. Otomatik Güncelleme (TAVSİYE EDİLEN)
-Artık sunucuda tek bir komutla tüm süreci (git pull + docker build + restart) yöneten bir script bulunmaktadır:
+Artık sunucuda tek bir komutla tüm süreci (git pull + db optimize + docker build + restart) yöneten bir script bulunmaktadır:
 
 ```bash
 # Sunucuya bağlandıktan sonra:
@@ -26,8 +27,11 @@ Eğer yukarıdaki script yerine manuel ilerlemek isterseniz:
 # Doğru dizine git
 cd /opt/imzagyo
 
-# Değişiklikleri çek
-sudo git pull origin main
+# Değişiklikleri çek (Gerekirse stash veya reset kullan)
+sudo git fetch --all && sudo git reset --hard origin/main
+
+# Veritabanı performans indekslerini oluştur (Kritik!)
+sudo python3 scripts/optimize_db.py
 
 # Docker konteynerini tazeleyin
 sudo docker-compose down
@@ -66,4 +70,5 @@ sudo nano .env
 ## 💡 Hata Giderme Notları
 - **GitHub Şifresi:** `git pull` yaptığında şifre isterse, GitHub "Personal Access Token" veya kullanıcı şifreni girmelisin.
 - **Log Takibi:** Eğer bir sorun olursa `sudo docker logs imza-backend --tail 50` komutu ile hataları görebilirsiniz.
+- **Düşük Kaynak (RAM):** Eğer sunucu yavaşsa `free -m` ile swap'ı kontrol edin. Swap yoksa rehberdeki adımlarla 2GB swap oluşturun.
 - **Nginx:** Eğer site hala eski görünüyorsa `sudo systemctl restart nginx` komutunu deneyebilirsin.
