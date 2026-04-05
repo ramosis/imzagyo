@@ -20,7 +20,6 @@ celery
 redis
 flasgger
 flask-socketio
-eventlet
 pytest
 pytest-flask
 pytest-cov

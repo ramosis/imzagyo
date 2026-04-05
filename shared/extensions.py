@@ -10,7 +10,8 @@ import os
 
 # Initialize extensions without app
 # Disabled Redis message queue for now due to infrastructure lack in docker-compose.yml
-socketio = SocketIO(cors_allowed_origins="*")
+# Use 'gevent' to match Gunicorn worker class for maximum stability
+socketio = SocketIO(cors_allowed_origins="*", async_mode='gevent')
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["10000 per day", "100 per minute"],
