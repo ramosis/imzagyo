@@ -54,7 +54,7 @@ flowchart TD
     extension_bypass_phase("Eklenti Şifresiz Erişim (Bypass)<br/><sub>Eklenti giriş ekranı kaldırıldı,<br/>admin:admin123 ile sessiz oturum<br/>altyapısı kuruldu ve araçlar<br/>erişilebilir hale getirildi.</sub>")
 
     %% @portal_auth_fix [ai-task, closed, 2026-04-08, antigravity]
-    portal_auth_fix("Portal Giriş Onarımı<br/><sub>/api/v1/login olan hatalı API<br/>yolu /api/v1/auth/login olarak<br/>düzeltildi, portal erişimi<br/>tekrar aktif hale getirildi.</sub>")
+    portal_auth_fix("Portal & Server Stabilizasyonu<br/><sub>Jinja2 render_template geçişi yapıldı,<br/>portföy fiyat serilizasyon hatası<br/>(Float->Str) giderildi ve portal<br/>girişi tamamen restore edildi.</sub>")
 
     %% === FUTURE WORK ===
     %% @phase_29_postgresql [ai-task, opened, 2026-04-10, antigravity]

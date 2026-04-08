@@ -40,6 +40,13 @@ sudo docker-compose up -d --build
 # Nginx ayarlarını tazelemek için (Eğer nginx.conf veya alan adları değiştiyse):
 sudo cp deploy/nginx.conf /etc/nginx/sites-available/imzagayrimenkul
 sudo systemctl reload nginx
+
+#Log ve Erorları Görmek İçin
+
+sudo docker logs imza-backend --tail 50
+sudo docker logs imza-backend -f
+sudo tail -f /var/log/nginx/error.log
+
 ```
 
 ## 🛠️ 3. Çevresel Değişkenler (.env) Onarımı

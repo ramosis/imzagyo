@@ -22,7 +22,7 @@ class PortfolioSchema(Schema):
     subtitle = fields.Str(required=False, allow_none=True, attribute="baslik2")
     category = fields.Str(required=False, attribute="koleksiyon") 
     location = fields.Str(required=False, attribute="lokasyon")
-    price = fields.Float(required=False, attribute="fiyat")
+    price = fields.Str(required=False, attribute="fiyat")
     rooms = fields.Str(required=False, attribute="oda")
     area = fields.Str(required=False, attribute="alan")
     floor = fields.Str(required=False, attribute="kat")

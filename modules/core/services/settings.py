@@ -18,7 +18,10 @@ class SettingsService:
             SettingsService._cache[key] = val
             return val
         except Exception as e:
-            print(f"ERROR: Could not fetch setting ({key}): {e}")
+            # If the table doesn't exist yet (e.g. during first boot), fail silently with default
+            error_str = str(e)
+            if "no such table" not in error_str:
+                print(f"ERROR: Could not fetch setting ({key}): {e}")
             return default
 
     @staticmethod

@@ -1,4 +1,4 @@
-from flask import Blueprint, send_from_directory, request, jsonify, current_app
+from flask import Blueprint, send_from_directory, request, jsonify, current_app, render_template
 import os
 # from shared.database import get_db_connection, get_db, get_setting, set_setting  # REMOVED TO BREAK CIRCULAR IMPORT
 from shared.page_service import PageService
@@ -17,35 +17,29 @@ def health_check():
 @main_bp.route('/')
 def index():
     host = request.headers.get('Host', '')
-    pages_dir = os.path.join(get_root_path(), 'pages')
     if 'imzamahalle.com' in host:
-        return send_from_directory(pages_dir, 'mahalle.html')
-    return send_from_directory(pages_dir, 'anasayfa.html')
+        return render_template('mahalle.html')
+    return render_template('anasayfa.html')
 
 @main_bp.route('/portal')
 def portal():
-    pages_dir = os.path.join(get_root_path(), 'pages')
-    return send_from_directory(pages_dir, 'portal.html')
+    return render_template('portal.html')
 
 @main_bp.route('/pipeline')
 def pipeline():
-    pages_dir = os.path.join(get_root_path(), 'pages')
-    return send_from_directory(pages_dir, 'pipeline.html')
+    return render_template('pipeline.html')
 
 @main_bp.route('/mahalle')
 def mahalle():
-    pages_dir = os.path.join(get_root_path(), 'pages')
-    return send_from_directory(pages_dir, 'mahalle.html')
+    return render_template('mahalle.html')
 
 @main_bp.route('/inspection')
 def inspection_page():
-    pages_dir = os.path.join(get_root_path(), 'pages')
-    return send_from_directory(pages_dir, 'inspection.html')
+    return render_template('inspection.html')
 
 @main_bp.route('/admin/analytics')
 def admin_analytics_page():
-    pages_dir = os.path.join(get_root_path(), 'pages')
-    return send_from_directory(pages_dir, 'admin-analytics.html')
+    return render_template('admin-analytics.html')
 
 @main_bp.route('/mls')
 def mls_page():
