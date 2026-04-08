@@ -52,8 +52,14 @@ def collect_interaction():
 _translation_cache = {}
 
 def translate_content(text, target_lang):
-    """Translates content using Gemini, with in-memory caching."""
+    """Translates content using Gemini, with in-memory caching and Circuit Breaker."""
     if not text: return ""
+    
+    # Circuit Breaker: Skip non-essential AI work if the system is under pressure
+    from shared.utils import is_system_busy
+    if is_system_busy():
+        print(f"DEBUG: System busy (load > 3.5), skipping AI translation for {target_lang}")
+        return text
     
     cache_key = f"{target_lang}:{text[:50]}" # Simple key for caching
     if cache_key in _translation_cache:
@@ -72,6 +78,11 @@ def translate_content(text, target_lang):
         return text
 
 def calculate_intent_score(session_id):
+    """Calculates intent score for a session, skip-able if system is busy."""
+    from shared.utils import is_system_busy
+    if is_system_busy():
+        return 10, "Genel (Busy)" # Minimal default when under pressure
+        
     with get_db() as conn:
         interactions = conn.execute('SELECT event_type, url FROM user_interactions WHERE session_id = ?', (session_id,)).fetchall()
         if not interactions: return 0, "Bilinmiyor"

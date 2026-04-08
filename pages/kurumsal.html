@@ -10,7 +10,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../static/css/fluid.css">
+    <link rel="stylesheet" href="../static/css/fluid.css?v=2.0">
+    <script src="../static/js/mobile_polish.js?v=2.0" defer></script>
     
     <!-- Geo Targeting -->
     <meta name="geo.region" content="TR-43" />
@@ -165,6 +166,7 @@
             width: 1px;
             background-color: #e5e7eb;
         }
+        /* Mobile safe-area/typography handled globally in fluid.css */
     </style>
     <script>
         // Lux Curtain Bridge Logic (Fluid Outro, Luxury Intro)
@@ -242,17 +244,23 @@
 
     <!-- Header (Sabit) -->
     <header class="fixed w-full z-50 border-b border-gray-100 bg-white/90 backdrop-blur-md header-animate">
-        <nav class="max-w-[1920px] mx-auto px-4 md:px-8">
+        <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+        <nav class="luxury-container px-4 md:px-8">
             <div class="flex justify-between items-center h-16">
-                <a href="anasayfa.html" class="flex items-center group">
-                    <i class="fa-solid fa-signature text-gold text-xl mr-3"></i>
-                    <span class="font-serif font-bold text-lg tracking-widest text-navy uppercase text-left">İMZA</span>
+                <a href="anasayfa.html" class="flex items-center group/logo" aria-label="İmza Gayrimenkul Ana Sayfa">
+                    <i class="fa-solid fa-signature text-gold text-2xl mr-3 group-hover/logo:scale-110 transition-transform"></i>
+                    <div class="flex flex-col">
+                        <span class="font-serif font-bold text-xl tracking-widest text-navy leading-none uppercase">İMZA</span>
+                        <span class="text-gold text-[8px] tracking-[0.4em] uppercase font-bold mt-1 text-left">Gayrimenkul</span>
+                    </div>
                 </a>
-                <div class="hidden md:flex ml-12 space-x-8 text-[12px] font-bold uppercase tracking-[0.2em]">
-                    <a href="/" class="text-gray-400 hover:text-gold transition-colors">Ana Sayfa</a>
-                    <a href="kurumsal.html" class="text-gold border-b border-gold font-black">Kurumsal</a>
-                    <a href="ekip.html" class="text-gray-400 hover:text-gold transition-colors">Ekibimiz</a>
-                    <a href="arama.html" class="text-gray-400 hover:text-gold transition-colors">Portföyler</a>
+                <div class="flex items-center gap-x-6">
+                    <a href="anasayfa.html"
+                        class="hidden sm:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ana Sayfa</a>
+                    <a href="ekip.html"
+                        class="hidden md:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ekibimiz</a>
+                    <a href="portal.html"
+                        class="bg-navy text-gold px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-wider shadow-lg shadow-navy/20">İmza Portal</a>
                 </div>
             </div>
         </nav>
@@ -273,7 +281,7 @@
                     class="text-gold uppercase tracking-[0.4em] text-xs font-bold mb-6 italic border-b-2 border-gold pb-2 inline-block mx-auto">
                     Sıradanlığın Ötesinde</p>
                 <h1
-                    class="text-white font-serif font-bold text-fluid-7xl mb-fluid-s uppercase tracking-tighter">
+                    class="text-white font-serif font-bold text-fluid-4xl md:text-fluid-7xl mb-fluid-s uppercase tracking-tighter">
                     Mükemmelliğe Atılan <br><span class="text-gold italic">Güçlü İmza.</span>
                 </h1>
                 <p class="text-gray-300 max-w-2xl mx-auto leading-relaxed text-sm md:text-base font-medium">
@@ -293,10 +301,10 @@
         <!-- Section 2: Vizyon & Misyon & Değerler -->
         <section
             class="snap-section bg-soft py-16 px-4 md:px-8 relative z-10 !h-auto md:!h-screen overflow-y-auto md:overflow-hidden">
-            <div class="max-w-7xl mx-auto w-full flex flex-col justify-center h-full pt-16 md:pt-0">
+            <div class="luxury-container w-full flex flex-col justify-center h-full pt-16 md:pt-0">
 
                 <div class="text-center mb-16 md:mb-24">
-                    <h2 class="text-fluid-5xl font-bold text-navy font-serif uppercase tracking-tighter">
+                    <h2 class="text-fluid-4xl md:text-fluid-5xl font-bold text-navy font-serif uppercase tracking-tighter">
                         Çekirdek <span class="text-gold italic">Değerlerimiz</span>
                     </h2>
                 </div>
@@ -406,10 +414,6 @@
 
     </div>
 
-    <!-- Mobil Footer (Opsiyonel) -->
-    <div class="lg:hidden p-4 bg-navy text-center text-gray-400 text-[10px] uppercase font-bold tracking-widest">
-        © 2026 İmza Gayrimenkul
-    </div>
 
     <script>
         // Smooth Section Scroller (Maybach Effect)

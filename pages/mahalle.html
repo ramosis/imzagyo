@@ -9,7 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script src="/static/js/lmetrics.js"></script>
     <script src="/static/js/appointment-service.js"></script>
-    <link rel="stylesheet" href="../static/css/fluid.css">
+    <link rel="stylesheet" href="../static/css/fluid.css?v=2.0">
+    <script src="../static/js/mobile_polish.js?v=2.0" defer></script>
     <style>
         :root {
             --navy: #1a1a2e;
@@ -41,24 +42,27 @@
 
     <!-- NAVIGATION -->
     <nav class="fixed w-full z-50 glass-card py-4 px-fluid-screen flex justify-between items-center">
-        <div class="flex items-center gap-fluid-xs">
+        <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+        <div class="luxury-container flex justify-between items-center w-full">
+            <div class="flex items-center gap-fluid-xs">
             <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center">
                 <i class="fa-solid fa-house-chimney-window text-gold text-xl"></i>
             </div>
             <span class="text-fluid-xl font-serif font-bold tracking-tight">İmza <span class="text-sage">Mahalle</span></span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-semibold uppercase tracking-wider">
+                <a href="#about" class="hidden sm:inline-block hover:text-gold transition-colors">Mahallemiz</a>
+                <a href="#tools" class="hidden lg:inline-block hover:text-gold transition-colors">Araçlar</a>
+                <a href="#businesses" class="hidden xl:inline-block hover:text-gold transition-colors">Esnaf Girişi</a>
+                <a href="#demands" class="hover:text-gold transition-colors">Talep Bırak</a>
+            </div>
+            <button onclick="window.location.href='portal.html'" class="bg-navy text-gold px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-lg shadow-navy/20">İmza Portal</button>
         </div>
-        <div class="hidden md:flex gap-8 text-sm font-semibold uppercase tracking-wider">
-            <a href="#about" class="hover:text-gold transition-colors">Mahallemiz</a>
-            <a href="#tools" class="hover:text-gold transition-colors">Araçlar</a>
-            <a href="#businesses" class="hover:text-gold transition-colors">Esnaf Girişi</a>
-            <a href="#demands" class="hover:text-gold transition-colors">Talep Bırak</a>
-        </div>
-        <button onclick="window.location.href='/anasayfa'" class="bg-navy text-gold px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-lg shadow-navy/20">Emlak Portalı</button>
     </nav>
 
     <!-- MANAGEMENT & TRACKING -->
-    <section id="management" class="py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-6">
+    <section id="management" class="snap-section py-24 bg-white">
+        <div class="luxury-container px-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <!-- Unit Management -->
                 <div class="glass-card p-fluid-m rounded-[2.5rem] border-navy/5 bg-navy/[0.02]">
@@ -118,7 +122,7 @@
 
     <!-- RELOCATION ASSISTANT -->
     <section id="relocation" class="py-fluid-xl">
-        <div class="max-w-7xl mx-auto px-fluid-screen">
+        <div class="luxury-container px-fluid-screen">
             <div class="glass-card p-fluid-l rounded-[3rem] bg-gold/5 border-gold/10 relative overflow-hidden">
                 <div class="flex flex-col lg:flex-row gap-fluid-l relative z-10">
                     <div class="lg:w-1/3">
@@ -142,9 +146,9 @@
     </section>
 
     <!-- HERO SECTION -->
-    <section class="min-h-screen hero-gradient flex items-center justify-center pt-20 px-4">
+    <section class="snap-section min-h-screen hero-gradient flex items-center justify-center pt-20 px-4">
         <div class="max-w-4xl text-center text-white animate-fade-in">
-            <h1 class="text-fluid-7xl font-serif mb-fluid-s leading-tight">Mahallenizin Dijital Kalbi <span class="text-gold italic">Burada Atıyor.</span></h1>
+            <h1 class="text-fluid-5xl md:text-fluid-7xl font-serif mb-fluid-s leading-tight">Mahallenizin Dijital Kalbi <span class="text-gold italic">Burada Atıyor.</span></h1>
             <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">Sadece binaları değil, komşuluğu ve yerel değerleri önemsiyoruz. İmza Mahalle ile yaşamınızı kolaylaştırın, mahallenizle bütünleşin.</p>
             <div class="flex flex-wrap justify-center gap-4">
                 <a href="#demands" class="bg-gold text-navy px-8 py-4 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-white transition-colors">Bir Talep Bırak</a>
@@ -154,7 +158,7 @@
     </section>
 
     <!-- PORTFOY GRID AND EMPTY STATE -->
-    <section class="py-24 px-6 max-w-7xl mx-auto" itemscope itemtype="https://schema.org/LocalBusiness">
+    <section class="snap-section py-24 px-6 max-w-7xl mx-auto" itemscope itemtype="https://schema.org/LocalBusiness">
         <!-- Mahalle bazlı portföy gridi -->
         <div id="mahalle-portfoyleri">
             <div id="mahalle-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden"></div>
@@ -211,7 +215,7 @@
     </section>
 
     <!-- TOOLS GRID -->
-    <section id="tools" class="py-24 px-6 max-w-7xl mx-auto">
+    <section id="tools" class="snap-section py-24 px-6 max-w-7xl mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-xs font-bold text-sage uppercase tracking-[0.3em] mb-4">Dijital Yaşam</h2>
             <h3 class="text-4xl font-serif text-navy">Mahalleli İçin Özel Araçlar</h3>
@@ -517,7 +521,7 @@
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-white border-t border-gray-100 py-12 px-6">
+    <footer class="snap-section bg-white border-t border-gray-100 py-12 px-6">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-navy rounded-lg flex items-center justify-center">

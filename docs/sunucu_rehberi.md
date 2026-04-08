@@ -5,7 +5,7 @@ Sunucu dizini artık daha profesyonel ve anonim bir yol olan `/opt/imzagyo` olar
 ## 🌍 Canlı Altyapı Bilgileri (AI Kopya Kağıdı)
 - **SSH Bağlantısı:** `ssh fatihselimkeskin@imza-web-server`
 - **Sunucu Dizini:** `/opt/imzagyo`
-- **Ana Domain:** `https://imzagayrimenkul.com` (VIP & Yatırım Portalı)
+- **Ana Domain:** `https://imzaemlak.com` (VIP & Yatırım Portalı)
 - **Mahalle Portalı:** `https://imzamahalle.com`
 - **Backend Portu:** `8000` (Docker Konteynırı)
 - **Bağlantı Protokolü:** Nginx SSL (443) -> Proxy Pass (127.0.0.1:8000)

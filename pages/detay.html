@@ -22,7 +22,7 @@
     <!-- Structured Data Placeholder -->
     <script type="application/ld+json" id="listing-schema"></script>
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/static/css/fluid.css">
+    <link rel="stylesheet" href="../static/css/fluid.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -169,22 +169,7 @@
             display: none;
         }
 
-        @media (max-width: 767px) {
-            .mobile-cta-sticky {
-                display: flex;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(10, 25, 47, 0.95);
-                backdrop-filter: blur(10px);
-                padding: 1rem;
-                z-index: 1000;
-                border-top: 1px solid rgba(197, 160, 89, 0.3);
-                gap: 0.75rem;
-                box-shadow: 0 -10px 25px rgba(0,0,0,0.3);
-            }
-        }
+        /* Mobile safe-area handled globally in fluid.css */
     </style>
     <script>
         // Lux Curtain Bridge Logic (Fluid Outro, Luxury Intro)
@@ -243,6 +228,7 @@
             });
         });
     </script>
+    <script src="../static/js/mobile_polish.js" defer></script>
 </head>
 
 <body class="text-slate-800 antialiased font-sans flex flex-col h-screen">
@@ -281,25 +267,26 @@
         </div>
     </div>
 
-    <div class="luxury-main-container pb-24 md:pb-0">
+    <div class="luxury-main-container">
     <!-- Header -->
     <header class="fixed w-full z-50 transition-all duration-300 border-b border-black/5 glass-header header-animate">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+        <nav class="luxury-container px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <a href="anasayfa.html" class="flex items-center group" aria-label="İmza Gayrimenkul Ana Sayfa">
                     <i
                         class="fa-solid fa-signature text-gold text-2xl mr-3 group-hover:scale-110 transition-transform" aria-hidden="true"></i>
                     <span class="font-serif font-bold text-xl tracking-widest text-navy uppercase text-left">İMZA</span>
                 </a>
-                <div class="flex items-center space-x-6">
+                <div class="flex items-center gap-x-2 md:gap-x-6">
                     <a href="anasayfa.html"
-                        class="text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ana
+                        class="hidden sm:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ana
                         Sayfa</a>
                     <a href="ekip.html"
-                        class="text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ekibimiz</a>
+                        class="hidden sm:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ekibimiz</a>
                     
                     <!-- Globalization Selectors (Phase 4) -->
-                    <div class="flex items-center gap-4 text-[10px] font-bold border-r pr-6 border-black/10">
+                    <div class="hidden sm:flex items-center gap-4 text-[10px] font-bold border-r pr-6 border-black/10">
                         <select onchange="changeLang(this.value)" id="langSelect" class="bg-transparent outline-none cursor-pointer hover:text-gold transition-colors font-black uppercase">
                             <option value="tr">TR</option>
                             <option value="en">EN</option>
@@ -344,13 +331,13 @@
             <div class="absolute inset-0 gallery-gradient"></div>
 
             <div class="absolute bottom-24 left-0 right-0 z-10 animate-up" style="animation-delay: 0.3s;">
-                <div class="max-w-7xl xl:max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-end">
+                <div class="luxury-container px-4 sm:px-6 lg:px-8 flex justify-between items-end">
                     <div class="text-white text-left">
                         <p id="p-koleksiyon"
                             class="text-gold uppercase tracking-[0.4em] text-[10px] font-bold mb-2 italic">Koleksiyon
                         </p>
                         <h1
-                            class="text-fluid-9xl font-serif font-bold mb-fluid-s uppercase leading-tight text-left">
+                            class="text-fluid-3xl md:text-fluid-9xl font-serif font-bold mb-fluid-s uppercase leading-snug text-left">
                             <span id="p-baslik1">Başlık</span> <br><span id="p-baslik2" class="text-gold italic">Alt Başlık</span>
                         </h1>
                         <div
@@ -367,7 +354,7 @@
 
         <!-- Section 2: Specs & Story -->
         <section class="snap-section bg-white">
-            <div class="max-w-7xl xl:max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="luxury-container px-4 sm:px-6 lg:px-8 w-full">
                 <!-- Bar -->
                 <div class="grid grid-cols-2 md:grid-cols-4 border-b border-gray-100 py-10 mb-16">
                     <div class="spec-card flex flex-col items-center justify-center p-4">
@@ -715,9 +702,9 @@
             else if (touchEndY - touchStartY > 50) goToSection(currentSectionIndex - 1);
         });
     </script>
-    <script src="/static/js/i18n.js"></script>
-    <script src="/static/js/currency.js"></script>
-    <script src="/static/js/imza-settings.js"></script>
+    <script src="../static/js/i18n.js"></script>
+    <script src="../static/js/currency.js"></script>
+    <script src="../static/js/imza-settings.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             applyMaybachSettings();

@@ -44,3 +44,17 @@ def sanitize_html(html_content: str) -> str:
     """
     allowed_tags = ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3']
     return clean(html_content, tags=allowed_tags, strip=True)
+
+def is_system_busy(threshold=3.5) -> bool:
+    """
+    Checks if the system is currently under heavy load (Circuit Breaker).
+    Uses 1-minute load average on Linux/Unix systems.
+    """
+    import os
+    try:
+        # returns (1min, 5min, 15min) load averages
+        load1, _, _ = os.getloadavg()
+        return load1 > threshold
+    except (AttributeError, OSError):
+        # Fallback for systems without getloadavg (like direct Windows without WSL)
+        return False

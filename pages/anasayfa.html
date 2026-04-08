@@ -79,13 +79,14 @@
     <script src="/static/js/i18n.js"></script>
     <script src="/static/js/currency.js"></script>
     <script src="/static/js/mobile_polish.js"></script>
+    <script src="/static/js/mobile_polish.js?v=1.0"></script>
     
     <!-- İMZA LENS: AKILLI KARŞILAMA VE ANALİZ KÜTÜPHANESİ -->
     <link rel="stylesheet" href="/static/js/imzalens/imza-lens.css?v=1.4">
     <script src="/static/js/imzalens/imza-lens.core.js?v=1.4"></script>
     <script src="/static/js/imzalens/imza-lens.ui.js?v=1.4"></script>
     <script src="/static/js/imzalens/imza-lens-metrics.js?v=1.4"></script>
-    <link rel="stylesheet" href="/static/css/fluid.css">
+    <link rel="stylesheet" href="/static/css/fluid.css?v=2.2">
     <link rel="stylesheet" href="/static/css/placeholders.css">
 
     <script>
@@ -131,6 +132,7 @@
                 transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1);
                 /* Maybach vakum eğrisi */
                 will-change: transform;
+                overflow-x: hidden;
             }
 
             .intro-screen,
@@ -146,32 +148,8 @@
             }
         }
 
-        /* Mobil Düzenlemeler */
-        @media (max-width: 767px) {
-            html, body {
-                overflow-x: hidden;
-                overflow-y: auto; /* Doğal kaydırmaya izin ver */
-                height: auto;
-            }
-            .main-wrapper {
-                transform: none !important; /* JS transformunu mobilde iptal et */
-                height: auto;
-            }
-            .intro-screen {
-                height: auto;
-                display: block;
-            }
-            #heroSlider {
-                height: 70vh !important; /* Mobilde hero yüksekliği */
-                min-height: 500px;
-            }
-            section.snap-section {
-                height: auto;
-                min-height: 100vh;
-                padding-top: 5rem;
-                padding-bottom: 3rem;
-            }
-        }
+        /* Global rules in fluid.css handle .intro-screen and .snap-section padding-bottom on mobile */
+
 
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
@@ -329,6 +307,14 @@
 </head>
 
 <body class="text-slate-800 antialiased font-sans text-sm md:text-base">
+    <!-- Mobile UX Guard: Instant Padding Fix -->
+    <style>
+        @media screen and (max-width: 414px) {
+            .snap-section, .intro-screen, .mobile-safe-area {
+                padding-bottom: 12rem !important;
+            }
+        }
+    </style>
 
     <!-- Lux Curtain -->
     <div class="lux-curtain"></div>
@@ -343,7 +329,7 @@
         </button>
 
         <div class="px-fluid-screen w-full max-w-4xl relative z-10 search-content">
-            <h2 class="text-fluid-4xl font-serif text-white mb-fluid-m text-center uppercase tracking-tighter">Nereyi
+            <h2 class="text-fluid-3xl md:text-fluid-4xl font-serif text-white mb-fluid-m text-center uppercase tracking-normal leading-snug drop-shadow-sm">Nereyi
                 Keşfetmek İstersiniz?</h2>
             <div
                 class="bg-white rounded-full p-2 flex flex-col md:flex-row items-center shadow-2xl shadow-gold/20 text-navy">
@@ -373,7 +359,7 @@
     <!-- Header (Sticky) -->
     <header class="fixed w-full z-50 transition-all duration-300 border-b border-gray-100 shadow-sm">
         <nav class="w-full glass-panel border-b border-gray-100 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="header-nav-inner" style="margin-left: auto; margin-right: auto;">
                 <div class="flex justify-between items-center h-24">
                     <!-- Logo -->
                     <div class="flex-shrink-0 flex items-center cursor-pointer group/logo" onclick="goToSection(0)">
@@ -392,7 +378,7 @@
                     <div class="flex items-center space-x-8 md:space-x-8 lg:space-x-12 h-full">
                         <div class="hidden md:flex items-center space-x-8 lg:space-x-12 h-full">
                             <button type="button" onclick="toggleSearch()" aria-label="İlan Ara"
-                                class="text-navy hover:text-gold font-bold transition-colors text-xs uppercase tracking-widest flex items-center gap-2 group whitespace-nowrap">
+                                class="text-navy hover:text-gold font-bold transition-colors text-xs uppercase tracking-widest flex items-center gap-2 group whitespace-nowrap flex-shrink-0 flex-grow-0">
                                 <i
                                     class="fa-solid fa-magnifying-glass text-gold group-hover:scale-110 transition-transform"></i>
                                 İlan Ara
@@ -402,7 +388,7 @@
                                 <!-- Dinamik Ticker Butonu (Ok işareti kaldırıldı) -->
                                 <button type="button" aria-expanded="false" aria-haspopup="true"
                                     class="text-navy hover:text-gold font-bold transition-colors text-xs uppercase tracking-widest flex items-center gap-2 whitespace-nowrap outline-none h-full">
-                                    <div class="h-4 overflow-hidden relative w-[160px] text-left">
+                                    <div class="h-4 overflow-hidden relative min-w-[240px] text-left">
                                         <div class="flex flex-col animate-text-slide">
                                             <span class="block h-4 leading-4">Hizmetlerimiz</span>
                                             <span class="block h-4 leading-4">Yatırımcı İlişkileri</span>
@@ -608,7 +594,7 @@
         <section id="seriler" class="snap-section bg-white border-b border-gray-100 text-navy">
             <div class="w-full text-center px-fluid-screen">
                 <div class="mb-6 md:mb-8 text-center px-4">
-                    <h2 class="text-fluid-3xl md:text-fluid-4xl font-bold font-serif mb-2 uppercase tracking-tight leading-tight">Yaşam Koleksiyonları</h2>
+                    <h2 class="text-fluid-3xl md:text-fluid-4xl font-bold font-serif mb-4 uppercase tracking-normal leading-relaxed">Yaşam Koleksiyonları</h2>
                     <div class="w-16 h-1 bg-gold mx-auto mb-4"></div>
                     <p class="text-gray-400 text-[10px] md:text-sm max-w-lg mx-auto font-light leading-relaxed">Gayrimenkul dünyasında üç farklı vizyon, binlerce farklı hikaye.</p>
                 </div>
@@ -625,9 +611,9 @@
                 <div
                     class="flex flex-col md:flex-row justify-between items-center md:items-end gap-x-fluid-m gap-y-6 mb-10 md:mb-12 text-center md:text-left">
                     <div class="text-center md:text-left">
-                        <h2 data-i18n="section_portfolios_title" class="text-fluid-4xl font-bold text-navy font-serif mb-4 uppercase tracking-tighter">
+                        <h2 data-i18n="section_portfolios_title" class="text-fluid-3xl md:text-fluid-4xl font-bold text-navy font-serif mb-2 uppercase tracking-normal md:tracking-tight leading-snug">
                             İmza Portföyler</h2>
-                        <div class="flex flex-wrap justify-center md:justify-start gap-3" id="portfolio-tabs" role="tablist" aria-label="Portföy Kategorileri">
+                        <div class="flex flex-nowrap gap-3 overflow-x-auto no-scrollbar pb-2" id="portfolio-tabs" role="tablist" aria-label="Portföy Kategorileri">
                             <button type="button" onclick="renderPortfolios('tumu')" id="tab-tumu" data-i18n="tab_all"
                                 class="tab-btn active px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all border border-gray-100" role="tab" aria-selected="true" aria-controls="portfoy-list-container">Tümü</button>
                             <button type="button" onclick="renderPortfolios('prestij')" id="tab-prestij" data-i18n="tab_prestige"
@@ -805,12 +791,11 @@
         <section id="lifestyle-matcher" class="snap-section bg-navy text-white relative overflow-hidden">
             <div class="absolute inset-0 brand-pattern opacity-10"></div>
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 text-center">
-                <div class="mb-10">
-                    <h2 data-i18n="lifestyle_matcher_title" class="text-fluid-4xl font-bold font-serif mb-fluid-s uppercase tracking-tighter">Bana Uygun
-                        Evi Bul</h2>
+                <div class="mb-6 md:mb-8">
+                    <h2 data-i18n="lifestyle_matcher_title" class="text-fluid-3xl md:text-fluid-4xl font-bold font-serif mb-4 uppercase tracking-normal leading-relaxed">
+                        Bana Uygun Evi Bul</h2>
                     <div class="w-16 h-1 bg-gold mx-auto mb-4"></div>
-                    <p data-i18n="lifestyle_matcher_desc" class="text-gray-400 text-sm font-light max-w-lg mx-auto">Yaşam tarzınıza en uygun mülkü
-                        bulmak için birkaç soruya cevap verin.</p>
+                    <p data-i18n="lifestyle_matcher_desc" class="text-gray-300 text-[10px] md:text-sm font-light max-w-lg mx-auto leading-relaxed">Yaşam tarzınıza en uygun mülkü bulmak için birkaç soruya cevap verin.</p>
                 </div>
 
                 <!-- Soru Kartları -->
@@ -942,14 +927,12 @@
         <!-- Section 4: Yatırımcı Araçları -->
         <section id="araclar" class="snap-section bg-white border-b border-gray-100 text-navy">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div
-                    class="mb-10 md:mb-12 text-center md:text-left flex flex-col md:flex-row justify-between items-end gap-6">
+                <div class="mb-6 md:mb-8 text-center md:text-left flex flex-col md:flex-row justify-between items-end gap-4">
                     <div>
-                        <h2 class="text-fluid-4xl font-bold font-serif mb-fluid-s uppercase tracking-tighter">Yatırımcı
-                            Rehberi</h2>
+                        <h2 class="text-fluid-3xl md:text-fluid-4xl font-bold font-serif mb-2 uppercase tracking-normal md:tracking-tight leading-snug">
+                            Yatırımcı Rehberi</h2>
                         <div class="w-16 h-1 bg-gold mx-auto md:mx-0 mb-4"></div>
-                        <p class="text-gray-400 text-sm max-w-lg font-light">Karar vermeden önce akıllı araçlarımızı
-                            kullanın, süreci şeffafça yönetin.</p>
+                        <p class="text-gray-400 text-[10px] md:text-sm max-w-lg font-light leading-relaxed">Karar vermeden önce akıllı araçlarımızı kullanın, süreci şeffafça yönetin.</p>
                     </div>
                 </div>
 
@@ -1058,21 +1041,17 @@
         <section id="hizmetler"
             class="snap-section bg-navy relative overflow-hidden text-white border-t border-white/5">
             <div class="absolute inset-0 brand-pattern opacity-10"></div>
-            <div
-                class="max-w-7xl mx-auto px-fluid-screen relative z-10 w-full py-fluid-l md:py-0 text-center md:text-left">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-fluid-m md:gap-fluid-l lg:gap-fluid-xl text-left">
+            <div class="max-w-7xl mx-auto px-fluid-screen relative z-10 w-full py-8 md:py-0 text-left">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-fluid-l text-left">
                     <div class="lg:col-span-5 flex flex-col justify-center text-left">
-                        <div class="inline-block w-16 h-1 bg-gold mb-8 mx-auto md:mx-0"></div>
-                        <h2
-                            class="text-fluid-5xl font-bold font-serif mb-fluid-m leading-[1.1] tracking-tight uppercase text-left">
+                        <div class="w-16 h-1 bg-gold mb-4 mx-auto md:mx-0"></div>
+                        <h2 class="text-fluid-3xl md:text-fluid-5xl font-bold font-serif mb-4 leading-snug md:leading-[1.1] tracking-normal md:tracking-tight uppercase text-left">
                             Emlakta <br><span class="text-gold italic text-left">Yeni Vizyon</span></h2>
-                        <p
-                            class="text-gray-500 font-light mb-10 text-base md:text-lg leading-relaxed max-w-md mx-auto md:mx-0 text-left">
+                        <p class="text-gray-400 font-light mb-6 text-[10px] md:text-lg leading-relaxed max-w-md mx-auto md:mx-0 text-left">
                             Dijital mülk yönetimi ve yapay zeka destekli ekspertiz ile İmza güvencesinde.</p>
-                        <a href="portal.html"
-                            class="inline-flex items-center text-gold font-bold hover:text-white transition-all tracking-[0.3em] uppercase text-[10px] mx-auto md:mx-0 group text-left">İmza
-                            Portal'ı Keşfet <i
-                                class="fa-solid fa-arrow-right ml-4 group-hover:translate-x-3 transition-transform text-gold"></i></a>
+                        <a href="portal.html" class="inline-flex items-center text-gold font-bold hover:text-white transition-all tracking-[0.3em] uppercase text-[10px] mx-auto md:mx-0 group text-left">
+                            İmza Portal'ı Keşfet <i class="fa-solid fa-arrow-right ml-4 group-hover:translate-x-3 transition-transform text-gold"></i>
+                        </a>
                     </div>
                     <div class="lg:col-span-7 grid grid-cols-2 gap-4 md:gap-8 text-left">
                         <div
@@ -1131,16 +1110,19 @@
                                 Yatırım</span>
                         </div>
                     </div>
-                    <div class="hidden md:flex items-center space-x-10">
-                        <a href="anasayfa.html" data-i18n="nav_home"
-                            class="text-[12px] font-extrabold uppercase tracking-[0.2em] text-white hover:text-gold transition-colors duration-300">Anasayfa</a>
-                        <a href="kurumsal.html" data-i18n="nav_about"
-                            class="text-[12px] font-extrabold uppercase tracking-[0.2em] text-white hover:text-gold transition-colors duration-300">Kurumsal</a>
-                        <a href="ekip.html" data-i18n="nav_team"
-                            class="text-[12px] font-extrabold uppercase tracking-[0.2em] text-white hover:text-gold transition-colors duration-300">Ekip</a>
+                    <div class="flex flex-col md:flex-row items-center gap-6 md:space-x-10 mt-8 md:mt-0">
+                        <!-- Navigation (Visible on MD+) -->
+                        <div class="hidden md:flex items-center space-x-10">
+                            <a href="anasayfa.html" data-i18n="nav_home"
+                                class="text-[12px] font-extrabold uppercase tracking-[0.2em] text-white hover:text-gold transition-colors duration-300">Anasayfa</a>
+                            <a href="kurumsal.html" data-i18n="nav_about"
+                                class="text-[12px] font-extrabold uppercase tracking-[0.2em] text-white hover:text-gold transition-colors duration-300">Kurumsal</a>
+                            <a href="ekip.html" data-i18n="nav_team"
+                                class="text-[12px] font-extrabold uppercase tracking-[0.2em] text-white hover:text-gold transition-colors duration-300">Ekip</a>
+                        </div>
                         
-                        <!-- Globalization Selectors (Phase 4) -->
-                        <div class="flex items-center gap-4 text-[10px] font-bold border-r pr-6 border-black/10">
+                        <!-- Globalization Selectors (Visible on All) -->
+                        <div class="flex items-center gap-4 text-[10px] font-bold border-r pr-6 border-white/10">
                             <select onchange="changeLang(this.value)" id="langSelect" class="bg-transparent outline-none cursor-pointer hover:text-gold transition-colors font-black uppercase">
                                 <option value="tr">TR</option>
                                 <option value="en">EN</option>
@@ -1155,7 +1137,7 @@
                         </div>
 
                         <!-- Maybach Toggle (Luxury Scroll) -->
-                        <div class="flex items-center gap-3 border-l pl-8 border-white/10 group/toggle">
+                        <div class="flex items-center gap-3 md:border-l md:pl-8 border-white/10 group/toggle">
                             <span class="text-[9px] font-bold text-gray-500 group-hover/toggle:text-gold transition-colors uppercase tracking-widest">Luxury Scroll</span>
                             <button type="button" id="maybachToggle" onclick="toggleMaybachScroll()" 
                                 class="relative w-10 h-5 bg-white/10 rounded-full transition-all duration-500 focus:outline-none border border-white/5">
@@ -1163,8 +1145,8 @@
                             </button>
                         </div>
                         
-                        <!-- Language Switcher (Phase 2) -->
-                        <div class="flex space-x-2 border-l pl-8 border-white/10">
+                        <!-- Language Switcher (Phase 2 - TR/EN specific) -->
+                        <div class="flex space-x-2 md:border-l md:pl-8 border-white/10">
                             <button type="button" onclick="i18n.setLanguage('tr')" class="text-[10px] font-bold hover:text-gold transition-colors" aria-label="Türkçe">TR</button>
                             <button type="button" onclick="i18n.setLanguage('en')" class="text-[10px] font-bold hover:text-gold transition-colors" aria-label="English">EN</button>
                         </div>
@@ -1372,7 +1354,7 @@
                                 <p class="text-gold uppercase tracking-[0.4em] text-xs font-bold mb-4 md:mb-6 drop-shadow-md border-l-2 border-gold pl-4 slide-up italic">
                                     ${item.alt_title}
                                 </p>
-                                <${index === 0 ? 'h1' : 'h2'} data-i18n="hero_title" class="text-fluid-9xl font-serif text-white mb-6 leading-tight opacity-0 translate-y-10 transition-all duration-1000 delay-300 uppercase tracking-tighter">
+                                <${index === 0 ? 'h1' : 'h2'} data-i18n="hero_title" class="text-fluid-9xl font-serif text-white mb-6 leading-snug opacity-0 translate-y-10 transition-all duration-1000 delay-300 uppercase tracking-tighter">
                                     Lüksün Yeni İmzası
                                 </${index === 0 ? 'h1' : 'h2'}>
                                 <p data-i18n="hero_subtitle" class="text-fluid-lg text-gold font-light tracking-[0.3em] uppercase mb-12 opacity-0 translate-y-10 transition-all duration-1000 delay-500">
@@ -1822,8 +1804,6 @@
             }
         });
     </script>
-    <script>
-        // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
@@ -1831,6 +1811,22 @@
                     .catch(err => console.log('SW hatası', err));
             });
         }
+    </script>
+    <script>
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const sections = document.querySelectorAll('.animate-up, .slide-up');
+                sections.forEach(s => {
+                    const rect = s.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.bottom > 0) {
+                        s.style.opacity = '1';
+                        s.style.transform = 'translateY(0)';
+                    }
+                });
+            }, 150);
+        });
     </script>
 </body>
 

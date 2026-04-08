@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İmza Koleksiyonları | İmza Gayrimenkul</title>
+    <link rel="stylesheet" href="../static/css/fluid.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link
@@ -33,6 +34,8 @@
             color: white;
             overflow-x: hidden;
         }
+
+        /* Mobile safe-area handled globally in fluid.css */
 
         .brand-pattern {
             background-image: radial-gradient(#c5a059 1px, transparent 1px);
@@ -207,6 +210,7 @@
             });
         });
     </script>
+    <script src="../static/js/mobile_polish.js" defer></script>
 </head>
 
 <body class="antialiased selection:bg-gold selection:text-navy">
@@ -218,7 +222,8 @@
 
     <!-- Header / Navigasyon -->
     <header class="fixed w-full z-50 transition-all duration-500 bg-transparent header-animate">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
+        <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+        <nav class="luxury-container px-4 sm:px-6 lg:px-8 py-4 md:py-6">
             <div class="flex justify-between items-center">
                 <a href="anasayfa.html" class="flex items-center group">
                     <span class="text-2xl font-serif font-bold text-white tracking-widest relative drop-shadow-lg">
@@ -230,11 +235,12 @@
                         class="text-gold font-light ml-2 tracking-widest text-sm mt-1 drop-shadow-md">GAYRİMENKUL</span>
                 </a>
 
-                <div class="flex items-center space-x-10">
+                <div class="flex items-center space-x-4 md:space-x-10">
                     <a href="anasayfa.html"
-                        class="text-[12px] font-bold text-white hover:text-gold transition-colors tracking-widest drop-shadow-md uppercase">Ana
-                        Sayfa</a>
-                    <a href="#" class="cursor-pointer" onclick="javascript:history.back()">
+                        class="hidden sm:inline-block text-[12px] font-bold text-white hover:text-gold transition-colors tracking-widest drop-shadow-md uppercase">Ana Sayfa</a>
+                    <a href="portal.html"
+                        class="bg-gold/20 hover:bg-gold/40 text-gold px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-wider backdrop-blur-md transition-all">İmza Portal</a>
+                    <a href="arama.html" class="cursor-pointer">
                         <i class="fa-solid fa-xmark text-white hover:text-gold text-2xl transition-all"></i>
                     </a>
                 </div>
@@ -242,9 +248,9 @@
         </nav>
     </header>
 
-    <div class="main-wrapper" id="mainWrapper">
+    <div class="main-wrapper pt-20 md:pt-24" id="mainWrapper">
         <!-- Tam Ekran Hero Section -->
-        <section class="relative h-screen bg-navy overflow-hidden flex items-center">
+        <section class="snap-section relative h-screen bg-navy overflow-hidden flex items-center">
 
             <!-- Dinamik Arka Plan Görseli -->
             <div id="bg-image"
@@ -256,7 +262,7 @@
             <div class="absolute inset-0 brand-pattern opacity-10"></div>
 
             <div
-                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full flex flex-col md:flex-row items-center justify-between">
+                class="luxury-container px-4 sm:px-6 lg:px-8 relative z-10 w-full flex flex-col md:flex-row items-center justify-between">
 
                 <!-- Sol Taraf: Düzyazı ve Bilgi -->
                 <div class="max-w-2xl text-left animate-up" style="animation-delay: 0.3s;">
@@ -265,7 +271,7 @@
                         class="text-gold uppercase tracking-[0.4em] text-xs font-bold mb-4 drop-shadow-md border-l-2 border-gold pl-4 italic">
                         Zirvedeki Lüks</p>
                     <h1 id="col-title"
-                        class="text-5xl md:text-7xl font-serif font-bold text-white mb-8 tracking-tighter uppercase drop-shadow-2xl">
+                        class="text-fluid-5xl md:text-fluid-9xl font-serif font-bold text-white mb-8 tracking-tighter uppercase drop-shadow-2xl">
                         PRESTİJ <br><span class="text-gold italic">KOLEKSİYONU</span>
                     </h1>
                     <p id="col-desc" class="text-lg text-gray-300 font-light leading-relaxed mb-10 max-w-xl">
@@ -302,7 +308,7 @@
         </section>
 
         <!-- Koleksiyon İlan Listesi veya Alt Bölümü -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20" itemscope itemtype="https://schema.org/CollectionPage">
+        <section class="snap-section luxury-container px-4 sm:px-6 lg:px-8 py-20" itemscope itemtype="https://schema.org/CollectionPage">
             <!-- Liste -->
             <div class="portfoy-grid hidden" id="koleksiyon-list"></div>
 
@@ -334,6 +340,7 @@
         </section>
 
     </div>
+    <script src="../static/js/mobile_polish.js"></script>
 </body>
 
 </html>

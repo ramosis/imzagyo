@@ -8,6 +8,8 @@
     --fluid-min-width: 320;
     --fluid-max-width: 1600;
     --fluid-screen: 100vw;
+    /* --- Global Content Constraints --- */
+    --content-max-width: 1440px; /* Luxury Standard for 4K */
 
     /* Dinamik Tipografi (Clamp values) */
     /* Formül: clamp(min, preferred, max) */
@@ -103,3 +105,52 @@
 
 /* Border Radius */
 .rounded-fluid { border-radius: clamp(0.5rem, 0.4rem + 0.5vw, 1.5rem); }
+
+/* Global Mobil UX Stabilizasyonu (Safe Area & Tipografi Fix) */
+@media screen and (max-width: 767px) {
+    /* 1. Header Overlap Fix */
+    .text-fluid-3xl, .text-fluid-4xl, .text-fluid-5xl, .text-fluid-9xl {
+        line-height: 1.3 !important; /* leading-relaxed equivalent for wrapping headers */
+        letter-spacing: normal !important; /* Normalize tracking-tighter on mobile */
+    }
+
+    /* 2. Bottom Nav Safe Area */
+    .snap-section, .intro-screen, .mobile-safe-area {
+        padding-bottom: 7rem !important; /* Clearance for floating Bottom Nav */
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+
+    /* 3. Horizontal Jitter Protection */
+    .main-wrapper, body {
+        overflow-x: hidden !important;
+        width: 100vw !important;
+        position: relative !important;
+    }
+}
+
+/* 4. Ultra-Small Mobile Specific (320px - 414px) */
+@media screen and (max-width: 414px) {
+    html body .snap-section, 
+    html body .intro-screen, 
+    html body .mobile-safe-area {
+        padding-bottom: 11rem !important; /* Higher specificity and increased padding */
+    }
+}
+
+/* 5. Luxury Layout Helpers */
+.luxury-container {
+    max-width: var(--content-max-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100%;
+}
+
+.header-nav-inner {
+    max-width: var(--content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    padding-left: var(--space-fluid-screen);
+    padding-right: var(--space-fluid-screen);
+}

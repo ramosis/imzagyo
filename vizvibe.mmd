@@ -1,11 +1,11 @@
 flowchart TD
     %% === PROJECT GOALS ===
     %% Ultimate Goal: Türkiye'nin en teknolojik ve şeffaf gayrimenkul yönetim platformu olmak.
-    %% Current Goal: Faz 28: Mimari Sadeleşme & Klasör Konsolidasyonu tamamlandı.
+    %% Current Goal: Faz 9.1: Navigasyon Sertleştirme & UX Senkronizasyonu tamamlandı.
 
     %% === START ===
     %% @project_start [start, closed, 2026-01-09, user]
-    project_start("Project Start<br/><sub>Initial development phase of the<br/>İmza Gayrimenkul platform including<br/>core Flask setup and UI.</sub>")
+    project_start("Project Start<br/><sub>İmza Gayrimenkul platformu için<br/>Flask çekirdek yapısı ve lüks<br/>arayüz tasarımının başlangıcı.</sub>")
 
     %% === COMPLETED WORK ===
     %% @feature_apt_mgmt [ai-task, closed, 2026-03-23, user]
@@ -35,8 +35,26 @@ flowchart TD
     %% @performance_investigation [ai-task, closed, 2026-04-05, antigravity]
     performance_investigation("CPU & Stabilite Çözümü<br/><sub>Gevent worker yapısına geçildi,<br/>monkey-patching uygulandı ve<br/>CPU spike sorunları giderildi.<br/>Sistem 1GB RAM ile stabil.</sub>")
 
-    %% @ui_stabilization [ai-task, opened, 2026-04-05, antigravity]
-    ui_stabilization("UI & Asset Stabilizasyonu<br/><sub>404/405 hataları gideriliyor,<br/>asset yolları mutlaklaştırılıyor ve<br/>bekleme ekranı geri getiriliyor.</sub>")
+    %% @ui_stabilization [ai-task, closed, 2026-04-06, antigravity]
+    ui_stabilization("Mobil UI & Layout Çözümü<br/><sub>Tüm bölümler (Hero, Koleksiyonlar,<br/>Araçlar vb.) için mobil header<br/>çakışmaları ve font taşmaları<br/>tamamen giderildi, stabilite sağlandı.</sub>")
+
+    %% @responsive_audit_final [ai-task, closed, 2026-04-06, antigravity]
+    responsive_audit_final("7-Kademeli Audit & Fix (Core)<br/><sub>320px ve 2560px+ (4K) kritik<br/>hatalar Anasayfa, Detay ve<br/>Koleksiyon sayfaları için giderildi.<br/>Lüks capping (1440px) aktif edildi.</sub>")
+
+    %% @platform_wide_stabilization [ai-task, closed, 2026-04-07, antigravity]
+    platform_wide_stabilization("Platform Genelinde Stabilizasyon<br/><sub>Arama, Ekip, Kurumsal, Mahalle<br/>ve Portal sayfaları Luxury UI<br/>standartlarına yükseltildi.<br/>Global Mobile Polish v2.0 uygulandı.</sub>")
+
+    %% @phase_8_audit [ai-task, closed, 2026-04-07, antigravity]
+    phase_8_audit("Faz 8: Final Audit & Fix<br/><sub>Araçlar ve Portal sayfalarının<br/>responsive stabilizasyonu,<br/>4K capping ve Mobile Polish v2.0<br/>senkronizasyonu tamamlandı.</sub>")
+
+    %% @nav_hardening_faz9_1 [ai-task, closed, 2026-04-07, antigravity]
+    nav_hardening_faz9_1("Faz 9.1: Navigasyon Sertleştirme<br/><sub>Tüm alt sayfaların header ve logo<br/>yapısı senkronize edildi. Portal logosu<br/>izole edilerek portal içinde kalması<br/>ve dışa çıkış butonları sağlandı.</sub>")
+
+    %% @extension_bypass_phase [ai-task, closed, 2026-04-07, antigravity]
+    extension_bypass_phase("Eklenti Şifresiz Erişim (Bypass)<br/><sub>Eklenti giriş ekranı kaldırıldı,<br/>admin:admin123 ile sessiz oturum<br/>altyapısı kuruldu ve araçlar<br/>erişilebilir hale getirildi.</sub>")
+
+    %% @portal_auth_fix [ai-task, closed, 2026-04-08, antigravity]
+    portal_auth_fix("Portal Giriş Onarımı<br/><sub>/api/v1/login olan hatalı API<br/>yolu /api/v1/auth/login olarak<br/>düzeltildi, portal erişimi<br/>tekrar aktif hale getirildi.</sub>")
 
     %% === FUTURE WORK ===
     %% @phase_29_postgresql [ai-task, opened, 2026-04-10, antigravity]
@@ -45,9 +63,9 @@ flowchart TD
     %% @ultimate_goal [end, opened, 2026-06-01, user]
     ultimate_goal("Vizyon: Tam Otomasyon<br/><sub>Yapay zeka asistanı ile<br/>insansız operasyon ve<br/>maksimum satış dönüşümü.</sub>")
 
-    %% === RECENT ===
+    %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        ui_stabilization
+        portal_auth_fix
     end
 
     %% === EDGES ===
@@ -62,7 +80,13 @@ flowchart TD
     feature_domain_cleanup --> feature_sentry_safe_init
     feature_sentry_safe_init --> performance_investigation
     performance_investigation --> ui_stabilization
-    ui_stabilization -.-> phase_29_postgresql
+    ui_stabilization --> responsive_audit_final
+    responsive_audit_final --> platform_wide_stabilization
+    platform_wide_stabilization --> phase_8_audit
+    phase_8_audit --> nav_hardening_faz9_1
+    nav_hardening_faz9_1 --> extension_bypass_phase
+    extension_bypass_phase --> portal_auth_fix
+    portal_auth_fix -.-> phase_29_postgresql
     phase_29_postgresql -.-> ultimate_goal
 
     %% === STYLES ===
@@ -77,9 +101,15 @@ flowchart TD
     style feature_domain_cleanup fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style feature_sentry_safe_init fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style performance_investigation fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style ui_stabilization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style responsive_audit_final fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style platform_wide_stabilization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style phase_8_audit fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style nav_hardening_faz9_1 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style extension_bypass_phase fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
 
-    %% Recent node
-    style ui_stabilization fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    %% Recent node (highlighted purple)
+    style portal_auth_fix fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
@@ -87,5 +117,4 @@ flowchart TD
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
     style phase_29_postgresql fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style ui_stabilization fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
 

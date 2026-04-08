@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İmza Admin Portal | Premium Yönetim Paneli</title>
-    <link rel="stylesheet" href="../static/css/fluid.css">
+    <link rel="stylesheet" href="../static/css/fluid.css?v=2.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -16,8 +16,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script src="../js/mobile_polish.js"></script>
-    <script src="../static/js/media_manager.js"></script>
+    <script src="../static/js/mobile_polish.js?v=2.0" defer></script>
+    <script src="../static/js/media_manager.js?v=2.0"></script>
 
     <style>
         html, body {
@@ -214,6 +214,7 @@
 </head>
 
 <body class="text-slate-800 antialiased font-sans bg-gray-50 flex h-screen overflow-hidden">
+    <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
 
     <!-- LOGIN EKRANI (Varsayılan olarak görünür, giriş yapılınca gizlenir) -->
     <div id="login-section" class="fixed inset-0 z-50 bg-navy transition-all duration-700">
@@ -223,8 +224,10 @@
                 <div class="absolute inset-0 brand-pattern opacity-20"></div>
                 <div class="relative z-10 p-12 max-w-2xl w-full text-left">
                     <div class="mb-12 slide-up-anim">
-                        <i class="fa-solid fa-signature text-gold text-5xl mb-4" aria-hidden="true"></i>
-                        <h1 class="text-5xl lg:text-7xl font-bold font-serif text-white leading-tight drop-shadow-xl">
+                        <a href="portal.html" class="inline-block group/portal-logo" aria-label="Portal'ı Yenile">
+                            <i class="fa-solid fa-signature text-gold text-5xl mb-4 group-hover/portal-logo:scale-110 transition-transform" aria-hidden="true"></i>
+                        </a>
+                        <h1 class="text-fluid-4xl md:text-7xl font-bold font-serif text-white leading-tight drop-shadow-xl">
                             Sadece Bir Ev Değil, <br>
                             <span class="text-gold italic">Yeni Bir Hayat.</span>
                         </h1>
@@ -245,10 +248,19 @@
             </div>
 
             <!-- Sağ Taraf: Giriş Formu -->
-            <div class="split-right">
+            <div class="split-right relative">
+                <!-- Portal Exit (Login) -->
+                <div class="absolute top-8 right-8 z-20">
+                    <a href="anasayfa.html" class="flex items-center gap-2 text-white/40 hover:text-gold transition-all text-[10px] font-black uppercase tracking-widest border border-white/10 hover:border-gold/50 px-5 py-2 rounded-full backdrop-blur-md">
+                        <i class="fa-solid fa-arrow-left"></i> Web Sitesine Dön
+                    </a>
+                </div>
+
                 <div class="w-full max-w-md slide-up-anim delay-200">
                     <div class="text-center mb-10 md:hidden">
-                        <i class="fa-solid fa-signature text-gold text-5xl mb-3" aria-hidden="true"></i>
+                        <a href="portal.html" class="inline-block" aria-label="Portal'ı Yenile">
+                            <i class="fa-solid fa-signature text-gold text-5xl mb-3" aria-hidden="true"></i>
+                        </a>
                         <h2 class="text-fluid-3xl font-serif text-navy font-bold tracking-wider">İmza Portal</h2>
                     </div>
 
@@ -344,10 +356,12 @@
 
     <!-- ANA PORTAL ARAYÜZÜ (Giriş yapıldıktan sonra gösterilir) -->
     <div id="portal-app" class="flex w-full h-full hidden">
+        <!-- Sidebar Overlay (Mobile) -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-navy/60 backdrop-blur-sm z-[1000] hidden lg:hidden animate-fade-in"></div>
 
         <!-- SIDEBAR -->
         <aside id="sidebar"
-            class="w-72 glass-dark flex flex-col h-full shrink-0 fixed inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 lg:relative lg:inset-0 transition-transform duration-300 z-[100]">
+            class="w-72 glass-dark flex flex-col h-full shrink-0 fixed inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 lg:relative lg:inset-0 transition-transform duration-300 z-[1001] shadow-2xl lg:shadow-none">
             <!-- Mobil Kapatma Butonu -->
             <button type="button" onclick="toggleSidebar()" class="lg:hidden absolute top-4 right-4 text-white/40 hover:text-gold z-20">
                 <i class="fa-solid fa-xmark text-2xl"></i>
@@ -356,7 +370,7 @@
 
             <!-- Logo Alanı -->
             <div class="h-20 flex items-center px-8 border-b border-white/10 relative z-10 cursor-pointer"
-                onclick="window.location.href='anasayfa.html'">
+                onclick="showSection('dashboard')">
                 <i class="fa-solid fa-signature text-gold text-2xl mr-3" aria-hidden="true"></i>
                 <div class="flex flex-col">
                     <span
@@ -536,8 +550,12 @@
                 </button>
             </nav>
 
-            <!-- Çıkış Butonu -->
-            <div class="p-4 border-t border-white/10 relative z-10">
+            <!-- Kontrol ve Çıkış -->
+            <div class="p-4 border-t border-white/10 relative z-10 space-y-1">
+                <button onclick="window.location.href='anasayfa.html'"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-gold hover:bg-gold/5 transition-all text-sm font-bold">
+                    <i class="fa-solid fa-house-chimney w-5 text-center"></i> Web Sitesine Dön
+                </button>
                 <button onclick="logout()"
                     class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-modern hover:bg-modern/10 transition-all text-sm font-bold">
                     <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Güvenli Çıkış
@@ -550,9 +568,10 @@
 
             <!-- Header (Top bar) -->
             <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0 z-10">
-                <h2 id="page-title" class="text-xl font-serif font-bold text-navy flex items-center gap-3">
-                    <i class="fa-solid fa-chart-pie text-gold text-lg"></i> Dashboard Özet
-                </h2>
+                <div class="luxury-container flex justify-between items-center w-full">
+                    <h2 id="page-title" class="text-xl font-serif font-bold text-navy flex items-center gap-3">
+                        <i class="fa-solid fa-chart-pie text-gold text-lg"></i> Dashboard Özet
+                    </h2>
 
                 <div class="flex items-center gap-5">
                     <!-- Globalization Selectors (Phase 4) -->

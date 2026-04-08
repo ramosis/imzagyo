@@ -10,7 +10,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../static/css/fluid.css">
+    <link rel="stylesheet" href="../static/css/fluid.css?v=2.0">
+    <script src="../static/js/mobile_polish.js?v=2.0" defer></script>
 
     <!-- Geo Targeting -->
     <meta name="geo.region" content="TR-43" />
@@ -129,16 +130,7 @@
             opacity: 0;
         }
 
-        /* Fotoğraf Hover Efektleri */
-        .team-photo {
-            filter: grayscale(100%) contrast(1.1);
-            transition: filter 0.5s ease, transform 1s ease;
-        }
-
-        .group:hover .team-photo {
-            filter: grayscale(0%) contrast(1);
-            transform: scale(1.05);
-        }
+        /* Style overrides handled globally in fluid.css */
     </style>
     <script>
         // Lux Curtain Bridge Logic (Fluid Outro, Luxury Intro)
@@ -218,36 +210,25 @@
 
     <!-- Header / Navigasyon -->
     <header class="fixed w-full z-50 transition-all duration-500 bg-transparent header-animate">
-        <nav class="max-w-7xl mx-auto px-fluid-screen py-fluid-xs">
+        <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+        <nav class="luxury-container px-fluid-screen py-fluid-xs">
             <div class="flex justify-between items-center">
                 <!-- Logo -->
-                <a href="anasayfa.html" class="flex items-center group" aria-label="İmza Gayrimenkul Ana Sayfa">
-                    <span class="text-2xl font-serif font-bold text-white tracking-widest relative">
-                        İMZA
-                        <span
-                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gold transition-all duration-500 group-hover:w-full"></span>
-                    </span>
-                    <span class="text-gold font-light ml-2 tracking-widest text-sm mt-1">GAYRİMENKUL</span>
+                <a href="anasayfa.html" class="flex items-center group/logo" aria-label="İmza Gayrimenkul Ana Sayfa">
+                    <i class="fa-solid fa-signature text-gold text-2xl mr-3 group-hover/logo:scale-110 transition-transform"></i>
+                    <div class="flex flex-col">
+                        <span class="font-serif font-bold text-xl tracking-widest text-white leading-none uppercase">İMZA</span>
+                        <span class="font-serif font-bold text-xl tracking-widest text-navy leading-none uppercase">İMZA</span>
+                        <span class="text-gold text-[8px] tracking-[0.4em] uppercase font-bold mt-1 text-left">Gayrimenkul</span>
+                    </div>
                 </a>
-
-                <!-- Masaüstü Menü -->
-                <div class="hidden md:flex items-center space-x-10">
+                <div class="flex items-center gap-x-6">
                     <a href="anasayfa.html"
-                        class="text-sm font-medium text-white hover:text-gold transition-colors tracking-widest">Ana
-                        Sayfa</a>
-                    <a href="kurumsal.html"
-                        class="text-sm font-medium text-white hover:text-gold transition-colors tracking-widest">Kurumsal</a>
+                        class="hidden sm:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ana Sayfa</a>
                     <a href="ekip.html"
-                        class="text-sm font-medium text-gold transition-colors tracking-widest">Ekibimiz</a>
+                        class="hidden md:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ekibimiz</a>
                     <a href="portal.html"
-                        class="text-sm font-medium text-white hover:text-gold transition-colors tracking-widest">Koleksiyonlar</a>
-                    <a href="kariyer.html"
-                        class="text-sm font-medium text-white hover:text-gold transition-colors tracking-widest">Kariyer</a>
-                    <a href="arama.html"
-                        class="text-sm font-medium text-white hover:text-gold transition-colors tracking-widest"><i
-                            class="fas fa-search"></i> Portföy Ara</a>
-                    <a href="portal.html"
-                        class="bg-gold text-navy px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-white transition-colors" role="button">Portal</a>
+                        class="bg-navy text-gold px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-wider shadow-lg shadow-navy/20">İmza Portal</a>
                 </div>
             </div>
         </nav>
@@ -255,12 +236,12 @@
 
     <div class="main-wrapper" id="mainWrapper">
         <!-- Hero Section -->
-        <section class="relative pt-fluid-xl pb-fluid-l bg-navy overflow-hidden">
+        <section class="snap-section relative pt-fluid-xl pb-fluid-l bg-navy overflow-hidden">
             <div class="absolute inset-0 brand-pattern"></div>
-            <div class="max-w-7xl mx-auto px-fluid-screen relative z-10 text-center animate-up"
+            <div class="luxury-container px-fluid-screen relative z-10 text-center animate-up"
                 style="animation-delay: 0.2s;">
                 <h1
-                    class="text-fluid-7xl font-serif font-bold text-white mb-fluid-s tracking-tighter uppercase relative inline-block">
+                    class="text-fluid-5xl md:text-fluid-7xl font-serif font-bold text-white mb-fluid-s tracking-tighter uppercase relative inline-block">
                     İmza <span class="text-gold italic">Kadrosu</span>
                     <!-- Dekoratif İkon -->
                     <div class="absolute -right-12 -top-8 text-gold opacity-20 hidden md:block" aria-hidden="true">
@@ -282,7 +263,7 @@
         </section>
 
         <!-- Ekip Grid Section -->
-        <section class="py-fluid-l bg-soft">
+        <section class="snap-section py-fluid-l bg-soft">
             <!-- Ekip Gridleri Dinamik JS İle Buraya Basilacak -->
 
             <!-- Direktörler (Yöneticiler) -->
@@ -317,7 +298,7 @@
 
     <!-- Footer (Diğer sayfalarla aynı) -->
     <footer class="bg-[#050d1a] border-t border-white/5 py-12 md:py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="luxury-container px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
                 <div class="col-span-1 md:col-span-2">
                     <span class="text-3xl font-serif font-bold text-white tracking-widest mb-6 block">

@@ -56,29 +56,33 @@ const mobileAppPolish = {
         // Mobil cihazlarda alt menü (Native App Look)
         if (window.innerWidth < 768) {
             // İçeriğin menü altında kalmaması için body'ye padding ekle
-            document.body.style.paddingBottom = '6rem';
+            document.body.style.paddingBottom = '8rem';
 
             const bottomMenu = document.createElement('div');
             bottomMenu.className = 'fixed bottom-4 left-4 right-4 h-16 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 z-[9000] flex items-center justify-between px-8 text-navy/40';
+            // Adjust width and side margins for 320px devices
+            bottomMenu.style.width = 'calc(100% - 1.5rem)';
+            bottomMenu.style.left = '0.75rem';
+            bottomMenu.style.right = '0.75rem';
             bottomMenu.innerHTML = `
-                <button onclick="window.location.href='/'" class="flex flex-col items-center hover:text-gold transition-colors">
-                    <i class="fa-solid fa-house text-lg"></i>
+                <button onclick="window.location.href='anasayfa.html'" class="flex flex-col items-center hover:text-gold transition-colors">
+                    <i class="fa-solid fa-house text-lg text-gold"></i>
                     <span class="text-[8px] font-bold mt-1 uppercase">Ana</span>
                 </button>
-                <button onclick="window.location.href='/detay'" class="flex flex-col items-center hover:text-gold transition-colors">
+                <button onclick="window.location.href='arama.html'" class="flex flex-col items-center hover:text-gold transition-colors">
                     <i class="fa-solid fa-building text-lg"></i>
-                    <span class="text-[8px] font-bold mt-1 uppercase">İlan</span>
+                    <span class="text-[8px] font-bold mt-1 uppercase">İlanlar</span>
                 </button>
                 <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-12 h-12 bg-gold rounded-full -mt-10 flex items-center justify-center text-white shadow-lg border-4 border-white cursor-pointer active:scale-95 transition-transform">
                     <i class="fa-solid fa-arrow-up"></i>
                 </div>
-                <button onclick="window.location.href='/favorites'" class="flex flex-col items-center hover:text-gold transition-colors">
+                <button onclick="window.location.href='ekip.html'" class="flex flex-col items-center hover:text-gold transition-colors">
                     <i class="fa-solid fa-heart text-lg"></i>
-                    <span class="text-[8px] font-bold mt-1 uppercase">Favori</span>
+                    <span class="text-[8px] font-bold mt-1 uppercase">Ekibimiz</span>
                 </button>
-                <button onclick="window.location.href='/portal'" class="flex flex-col items-center hover:text-gold transition-colors">
-                    <i class="fa-solid fa-user text-lg"></i>
-                    <span class="text-[8px] font-bold mt-1 uppercase">Profil</span>
+                <button onclick="window.location.href='portal.html'" class="flex flex-col items-center hover:text-gold transition-colors">
+                    <i class="fa-solid fa-signature text-lg"></i>
+                    <span class="text-[8px] font-bold mt-1 uppercase">Portal</span>
                 </button>
             `;
             document.body.appendChild(bottomMenu);

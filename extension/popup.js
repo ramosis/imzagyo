@@ -178,35 +178,41 @@ async function checkAuth() {
     const mainSection = document.getElementById('mainSection');
     const userBadge = document.getElementById('userBadge');
 
+    // Always ensure main tools are visible (VIBE: Password-Free)
+    if (loginSection) loginSection.classList.add('hidden');
+    if (mainSection) mainSection.classList.remove('hidden');
+
     if (token) {
-        if (loginSection) loginSection.classList.add('hidden');
-        if (mainSection) mainSection.classList.remove('hidden');
         if (userBadge) userBadge.innerText = `👤 ${username}`;
     } else {
-        // AUTO-LOGIN ATTEMPT for the User (admin/admin123)
-        const { autoLoginTried = false } = await chrome.storage.local.get('autoLoginTried');
-        if (!autoLoginTried) {
-            console.log("İlk açılış: Otomatik giriş deneniyor...");
-            await chrome.storage.local.set({ autoLoginTried: true });
-            await handleLogin("admin", "admin123");
-            return;
+        // SILENT AUTO-LOGIN (Bypass)
+        console.log("Oturum yok: Arka planda giriş deneniyor...");
+        if (userBadge) userBadge.innerText = "⏳ Giriş Yapılıyor...";
+        
+        try {
+            const success = await handleLogin("admin", "admin123", true); // true = silent mode
+            if (!success && userBadge) {
+                userBadge.innerText = "⚠️ Offline / Demo Modu";
+                userBadge.style.borderColor = "#94a3b8";
+                userBadge.style.color = "#94a3b8";
+            }
+        } catch (e) {
+            console.error("Silent login error:", e);
         }
-        if (loginSection) loginSection.classList.remove('hidden');
-        if (mainSection) mainSection.classList.add('hidden');
     }
 }
 
-async function handleLogin(manualUser, manualPass) {
+async function handleLogin(manualUser, manualPass, isSilent = false) {
     const userInput = manualUser || document.getElementById('username').value;
     const passInput = manualPass || document.getElementById('password').value;
     const errorDiv = document.getElementById('loginError');
 
     if (!userInput || !passInput) {
-        if (errorDiv) errorDiv.innerText = "Lütfen alanları doldurun.";
-        return;
+        if (!isSilent && errorDiv) errorDiv.innerText = "Lütfen alanları doldurun.";
+        return false;
     }
 
-    if (errorDiv) errorDiv.innerText = "Giriş yapılıyor...";
+    if (!isSilent && errorDiv) errorDiv.innerText = "Giriş yapılıyor...";
 
     try {
         const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
@@ -223,14 +229,17 @@ async function handleLogin(manualUser, manualPass) {
                 username: data.user.username,
                 is_admin: data.user.is_admin
             });
-            if (errorDiv) errorDiv.innerText = "";
+            if (!isSilent && errorDiv) errorDiv.innerText = "";
             checkAuth();
+            return true;
         } else {
-            if (errorDiv) errorDiv.innerText = data.error || "Giriş başarısız.";
+            if (!isSilent && errorDiv) errorDiv.innerText = data.error || "Giriş başarısız.";
+            return false;
         }
     } catch (e) {
-        if (errorDiv) errorDiv.innerText = "Sunucuya bağlanılamadı.";
+        if (!isSilent && errorDiv) errorDiv.innerText = "Sunucuya bağlanılamadı.";
         console.error(e);
+        return false;
     }
 }
 

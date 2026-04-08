@@ -16,7 +16,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/placeholders.css">
+    <link rel="stylesheet" href="../static/css/fluid.css?v=2.0">
+    <script src="../static/js/mobile_polish.js?v=2.0" defer></script>
 
     <!-- Leaflet Harita & Çizim Kütüphaneleri -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -204,18 +205,23 @@
 
     <!-- Header (Sabit) -->
     <header class="fixed w-full z-50 border-b border-gray-100 bg-white/90 backdrop-blur-md header-animate">
-        <nav class="max-w-[1920px] mx-auto px-4 md:px-8">
+        <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+        <nav class="luxury-container px-4 md:px-8">
             <div class="flex justify-between items-center h-16">
-                <a href="anasayfa.html" class="flex items-center group">
-                    <i class="fa-solid fa-signature text-gold text-xl mr-3"></i>
-                    <span class="font-serif font-bold text-lg tracking-widest text-navy uppercase text-left">İMZA</span>
+                <a href="anasayfa.html" class="flex items-center group/logo" aria-label="İmza Gayrimenkul Ana Sayfa">
+                    <i class="fa-solid fa-signature text-gold text-2xl mr-3 group-hover/logo:scale-110 transition-transform"></i>
+                    <div class="flex flex-col">
+                        <span class="font-serif font-bold text-xl tracking-widest text-navy leading-none uppercase">İMZA</span>
+                        <span class="text-gold text-[8px] tracking-[0.4em] uppercase font-bold mt-1 text-left">Gayrimenkul</span>
+                    </div>
                 </a>
-                <div class="flex items-center space-x-6">
+                <div class="flex items-center gap-x-6">
                     <a href="anasayfa.html"
-                        class="text-navy hover:text-gold transition-colors text-[12px] font-bold uppercase tracking-widest">Ana
-                        Sayfa</a>
+                        class="hidden sm:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ana Sayfa</a>
+                    <a href="ekip.html"
+                        class="hidden md:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ekibimiz</a>
                     <a href="portal.html"
-                        class="bg-navy text-gold px-5 py-2 rounded-full font-bold text-[12px] uppercase tracking-widest shadow-lg shadow-navy/20">Portal</a>
+                        class="bg-navy text-gold px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-wider shadow-lg shadow-navy/20">İmza Portal</a>
                 </div>
             </div>
         </nav>
@@ -227,7 +233,7 @@
             <div class="absolute inset-0 brand-pattern opacity-20"></div>
             <div class="max-w-4xl w-full text-center relative z-10 animate-up" style="animation-delay: 0.3s;">
                 <h1
-                    class="text-white font-serif font-bold text-4xl md:text-6xl mb-8 uppercase tracking-tighter text-left text-center">
+                    class="text-white font-serif font-bold text-fluid-4xl md:text-6xl mb-8 uppercase tracking-tighter text-left text-center">
                     İmza Koleksiyonlarını <br><span class="text-gold italic">Keşfedin</span></h1>
                 <div
                     class="bg-white rounded-2xl md:rounded-full p-2 flex flex-col md:flex-row items-center justify-between shadow-2xl shadow-gold/20 text-navy gap-4 md:gap-0">
@@ -406,18 +412,6 @@
         </section>
     </div>
 
-    <!-- Mobil Alt Bar -->
-    <div
-        class="lg:hidden fixed bottom-0 left-0 right-0 bg-white p-4 grid grid-cols-2 gap-4 border-t border-gray-100 z-50">
-        <button
-            class="bg-navy text-gold py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-3">
-            <i class="fa-solid fa-map-location-dot"></i> Harita
-        </button>
-        <button
-            class="bg-white border border-navy text-navy py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-3">
-            <i class="fa-solid fa-sliders"></i> Filtrele
-        </button>
-    </div>
 
     <script>
         // Smooth Section Scroller

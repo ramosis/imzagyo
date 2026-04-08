@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/fluid.css?v=2.0">
+    <script src="../static/js/mobile_polish.js?v=2.0" defer></script>
     <!-- CountUp.js for number animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.7/countUp.umd.js"></script>
     <script>
@@ -189,23 +189,23 @@
 
     <!-- Header (Sabit) -->
     <header class="fixed w-full z-50 border-b border-gray-100 bg-white/90 backdrop-blur-md header-animate">
-        <nav class="max-w-[1920px] mx-auto px-4 md:px-8">
+        <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+        <nav class="luxury-container mx-auto px-4 md:px-8">
             <div class="flex justify-between items-center h-16">
-                <a href="anasayfa.html" class="flex items-center group">
-                    <i
-                        class="fa-solid fa-signature text-gold text-xl mr-3 group-hover:scale-110 transition-transform"></i>
-                    <span class="font-serif font-bold text-lg tracking-widest text-navy uppercase text-left">İMZA</span>
+                <a href="anasayfa.html" class="flex items-center group/logo" aria-label="İmza Gayrimenkul Ana Sayfa">
+                    <i class="fa-solid fa-signature text-gold text-2xl mr-3 group-hover/logo:scale-110 transition-transform"></i>
+                    <div class="flex flex-col">
+                        <span class="font-serif font-bold text-xl tracking-widest text-navy leading-none uppercase">İMZA</span>
+                        <span class="text-gold text-[8px] tracking-[0.4em] uppercase font-bold mt-1 text-left">Gayrimenkul</span>
+                    </div>
                 </a>
-                <div class="flex items-center space-x-6">
+                <div class="flex items-center gap-x-6">
                     <a href="anasayfa.html"
-                        class="text-navy hover:text-gold transition-colors text-[12px] font-bold uppercase tracking-widest">Ana
-                        Sayfa</a>
-                    <a href="arama.html"
-                        class="text-navy hover:text-gold transition-colors text-[12px] font-bold uppercase tracking-widest">Koleksiyonlar</a>
+                        class="hidden sm:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ana Sayfa</a>
                     <a href="ekip.html"
-                        class="text-navy hover:text-gold transition-colors text-[12px] font-bold uppercase tracking-widest">Ekibimiz</a>
+                        class="hidden md:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ekibimiz</a>
                     <a href="portal.html"
-                        class="bg-navy text-gold px-5 py-2 rounded-full font-bold text-[12px] uppercase tracking-widest shadow-lg shadow-navy/20">Portal</a>
+                        class="bg-navy text-gold px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-wider shadow-lg shadow-navy/20">İmza Portal</a>
                 </div>
             </div>
         </nav>
@@ -213,15 +213,15 @@
 
     <div class="flex-grow pt-16" id="mainWrapper">
         <!-- Hero Section -->
-        <section class="bg-navy relative overflow-hidden py-24 px-4 text-center">
+        <section class="snap-section bg-navy relative overflow-hidden py-24 px-4 text-center">
             <div
                 class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541888086438-e04772ab180e?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center opacity-20">
             </div>
             <div class="absolute inset-0 bg-navy/80"></div>
             <div class="absolute inset-0 brand-pattern opacity-20"></div>
 
-            <div class="relative z-10 max-w-4xl mx-auto animate-up">
-                <h1 class="text-3xl md:text-5xl font-serif font-bold text-white mb-6 uppercase tracking-tight">
+            <div class="relative z-10 luxury-container px-6 animate-up">
+                <h1 class="text-fluid-4xl md:text-5xl font-serif font-bold text-white mb-6 uppercase tracking-tight">
                     Yatırımcı <span class="text-gold italic">Rehberi</span>
                 </h1>
                 <p class="text-gray-300 max-w-2xl mx-auto text-sm md:text-base leading-relaxed font-light">
@@ -232,8 +232,8 @@
         </section>
 
         <!-- Tools Interface Container -->
-        <section class="py-16 px-4 md:px-8 bg-soft">
-            <div class="max-w-7xl mx-auto">
+        <section class="snap-section py-16 px-4 md:px-8 bg-soft">
+            <div class="luxury-container px-6">
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
                     <!-- Sidebar Navigation -->
@@ -519,8 +519,8 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-navy text-white text-center py-12 border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center justify-center">
+    <footer class="snap-section bg-navy text-white text-center py-12 border-t border-white/10 sm:hidden">
+        <div class="luxury-container px-4 flex flex-col items-center justify-center">
             <h2 class="font-serif font-bold text-2xl tracking-[0.4em] uppercase mb-4 text-gold">İMZA</h2>
             <p class="text-[10px] font-bold tracking-[0.6em] text-gray-500 uppercase mb-8">Yatırımcı Rehberi © 2026</p>
         </div>

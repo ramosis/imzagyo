@@ -131,12 +131,27 @@ function showSection(sectionId, btnElement) {
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    if (sidebar) sidebar.classList.toggle('-translate-x-full');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    if (sidebar) {
+        sidebar.classList.toggle('-translate-x-full');
+        // Toggle overlay visibility
+        if (overlay) {
+            overlay.classList.toggle('hidden');
+        }
+        // Lock body scroll on mobile when sidebar is open
+        if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 1024) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
 }
 
 const toggleBtn = document.getElementById('sidebar-toggle');
 if (toggleBtn) {
-    toggleBtn.addEventListener('click', toggleSidebar);
+    // Note: Inline onclick also exists, this adds a second listener or we can rely on one.
+    // Standardizing to ensure it works consistently.
 }
 
 function logout() {
@@ -234,7 +249,7 @@ async function login() {
     errorDiv.classList.add('hidden');
 
     try {
-        const response = await fetch(`${API_BASE}/login`, {
+        const response = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
