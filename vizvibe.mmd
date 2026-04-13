@@ -81,6 +81,9 @@ flowchart TD
     lead_automation("Lead-to-Pipeline Automation<br/><sub>Automated new lead transfer to<br/>the first pipeline stage with<br/>CRM filtering capabilities</sub>")
 
     %% === FUTURE WORK ===
+    %% @luxury_scroll_restored [ai-task, closed, 2026-04-13, antigravity]
+    luxury_scroll_restored("Luxury Scroll Onarımı<br/><sub>Eksik CSS transition'lar<br/>geri yüklendi, zıplama<br/>sorunu çözüldü ve vakumlu<br/>akışkanlık stabilize edildi.</sub>")
+
     %% @design_hardening_faz9_3 [ai-task, closed, 2026-04-13, antigravity]
     design_hardening_faz9_3("Faz 9.3: Tasarım Hardening<br/><sub>Anasayfa layout-shift çözümü,<br/>portal kontrast & ikon hizalama<br/>ve 'Shadow -> Gölge' yerelleştirmesi<br/>başarıyla mühürlendi.</sub>")
 
@@ -98,7 +101,7 @@ flowchart TD
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        design_hardening_faz9_3
+        luxury_scroll_restored
     end
 
     %% === EDGES ===
@@ -125,7 +128,9 @@ flowchart TD
     crm_stabilization_hardened --> portal_access_button_hardening
     portal_access_button_hardening --> auth_fix
     auth_fix --> deletion_hardening
-    design_hardening_faz9_3 --> postgresql_migration
+    deletion_hardening --> design_hardening_faz9_3
+    design_hardening_faz9_3 --> luxury_scroll_restored
+    luxury_scroll_restored --> postgresql_migration
     postgresql_migration -.-> ultimate_goal
 
     %% === STYLES ===
@@ -155,9 +160,10 @@ flowchart TD
     style auth_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style deletion_hardening fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style design_hardening_faz9_3 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style luxury_scroll_restored fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     
     %% Recent node (highlighted purple)
-    style design_hardening_faz9_3 fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style luxury_scroll_restored fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
     %% Recent subgraph (dashed border)
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
