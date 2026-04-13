@@ -9,7 +9,7 @@ export const IdentityHelpers = {
      */
     async fetchIdentities(token) {
         try {
-            const response = await fetch('/api/auth/identities', {
+            const response = await fetch('/api/v1/auth/identities', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) throw new Error('Kimlikler getirilemedi.');
@@ -30,7 +30,7 @@ export const IdentityHelpers = {
         }
 
         try {
-            const response = await fetch(`/api/auth/identities/unlink/${identityId}`, {
+            const response = await fetch(`/api/v1/auth/identities/unlink/${identityId}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -49,7 +49,7 @@ export const IdentityHelpers = {
      */
     async setPrimaryIdentity(token, identityId) {
         try {
-            const response = await fetch(`/api/auth/identities/set-primary/${identityId}`, {
+            const response = await fetch(`/api/v1/auth/identities/set-primary/${identityId}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -67,7 +67,7 @@ export const IdentityHelpers = {
      * Start the linking flow for a new provider (Google/Facebook)
      */
     linkNewProvider(provider) {
-        window.location.href = `/api/auth/social/login/${provider}`;
+        window.location.href = `/api/v1/auth/social/login/${provider}`;
     }
 };
 
@@ -77,7 +77,7 @@ export const AuditHelpers = {
      */
     async fetchAuditLogs(token) {
         try {
-            const response = await fetch('/api/auth/audit-log', {
+            const response = await fetch('/api/v1/auth/audit-log', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) throw new Error('Audit log getirilemedi.');

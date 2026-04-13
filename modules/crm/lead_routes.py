@@ -13,7 +13,18 @@ from .service import LeadService
 @login_required
 def get_leads():
     user = AuthService.get_current_user()
-    leads = LeadRepository.get_leads_for_user(user['id'], user['role'], user.get('circle', 'outer'))
+    
+    # Extract filters from query params
+    filters = {
+        'source': request.args.get('source'),
+        'status': request.args.get('status'),
+        'min_score': request.args.get('min_score'),
+        'pipeline': request.args.get('pipeline') # 'all', 'true', 'false'
+    }
+    # Remove None values
+    filters = {k: v for k, v in filters.items() if v is not None}
+    
+    leads = LeadRepository.get_leads_for_user(user['id'], user['role'], user.get('circle', 'outer'), filters=filters)
     return jsonify(lead_schema.dump(leads, many=True)), 200
 
 @crm_bp.route('/leads/<int:id>', methods=['GET'])

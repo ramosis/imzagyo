@@ -9,5 +9,6 @@ class Notification(db.Model):
     type = db.Column(db.String(50), nullable=False) # pipeline, ai_alert, etc.
     title = db.Column(db.String(255), nullable=False)
     message = db.Column(db.Text, nullable=False)
+    target_role = db.Column(db.String(50), nullable=True) # tenant, owner, agent, all
     status = db.Column(db.String(20), default='unread') # unread, read
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

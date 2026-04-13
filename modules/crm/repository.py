@@ -9,7 +9,7 @@ class LeadRepository:
     """Handles database operations for Leads using SQLAlchemy ORM."""
     
     @staticmethod
-    def get_leads_for_user(user_id: int, role: str, circle: str) -> List[Lead]:
+    def get_leads_for_user(user_id: int, role: str, circle: str, filters: Dict[str, Any] = None) -> List[Lead]:
         query = db.session.query(Lead)
         
         if circle == 'outer':
@@ -19,6 +19,19 @@ class LeadRepository:
         elif role not in ['admin', 'super_admin']:
             # Regular users only see their assigned leads
             query = query.filter(Lead.assigned_user_id == user_id)
+
+        # Dynamic Filters
+        if filters:
+            if filters.get('source'):
+                query = query.filter(Lead.source == filters['source'])
+            if filters.get('status'):
+                query = query.filter(Lead.status == filters['status'])
+            if filters.get('min_score'):
+                query = query.filter(Lead.ai_score >= int(filters['min_score']))
+            if filters.get('pipeline') == 'true':
+                query = query.filter(Lead.pipeline_stage_id.isnot(None))
+            elif filters.get('pipeline') == 'false':
+                query = query.filter(Lead.pipeline_stage_id.is_(None))
             
         return query.order_by(Lead.ai_score.desc(), Lead.created_at.desc()).all()
 
@@ -39,6 +52,12 @@ class LeadRepository:
 
     @staticmethod
     def create(data: Dict[str, Any]) -> Lead:
+        # Auto-assign to the first pipeline stage if not specified
+        if 'pipeline_stage_id' not in data:
+            first_stage = PipelineStage.query.order_by(PipelineStage.order_index).first()
+            if first_stage:
+                data['pipeline_stage_id'] = first_stage.id
+                
         lead = Lead(**data)
         db.session.add(lead)
         db.session.commit()

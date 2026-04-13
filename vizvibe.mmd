@@ -1,7 +1,7 @@
 flowchart TD
     %% === PROJECT GOALS ===
     %% Ultimate Goal: Türkiye'nin en teknolojik ve şeffaf gayrimenkul yönetim platformu olmak.
-    %% Current Goal: Faz 9.1: Navigasyon Sertleştirme & UX Senkronizasyonu tamamlandı.
+    %% Current Goal: Faz 9.3: Tasarım Hardening & Görsel Stabilizasyon Tamamlandı.
 
     %% === START ===
     %% @project_start [start, closed, 2026-01-09, user]
@@ -53,19 +53,52 @@ flowchart TD
     %% @extension_bypass_phase [ai-task, closed, 2026-04-07, antigravity]
     extension_bypass_phase("Eklenti Şifresiz Erişim (Bypass)<br/><sub>Eklenti giriş ekranı kaldırıldı,<br/>admin:admin123 ile sessiz oturum<br/>altyapısı kuruldu ve araçlar<br/>erişilebilir hale getirildi.</sub>")
 
-    %% @portal_auth_fix [ai-task, closed, 2026-04-08, antigravity]
-    portal_auth_fix("Portal & Server Stabilizasyonu<br/><sub>Jinja2 render_template geçişi yapıldı,<br/>portföy fiyat serilizasyon hatası<br/>(Float->Str) giderildi ve portal<br/>girişi tamamen restore edildi.</sub>")
+    %% @portal_modules_modenization [ai-task, closed, 2026-04-09, antigravity]
+    portal_modules_modenization("Portal Modül Modernizasyonu<br/><sub>Proje Masası, AI Raporlar ve CMS<br/>modülleri eklendi. Yapay zeka<br/>etiketleri premium/kurumsal dille<br/>yeniden kurgulandı.</sub>")
+
+    %% @project_archiving_logic [ai-task, closed, 2026-04-09, antigravity]
+    project_archiving_logic("Proje Arşivleme & Pipeline<br/><sub>Lansman başvurularının şişmesini<br/>önleyen arşivleme mantığı ve<br/>Pipeline'a tek tıkla 'PROJE' etiketiyle<br/>aktarım altyapısı kuruldu.</sub>")
+
+    %% @nav_audit_stabilization [ai-task, closed, 2026-04-09, antigravity]
+    nav_audit_stabilization("Navigayon Audit & Stabilite<br/><sub>Duplicate ID'ler çözüldü,<br/>yanlış maplenen butonlar fixlendi<br/>ve SPA geçişleri hatasız hale getirildi.</sub>")
+
+    %% @op_module_handlers [ai-task, closed, 2026-04-09, antigravity]
+    op_module_handlers("Operasyonel Modül Gelişimi<br/><sub>Haber/Blog CMS, Ofis döküman destekli<br/>Medya Merkezi ve Kiracı/Ev Sahibi<br/>odaklı hedefli duyurular tamamlandı.</sub>")
+
+    %% @crm_stabilization_hardened [ai-task, closed, 2026-04-09, antigravity]
+    crm_stabilization_hardened("CRM & İnteraktif Sertleştirme<br/><sub>Aday müşteri (Lead) ve Pipeline<br/>görünümleri birleştirildi. Tablo/Kanban<br/>geçişi, interaktif modallar ve TL/TR<br/>lokalizasyonu başarıyla tamamlandı.</sub>")
+
+    %% @portal_rbac [ai-task, closed, 2026-04-12, antigravity]
+    portal_rbac("RBAC & Access Hardening<br/><sub>Implemented role-based sidebar<br/>filtering and permission checks<br/>in portal core logic</sub>")
+
+    %% @visual_stabilization [ai-task, closed, 2026-04-12, antigravity]
+    visual_stabilization("Visual & Contrast Fixes<br/><sub>Resolved white-on-white button<br/>visibility issues and improved<br/>dynamic data contrast</sub>")
+
+    %% @expense_module [ai-task, closed, 2026-04-12, antigravity]
+    expense_module("Expense Management Active<br/><sub>Integrated finance API for<br/>expense tracking and approval<br/>within the administrative portal</sub>")
+
+    %% @lead_automation [ai-task, closed, 2026-04-12, antigravity]
+    lead_automation("Lead-to-Pipeline Automation<br/><sub>Automated new lead transfer to<br/>the first pipeline stage with<br/>CRM filtering capabilities</sub>")
 
     %% === FUTURE WORK ===
-    %% @phase_29_postgresql [ai-task, opened, 2026-04-10, antigravity]
-    phase_29_postgresql("Faz 29: Postgres & Migrasyon<br/><sub>SQLite'tan PostgreSQL'e geçiş,<br/>veritabanı normalizasyonu ve<br/>performans optimizasyonu.</sub>")
+    %% @design_hardening_faz9_3 [ai-task, closed, 2026-04-13, antigravity]
+    design_hardening_faz9_3("Faz 9.3: Tasarım Hardening<br/><sub>Anasayfa layout-shift çözümü,<br/>portal kontrast & ikon hizalama<br/>ve 'Shadow -> Gölge' yerelleştirmesi<br/>başarıyla mühürlendi.</sub>")
+
+    %% @auth_fix [ai-task, closed, 2026-04-13, antigravity]
+    auth_fix("Google Login & Auth Fix<br/><sub>Resolved 404 errors by correcting<br/>API prefixes and social link URLs.<br/>Improved mobile login reliability.</sub>")
+
+    %% @deletion_hardening [ai-task, closed, 2026-04-13, antigravity]
+    deletion_hardening("Portal Deletion Hardening<br/><sub>Activated delete actions for CMS,<br/>Hero, and Media with confirmation<br/>logic and safe API handlers.</sub>")
+
+    %% @postgresql_migration [ai-task, opened, 2026-04-12, antigravity]
+    postgresql_migration("PostgreSQL Migration<br/><sub>Transitioning database to<br/>PostgreSQL for production-ready<br/>stability and scale</sub>")
 
     %% @ultimate_goal [end, opened, 2026-06-01, user]
     ultimate_goal("Vizyon: Tam Otomasyon<br/><sub>Yapay zeka asistanı ile<br/>insansız operasyon ve<br/>maksimum satış dönüşümü.</sub>")
 
     %% === RECENT WORK HIGHLIGHT ===
     subgraph recent [RECENT]
-        portal_auth_fix
+        design_hardening_faz9_3
     end
 
     %% === EDGES ===
@@ -74,7 +107,6 @@ flowchart TD
     feature_three_mode_site --> feature_neighborhood_hub
     feature_neighborhood_hub --> feature_phase25_docker_stabilization
     feature_phase25_docker_stabilization --> feature_phase28_unification
-    feature_phase25_docker_stabilization --> ui_stabilization
     feature_phase28_unification --> feature_phase28_stabilization
     feature_phase28_stabilization --> feature_domain_cleanup
     feature_domain_cleanup --> feature_sentry_safe_init
@@ -85,9 +117,16 @@ flowchart TD
     platform_wide_stabilization --> phase_8_audit
     phase_8_audit --> nav_hardening_faz9_1
     nav_hardening_faz9_1 --> extension_bypass_phase
-    extension_bypass_phase --> portal_auth_fix
-    portal_auth_fix -.-> phase_29_postgresql
-    phase_29_postgresql -.-> ultimate_goal
+    extension_bypass_phase --> portal_modules_modenization
+    portal_modules_modenization --> project_archiving_logic
+    project_archiving_logic --> nav_audit_stabilization
+    nav_audit_stabilization --> op_module_handlers
+    op_module_handlers --> crm_stabilization_hardened
+    crm_stabilization_hardened --> portal_access_button_hardening
+    portal_access_button_hardening --> auth_fix
+    auth_fix --> deletion_hardening
+    design_hardening_faz9_3 --> postgresql_migration
+    postgresql_migration -.-> ultimate_goal
 
     %% === STYLES ===
     %% Closed tasks
@@ -107,14 +146,22 @@ flowchart TD
     style phase_8_audit fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style nav_hardening_faz9_1 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
     style extension_bypass_phase fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
-
+    style portal_modules_modenization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style project_archiving_logic fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style nav_audit_stabilization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style op_module_handlers fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style portal_integration_hardening fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style crm_stabilization_hardened fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style auth_fix fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style deletion_hardening fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style design_hardening_faz9_3 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    
     %% Recent node (highlighted purple)
-    style portal_auth_fix fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style design_hardening_faz9_3 fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
 
-    %% Recent subgraph
+    %% Recent subgraph (dashed border)
     style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
 
     %% Open tasks
     style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-    style phase_29_postgresql fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
-
+    style postgresql_migration fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px

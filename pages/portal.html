@@ -56,8 +56,9 @@
             letter-spacing: 0.05em;
             text-transform: uppercase;
             font-size: 0.75rem;
-            color: #64748b;
+            color: #475569; /* Contrast increased from #64748b */
             background-color: #f8fafc;
+            border-bottom: 2px solid #f1f5f9;
         }
 
         .premium-table tr {
@@ -202,8 +203,84 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
         }
 
+        /* Proje Hub Tab Aktif Durumu */
+        .hub-tab-btn.active {
+            background-color: white !important;
+            color: #0a192f !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+        }
+
         .animate-fade-in {
             animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        /* Premium Dropdown Logic */
+        .premium-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.75rem;
+            min-width: 160px;
+            background: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(197, 160, 89, 0.1);
+            color: #c5a059;
+        }
+
+        .dropdown-item.active {
+            color: #c5a059;
+            background: rgba(197, 160, 89, 0.05);
+        }
+
+        /* Sidebar Profile Role Switch */
+        .role-badge-trigger {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .role-badge-trigger:hover .role-text {
+            color: white;
+        }
+
+        .role-badge-trigger:hover .role-chevron {
+            transform: rotate(180deg);
         }
     </style>
 
@@ -320,19 +397,19 @@
                             </div>
 
                             <div class="mt-6 flex items-center">
-                                <div class="flex-grow border-t border-gray-200"></div>
-                                <span class="px-3 text-[10px] text-gray-500 font-bold uppercase tracking-widest bg-white">veya sosyal ağ i̇le</span>
-                                <div class="flex-grow border-t border-gray-200"></div>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                                <span class="px-4 text-[11px] text-slate-600 font-bold uppercase tracking-widest bg-white">veya sosyal ağ i̇le</span>
+                                <div class="flex-grow border-t border-gray-300"></div>
                             </div>
 
                             <div class="mt-6 grid grid-cols-2 gap-3">
-                                <a href="/api/v1/auth/login/google" class="w-full flex items-center justify-center gap-2 py-3.5 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-[11px] font-bold text-gray-600 uppercase tracking-wider">
+                                <a href="/api/v1/auth/social/login/google" class="w-full flex items-center justify-center gap-2 py-3.5 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-[11px] font-bold text-gray-600 uppercase tracking-wider">
                                     <i class="fa-brands fa-google text-red-500 text-sm"></i> Google
                                 </a>
-                                <a href="/api/v1/auth/login/facebook" class="w-full flex items-center justify-center gap-2 py-3.5 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-[11px] font-bold text-gray-600 uppercase tracking-wider">
+                                <a href="/api/v1/auth/social/login/facebook" class="w-full flex items-center justify-center gap-2 py-3.5 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-[11px] font-bold text-gray-600 uppercase tracking-wider">
                                     <i class="fa-brands fa-facebook-f text-blue-600 text-sm"></i> Facebook
                                 </a>
-                                <a href="/api/v1/auth/login/instagram" class="col-span-2 w-full flex items-center justify-center gap-2 py-3.5 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-[11px] font-bold text-gray-600 uppercase tracking-wider">
+                                <a href="/api/v1/auth/social/login/instagram" class="col-span-2 w-full flex items-center justify-center gap-2 py-3.5 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-[11px] font-bold text-gray-600 uppercase tracking-wider">
                                     <i class="fa-brands fa-instagram text-pink-600 text-sm"></i> Instagram
                                 </a>
                             </div>
@@ -346,7 +423,7 @@
                         </div>
                     </div>
 
-                    <p class="text-center text-gray-500 text-[10px] uppercase tracking-widest mt-8 font-medium">
+                    <p class="text-center text-slate-500 text-[11px] uppercase tracking-widest mt-8 font-bold">
                         &copy; 2026 İMZA GAYRİMENKUL. TÜM HAKLARI SAKLIDIR.
                     </p>
                 </div>
@@ -383,170 +460,218 @@
             <div class="px-8 py-6 border-b border-white/5 relative z-10">
                 <div class="flex items-center gap-4">
                     <div
-                        class="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center border border-gold/50">
+                        class="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center border border-gold/50 shadow-lg shadow-gold/10">
                         <i class="fa-regular fa-user text-gold text-xl"></i>
                     </div>
                     <div>
                         <p id="sidebar-user-name" class="text-white font-medium text-sm">Yönetici</p>
-                        <p id="sidebar-user-role" class="text-gold text-[10px] uppercase tracking-wider font-bold">Admin
-                        </p>
+                        <div class="premium-dropdown">
+                            <div class="role-badge-trigger group" onclick="toggleDropdown('role-dropdown')">
+                                <p id="sidebar-user-role" class="role-text text-gold text-[10px] uppercase tracking-wider font-bold transition-colors">YÖNETİCİ</p>
+                                <i class="fa-solid fa-chevron-down text-[8px] text-white/30 role-chevron transition-transform group-hover:text-gold"></i>
+                            </div>
+                            <div id="role-dropdown" class="dropdown-menu !left-0 !right-auto">
+                                <div class="px-4 py-2 border-b border-white/5 mb-1">
+                                    <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Rol Değiştir</span>
+                                </div>
+                                <div class="dropdown-item" onclick="switchRole('admin')">
+                                    <i class="fa-solid fa-crown text-[10px]"></i> Yönetici (Admin)
+                                </div>
+                                <div class="dropdown-item" onclick="switchRole('broker')">
+                                    <i class="fa-solid fa-briefcase text-[10px]"></i> Broker
+                                </div>
+                                <div class="dropdown-item" onclick="switchRole('standart')">
+                                    <i class="fa-solid fa-user-tie text-[10px]"></i> Danışman (Agent)
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
             <!-- Navigasyon -->
-            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1 relative z-10">
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1 relative z-10 custom-scrollbar">
+                
+                <!-- 1. AI & STRATEJİK ANALİZ -->
+                <div class="pb-2 px-4">
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">AI & Strateji</p>
+                </div>
                 <button type="button" onclick="showSection('dashboard', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium active">
-                    <i class="fa-solid fa-chart-pie w-6 text-center text-lg"></i> Dashboard Özet
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium active">
+                    <i class="fa-solid fa-gauge-high w-8 flex items-center justify-center text-lg"></i> Hızlı Bakış
                 </button>
-
-                <button type="button" onclick="showSection('global-sync', this)"
-                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                <button type="button" onclick="showSection('imza-lens', this)"
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-globe w-6 text-center text-lg"></i> Bölgesel Görünürlük
+                        <i class="fa-solid fa-microchip w-8 flex items-center justify-center text-lg"></i> İmza Lens (AI)
                     </div>
-                    <span class="bg-indigo-500/20 text-indigo-400 text-[9px] py-0.5 px-2 rounded-full font-bold uppercase tracking-tighter">AI Global</span>
+                </button>
+                <button type="button" onclick="showSection('ai-reports', this)"
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-brain w-8 flex items-center justify-center text-lg text-gold/60"></i> AI Analiz Raporları
+                    </div>
+                </button>
+                <button type="button" onclick="showSection('market-analytics', this)"
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-chart-pie w-8 flex items-center justify-center text-lg"></i> Pazar Analitiği
+                    </div>
+                </button>
+                <button type="button" onclick="showSection('global-sync', this)" data-access="admin"
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-earth-europe w-8 flex items-center justify-center text-lg"></i> Global Görünürlük
+                    </div>
                 </button>
 
-                <div class="pt-4 pb-2 px-4">
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Yönetim</p>
+                <!-- 2. PORTFÖY & SAHA -->
+                <div class="pt-6 pb-2 px-4">
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Portföy & Saha</p>
                 </div>
                 <button type="button" onclick="showSection('portfolios', this)"
-                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-gem w-6 text-center text-lg"></i> Portföy Yönetimi
-                    </div>
-                    <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">34</span>
-                </button>
-
-                <button type="button" onclick="showSection('contracts', this)"
-                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-file-signature w-6 text-center text-lg"></i> Sözleşmeler
+                        <i class="fa-solid fa-building-columns w-8 flex items-center justify-center text-lg"></i> Portföy Yönetimi
                     </div>
                 </button>
-
-                <button type="button" onclick="showSection('contract-builder', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-file-pen w-6 text-center text-lg"></i> Sözleşme Hazırlama
-                    <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
-                </button>
-
-                <button type="button" onclick="showSection('leads', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-bullseye w-6 text-center text-lg"></i> Müşteri Adayları (CRM)
-                </button>
-
-                <button type="button" onclick="window.location.href='/pipeline'"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-columns w-6 text-center text-lg"></i> Pipeline (Kanban)
-                </button>
-
-                <button type="button" onclick="showSection('contacts', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-address-book w-6 text-center text-lg"></i> Telefon Rehberi
-                </button>
-
-                <button type="button" onclick="showSection('campaigns', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-envelopes-bulk w-6 text-center text-lg"></i> E-Posta Yönetimi
-                    <span class="bg-modern/20 text-modern text-[10px] py-0.5 px-2 rounded-full">Pro</span>
-                </button>
-
-                <button type="button" onclick="showSection('barter-wizard-section', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-calculator w-6 text-center text-lg"></i> Alım Gücü Sihirbazı
-                    <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
-                </button>
-
-                <button type="button" onclick="showSection('taxes-calculator', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-percent w-6 text-center text-lg"></i> Konut Kredisi Hesaplama
-                </button>
-
-                <button type="button" onclick="showSection('taxes', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-scale-balanced w-6 text-center text-lg"></i> Finans & Vergi
-                </button>
-
-                <button type="button" onclick="showSection('expenses', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-receipt w-6 text-center text-lg"></i> Harcama Yönetimi
-                </button>
-
-                <button type="button" onclick="showSection('payroll', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-money-bill-trend-up w-6 text-center text-lg"></i> Hakediş & Komisyon
-                </button>
-
-                <div class="mt-4 mb-2 px-4">
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Entegrasyonlar</p>
-                </div>
-
-                <button type="button" onclick="showSection('integrations', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-share-nodes w-6 text-center text-lg"></i> Entegrasyon Merkezi
-                    <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
-                </button>
-
-                <button type="button" onclick="showSection('imza-lens', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-eye w-6 text-center text-lg"></i> İmza Lens (Merkezi)
-                    <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Pro</span>
-                </button>
-
-                <button type="button" onclick="showSection('market-analytics', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-chart-line w-6 text-center text-lg"></i> Pazar Analitiği
-                    <span class="bg-indigo-500/20 text-indigo-400 text-[10px] py-0.5 px-2 rounded-full font-bold">Trend</span>
-                </button>
-
-                <button type="button" onclick="window.open('/inspection', '_blank')"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-clipboard-check w-6 text-center text-lg"></i> Dijital Denetim
-                    <span class="bg-modern/20 text-modern text-[10px] py-0.5 px-2 rounded-full">Saha</span>
-                </button>
-
                 <button type="button" onclick="window.open('/mls', '_blank')"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-layer-group w-6 text-center text-lg"></i> MLS (Portföy Havuzu)
-                    <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Pro</span>
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-layer-group w-8 flex items-center justify-center text-lg"></i> MLS (Portföy Havuzu)
                 </button>
-
-                <button type="button" onclick="showSection('maintenance', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-screwdriver-wrench w-6 text-center text-lg"></i> Bakım Talepleri
+                <button type="button" onclick="showSection('media-center', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-photo-film w-8 flex items-center justify-center text-lg"></i> Medya & Dosya Merkezi
                 </button>
-
-                <button type="button" onclick="showSection('appointments', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-regular fa-calendar-check w-6 text-center text-lg"></i> Randevular
+                <button type="button" onclick="window.open('/inspection', '_blank')"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-clipboard-check w-8 flex items-center justify-center text-lg"></i> Dijital Denetim
                 </button>
-
-                <div class="pt-4 pb-2 px-4">
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Sistem</p>
-                </div>
-
-                <button type="button" onclick="showSection('hero', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-images w-6 text-center text-lg"></i> Vitrin (Hero) Yönetimi
-                </button>
-
                 <button type="button" onclick="showSection('projects', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-laptop-code w-6 text-center text-lg"></i> Projeler (Landing)
-                    <span class="bg-gold/20 text-gold text-[10px] py-0.5 px-2 rounded-full">Yeni</span>
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-map-location-dot w-8 flex items-center justify-center text-lg"></i> Landing Yönetimi
                 </button>
 
-                <button type="button" onclick="showSection('users', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-users-gear w-6 text-center text-lg"></i> Kullanıcı Yönetimi
+                <!-- 3. MÜŞTERİ & CRM -->
+                <div class="pt-6 pb-2 px-4">
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Müşteri & CRM</p>
+                </div>
+                <button type="button" onclick="showSection('leads', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-user-tag w-8 flex items-center justify-center text-lg"></i> Müşteri Adayları (CRM)
+                </button>
+                <button type="button" onclick="window.location.href='/pipeline'"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-diagram-project w-8 flex items-center justify-center text-lg"></i> İş Akışı (Pipeline)
+                </button>
+                <button type="button" onclick="showSection('project-hub', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-briefcase w-8 flex items-center justify-center text-lg text-gold/70"></i> Proje Masası
+                </button>
+                <button type="button" onclick="showSection('appointments', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-calendar-check w-8 flex items-center justify-center text-lg"></i> Randevular & Keşifler
+                </button>
+                <button type="button" onclick="showSection('contacts', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-address-book w-8 flex items-center justify-center text-lg"></i> Telefon Rehberi
                 </button>
 
-                <button type="button" onclick="showSection('site-settings', this)"
-                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                    <i class="fa-solid fa-gears w-6 text-center text-lg"></i> Site Ayarları
+                <!-- 4. SÖZLEŞME & HUKUK -->
+                <div class="pt-6 pb-2 px-4">
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Sözleşme & Hukuk</p>
+                </div>
+                <button type="button" onclick="showSection('contracts', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-file-signature w-8 flex items-center justify-center text-lg"></i> Sözleşme Arşivi
+                </button>
+                <button type="button" onclick="showSection('contract-builder', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-file-invoice w-8 flex items-center justify-center text-lg"></i> Sözleşme Hazırlama
+                </button>
+                <button type="button" onclick="showSection('payroll', this)" data-access="broker"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-calculator w-8 flex items-center justify-center text-lg"></i> Hakediş & Komisyon
+                </button>
+
+                <!-- 5. FİNANS & MUHASEBE -->
+                <div class="pt-6 pb-2 px-4">
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Finans & Muhasebe</p>
+                </div>
+                <button type="button" onclick="showSection('expenses', this)" data-access="broker"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-receipt w-8 flex items-center justify-center text-lg"></i> Gider Yönetimi
+                </button>
+                <button type="button" onclick="showSection('taxes', this)" data-access="broker"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-money-bill-transfer w-8 flex items-center justify-center text-lg"></i> Vergi & Finans
+                </button>
+                <button type="button" onclick="showSection('barter-wizard-section', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-wand-magic-sparkles w-8 flex items-center justify-center text-lg"></i> Alım Gücü Sihirbazı
+                </button>
+                <button type="button" onclick="showSection('taxes-calculator', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-house-medical-circle-check w-8 flex items-center justify-center text-lg"></i> Kredi Hesaplama
+                </button>
+
+                <!-- 6. PAZARLAMA & ARAÇLAR -->
+                <div class="pt-6 pb-2 px-4">
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Pazarlama & Araçlar</p>
+                </div>
+                <button type="button" onclick="showSection('campaigns', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-bullhorn w-8 flex items-center justify-center text-lg"></i> Kampanya Yönetimi
+                </button>
+                <button type="button" onclick="showSection('integrations', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-link w-8 flex items-center justify-center text-lg"></i> Entegrasyon Merkezi
+                </button>
+                <button type="button" onclick="showSection('cms-section', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-newspaper w-8 flex items-center justify-center text-lg"></i> Haber & Blog (CMS)
+                </button>
+
+                <!-- 7. TOPLULUK & OPERASYON -->
+                <div class="pt-6 pb-2 px-4 border-t border-white/5 mt-4">
+                    <p class="text-[10px] font-bold text-gold/60 uppercase tracking-widest">Topluluk & Operasyon</p>
+                </div>
+                <button type="button" onclick="showSection('neighborhood', this)"
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-map-location-dot w-8 flex items-center justify-center text-lg"></i> Mahalle Hub
+                    </div>
+                    <span class="bg-gold/10 text-gold text-[8px] py-0.5 px-2 border border-gold/20 rounded-full font-bold uppercase tracking-widest">Beta</span>
+                </button>
+                <button type="button" onclick="showSection('apartments', this)"
+                    class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-city w-8 flex items-center justify-center text-lg"></i> Apartman Yönetimi
+                    </div>
+                </button>
+                <button type="button" onclick="showSection('maintenance', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-screwdriver-wrench w-8 flex items-center justify-center text-lg"></i> Bakım & Teknik
+                </button>
+                <button type="button" onclick="showSection('notices-section', this)"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-bullhorn w-8 flex items-center justify-center text-lg"></i> Duyurular & Ajanda
+                </button>
+
+                <!-- 8. SİSTEM -->
+                <div class="pt-6 pb-2 px-4">
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Sistem</p>
+                </div>
+                <button type="button" onclick="showSection('hero', this)" data-access="admin"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-palette w-8 flex items-center justify-center text-lg"></i> Vitrin (Hero) Yönetimi
+                </button>
+                <button type="button" onclick="showSection('users', this)" data-access="admin"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-users-gear w-8 flex items-center justify-center text-lg"></i> Kullanıcı Yönetimi
+                </button>
+                <button type="button" onclick="showSection('system-settings', this)" data-access="admin"
+                    class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-gears w-8 flex items-center justify-center text-lg"></i> Sistem Ayarları
                 </button>
             </nav>
 
@@ -574,19 +699,24 @@
                     </h2>
 
                 <div class="flex items-center gap-5">
-                    <!-- Globalization Selectors (Phase 4) -->
-                    <div class="hidden md:flex items-center gap-4 text-[10px] font-bold border-r pr-6 border-black/10">
-                        <select onchange="changeLang(this.value)" id="langSelect" class="bg-transparent outline-none cursor-pointer hover:text-navy transition-colors font-black uppercase">
-                            <option value="tr">TR</option>
-                            <option value="en">EN</option>
-                            <option value="ru">RU</option>
-                            <option value="ar">AR</option>
-                        </select>
-                        <select onchange="changeCurrency(this.value)" id="currencySelect" class="bg-transparent outline-none cursor-pointer hover:text-navy transition-colors font-black uppercase">
-                            <option value="try">₺ TRY</option>
-                            <option value="usd">$ USD</option>
-                            <option value="eur">€ EUR</option>
-                        </select>
+                    <!-- Globalization Selectors (V3 Premium) -->
+                    <div class="hidden md:flex items-center gap-6 border-r pr-6 border-black/10">
+                        
+                        <!-- Language Select -->
+                        <div class="premium-dropdown">
+                            <button class="flex items-center gap-2 text-[10px] font-black uppercase text-navy/80 hover:text-navy transition-all group cursor-default">
+                                <i class="fa-solid fa-globe text-sm text-gold group-hover:text-gold"></i>
+                                <span id="active-lang-text">TR</span>
+                            </button>
+                        </div>
+
+                        <!-- Currency Select -->
+                        <div class="premium-dropdown">
+                            <button class="flex items-center gap-2 text-[10px] font-black uppercase text-navy/80 hover:text-navy transition-all group cursor-default">
+                                <i class="fa-solid fa-coins text-sm text-gold group-hover:text-gold"></i>
+                                <span id="active-cur-text">TRY (₺)</span>
+                            </button>
+                        </div>
                     </div>
 
                     <button type="button" id="sidebar-toggle" aria-label="Menüyü Aç" onclick="toggleSidebar()"
@@ -1867,10 +1997,9 @@
                                                     </th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="hero-table-body" class="text-sm text-gray-700">
+                                            <tbody id="hero-slides-table-body" class="text-sm text-gray-700">
                                                 <tr>
-                                                    <td colspan="6" class="py-8 text-center text-gray-400">Yükleniyor...
-                                                    </td>
+                                                    <td colspan="6" class="py-8 text-center text-gray-400 font-serif italic animate-pulse">Vitrini taranıyor...</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -2166,11 +2295,11 @@
                                     </div>
                                     <div class="flex gap-4">
                                         <button onclick="showSection('taxes-calculator', this)"
-                                            class="bg-white border border-gray-200 hover:bg-gray-50 text-navy font-bold py-3 px-6 rounded-lg transition-all text-xs flex items-center gap-2">
+                                            class="bg-gray-50 border border-gray-300 hover:bg-gray-100 text-navy font-bold py-3 px-6 rounded-lg transition-all text-xs flex items-center gap-2 shadow-sm">
                                             <i class="fa-solid fa-calculator text-gold"></i> TCMB Hesaplayıcı
                                         </button>
                                         <button onclick="openTaxModal()"
-                                            class="bg-navy hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-lg transition-all uppercase tracking-[0.15em] text-xs flex items-center gap-2">
+                                            class="bg-navy hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-lg transition-all uppercase tracking-[0.15em] text-xs flex items-center gap-2 shadow-lg">
                                             <i class="fa-solid fa-plus text-gold"></i> Kayıt Ekle
                                         </button>
                                     </div>
@@ -2550,8 +2679,8 @@
                                         <p class="text-sm text-gray-500">Personel masrafları ve ofis giderleri.</p>
                                     </div>
                                     <button onclick="openExpenseModal()"
-                                        class="bg-white border border-gray-200 text-navy font-bold py-3 px-6 rounded-lg transition-all text-xs uppercase tracking-widest hover:bg-gray-50">
-                                        <i class="fa-solid fa-receipt text-gold mr-2"></i> Fiş Ekle
+                                        class="bg-gray-50 border border-gray-300 text-navy font-bold py-3 px-6 rounded-lg transition-all text-xs uppercase tracking-widest hover:bg-gray-100 shadow-sm flex items-center gap-2">
+                                        <i class="fa-solid fa-receipt text-gold"></i> Fiş Ekle
                                     </button>
                                 </div>
                             </div>
@@ -2587,8 +2716,8 @@
                                         Müşteri
                                         E-Postası (Kampanya)</h3>
                                     <button onclick="closeCampaignModal()"
-                                        class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-modern hover:border-modern transition-colors">
-                                        <i class="fa-solid fa-xmark"></i>
+                                        class="w-10 h-10 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-navy hover:text-red-500 hover:border-red-500 transition-all shadow-sm">
+                                        <i class="fa-solid fa-xmark text-lg"></i>
                                     </button>
                                 </div>
 
@@ -2670,8 +2799,8 @@
                             </div>
                         </div>
 
-                <!-- SITE SETTINGS SECTION -->
-                <div id="site-settings-section" class="content-section hidden animate-fade-in pb-20">
+                <!-- SYSTEM SETTINGS SECTION -->
+                <div id="system-settings-section" class="content-section hidden animate-fade-in pb-20">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                         <div>
                             <h2 class="text-2xl font-black text-navy tracking-tight mb-1 uppercase font-serif"><i class="fa-solid fa-gears text-gold mr-2"></i> Sistem Ayarları</h2>
@@ -2728,6 +2857,236 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ============================================== -->
+                <!-- AI ANALİZ RAPORLARI SECTION -->
+                <!-- ============================================== -->
+                <section id="ai-reports-section" class="content-section hidden animate-fade-in p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-32 h-32 bg-gold/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                        <div class="relative z-10">
+                            <h2 class="text-3xl font-black text-navy tracking-tight mb-1 uppercase font-serif italic"><i class="fa-solid fa-brain text-gold mr-3"></i> AI Analiz <span class="text-gold">Raporları</span></h2>
+                            <p class="text-gray-500 text-sm font-medium">Yatırımcı profili, niyet skoru ve davranışsal analiz merkezi.</p>
+                        </div>
+                        <div class="flex gap-3 relative z-10">
+                            <button onclick="fetchAiReports()" class="bg-gray-100 hover:bg-gray-200 text-navy px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-rotate"></i> Yenile
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-[2.5rem] shadow-xl shadow-navy/5 border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="premium-table w-full text-left">
+                                <thead>
+                                    <tr class="bg-gray-50/50 border-b border-gray-100">
+                                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Müşteri</th>
+                                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">AI Profil Teşhisi</th>
+                                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Bütçe / Hacim</th>
+                                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Skor</th>
+                                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ai-reports-table-body" class="divide-y divide-gray-50 text-sm">
+                                    <tr><td colspan="5" class="py-20 text-center text-gray-400 font-medium">Veriler AI motorundan çekiliyor...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- PROJE MASASI SECTION -->
+                <!-- ============================================== -->
+                <section id="project-hub-section" class="content-section hidden animate-fade-in p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                        <div>
+                            <h2 class="text-4xl font-black text-navy tracking-tighter mb-2 uppercase italic">Proje <span class="text-gold">Masası</span></h2>
+                            <p class="text-gray-500 text-sm font-medium">Lansmanlar, gayrimenkul projeleri ve başvuru takibi.</p>
+                        </div>
+                        <div class="flex gap-2 bg-gray-100 p-1.5 rounded-2xl">
+                            <button onclick="filterProjectHub('active')" id="hub-tab-active" class="hub-tab-btn active px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Aktif</button>
+                            <button onclick="filterProjectHub('archive')" id="hub-tab-archive" class="hub-tab-btn px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-navy transition-all">Arşiv</button>
+                        </div>
+                    </div>
+
+                    <!-- Proje Kartları Grid -->
+                    <div id="project-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Örnek Proje Kartı: Sağlıkçılar -->
+                        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-navy/5 overflow-hidden group hover:border-gold/30 transition-all">
+                            <div class="h-48 relative overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1545459720-aac273a27763?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent"></div>
+                                <div class="absolute top-6 left-6 flex gap-2">
+                                    <span class="bg-emerald-500 text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Lansmanda</span>
+                                </div>
+                            </div>
+                            <div class="p-8">
+                                <h3 class="text-xl font-bold text-navy mb-2">Sağlık Yatırım Ortaklığı</h3>
+                                <p class="text-gray-400 text-xs mb-6 leading-relaxed">Geleceğinize imza atan özel arsa ve konut projesi.</p>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-8">
+                                    <div class="bg-gray-50 p-4 rounded-2xl">
+                                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Başvuru</p>
+                                        <p class="text-xl font-black text-navy" id="hub-lead-count-syo">124</p>
+                                    </div>
+                                    <div class="bg-gold/5 p-4 rounded-2xl border border-gold/10">
+                                        <p class="text-[9px] font-bold text-gold/60 uppercase tracking-widest mb-1">Niyet Skoru</p>
+                                        <p class="text-xl font-black text-gold">%88</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3">
+                                    <button onclick="showSection('leads', null, 'Sağlık')" class="flex-1 bg-navy text-white text-[10px] font-bold py-3.5 rounded-xl uppercase tracking-widest hover:bg-slate-800 transition-all">
+                                        Başvuruları Gör
+                                    </button>
+                                    <button onclick="window.location.href='/pipeline?project=syo'" class="w-12 h-12 flex items-center justify-center border border-gray-100 rounded-xl text-navy hover:text-gold hover:border-gold/30 transition-all">
+                                        <i class="fa-solid fa-diagram-project"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- MEDYA & DOSYA MERKEZİ -->
+                <!-- ============================================== -->
+                <section id="media-center-section" class="content-section hidden animate-fade-in p-8">
+                    <div class="flex justify-between items-center mb-10 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                        <div>
+                            <h2 class="text-3xl font-black text-navy tracking-tighter uppercase italic">Medya & <span class="text-gold">Dosya</span></h2>
+                            <p class="text-gray-500 text-sm font-medium">Kurumsal dökümanlar, Excel şablonları ve Word belgeleri.</p>
+                        </div>
+                        <button class="bg-navy text-gold px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Yeni Dosya Yükle
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50/50">
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest w-20">Tür</th>
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Dosya Adı</th>
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Format</th>
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="media-vault-table-body" class="divide-y divide-gray-50 text-sm">
+                                <tr><td colspan="4" class="py-20 text-center text-gray-400">Dosya listesi yükleniyor...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- HABER & BLOG CMS -->
+                <!-- ============================================== -->
+                <section id="cms-section" class="content-section hidden animate-fade-in p-8">
+                    <div class="flex justify-between items-center mb-10">
+                        <div>
+                            <h2 class="text-3xl font-black text-navy tracking-tighter uppercase mb-1 italic">Haber & <span class="text-emerald-500">Blog</span> CMS</h2>
+                            <p class="text-gray-500 text-sm font-medium">Web sitenizdeki içerikleri yönetin.</p>
+                        </div>
+                        <button class="bg-emerald-500 text-white px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Yeni İçerik Ekle
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50/50">
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest w-20">ID</th>
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Başlık</th>
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Yazar</th>
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Kategori</th>
+                                    <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cms-table-body" class="divide-y divide-gray-50 text-sm">
+                                <tr><td colspan="5" class="py-20 text-center text-gray-400">CMS verileri alınıyor...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- DUYURULAR & AJANDA -->
+                <!-- ============================================== -->
+                <section id="notices-section" class="content-section hidden animate-fade-in p-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-3xl font-black text-navy tracking-tighter uppercase mb-1 italic">Duyuru <span class="text-emerald-500">Panosu</span></h2>
+                            <p class="text-gray-500 text-sm font-medium">Ev sahipleri, kiracılar ve ekip arkadaşlarınız için özel duyurular.</p>
+                        </div>
+                        <button onclick="console.log('Open Notice Modal')" class="px-6 py-3 border border-emerald-100 text-emerald-600 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-emerald-50 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-broadcast-tower"></i> Yayınla
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                            <div class="p-6 border-b border-gray-50 bg-gray-50/30">
+                                <h3 class="text-xs font-black text-navy uppercase tracking-widest flex items-center gap-2">
+                                    <i class="fa-solid fa-clock-rotate-left"></i> Son Yayınlananlar
+                                </h3>
+                            </div>
+                            <div id="notices-container" class="divide-y divide-gray-50">
+                                <div class="p-20 text-center text-gray-400">Duyurular taranıyor...</div>
+                            </div>
+                        </div>
+                        <div class="bg-navy rounded-3xl p-8 text-white shadow-xl shadow-navy/20 relative overflow-hidden group">
+                           <!-- Ajanda Placeholder -->
+                           <h3 class="text-lg font-black uppercase mb-4 tracking-tighter">Ofis Ajandası</h3>
+                           <p class="text-navy-100/60 text-xs mb-8">Dahili toplantılar ve saha görevleri.</p>
+                           <div class="space-y-4 opacity-50">
+                               <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                                   <span class="text-[10px] font-bold text-gold uppercase tracking-widest">Pazartesi 09:00</span>
+                                   <p class="font-bold text-sm mt-1">Haftalık Vizyon Toplantısı</p>
+                               </div>
+                           </div>
+                           <div class="absolute bottom-[-20%] right-[-10%] opacity-10 pointer-events-none group-hover:scale-110 transition-transform">
+                               <i class="fa-solid fa-calendar-days text-[150px]"></i>
+                           </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- MAHALLE HUB SECTION (PLACEHOLDER) -->
+                <!-- ============================================== -->
+                <section id="neighborhood-section" class="content-section hidden animate-fade-in p-8">
+                    <div class="bg-white rounded-3xl p-12 border border-blue-100 shadow-xl shadow-blue-500/5 text-center flex flex-col items-center justify-center min-h-[500px]">
+                        <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-map-location-dot text-4xl text-blue-500 animate-pulse"></i>
+                        </div>
+                        <h2 class="text-3xl font-serif font-bold text-navy mb-4">Mahalle Portalı Hub</h2>
+                        <p class="text-gray-500 max-w-md mx-auto mb-8 text-lg">Bölgesel topluluk yönetimi, yerel rezervasyonlar ve mahalle bazlı etkileşim merkezi çok yakında burada olacak.</p>
+                        <div class="flex gap-4">
+                            <span class="px-6 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-bold uppercase tracking-widest">Faz 12 Geliştirme</span>
+                            <span class="px-6 py-2 bg-gold/10 text-gold rounded-full text-sm font-bold uppercase tracking-widest">Beta Erişimi Bekleniyor</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- APARTMAN YÖNETİMİ SECTION (PLACEHOLDER) -->
+                <!-- ============================================== -->
+                <section id="apartments-section" class="content-section hidden animate-fade-in p-8">
+                    <div class="bg-white rounded-3xl p-12 border border-emerald-100 shadow-xl shadow-emerald-500/5 text-center flex flex-col items-center justify-center min-h-[500px]">
+                        <div class="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-city text-4xl text-emerald-500"></i>
+                        </div>
+                        <h2 class="text-3xl font-serif font-bold text-navy mb-4">Apartman & Site Yönetimi</h2>
+                        <p class="text-gray-500 max-w-md mx-auto mb-8 text-lg">Aidat takibi, dijital pano, site toplantıları ve şeffaf kasa yönetimi için hazırlanan modülümüz son aşamada.</p>
+                        <div class="px-8 py-3 bg-emerald-500 text-white rounded-xl font-bold uppercase tracking-widest text-xs inline-block">
+                             2026 Q3 Sürümü
+                        </div>
+                    </div>
+                </section>
+
 
         </main>
     </div>

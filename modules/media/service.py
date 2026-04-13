@@ -10,7 +10,7 @@ from cloudinary.utils import cloudinary_url
 import filetype
 
 # Helper to check allowed extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf', 'docx', 'doc', 'xlsx', 'xls'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -22,10 +22,22 @@ def is_safe_file_content(file_stream) -> bool:
     file_stream.seek(0)
     
     kind = filetype.guess(header)
-    if not kind:
-        return False
+    
+    # Generic check for standard extensions
+    if kind and kind.extension in ALLOWED_EXTENSIONS:
+        return True
         
-    return kind.extension in ALLOWED_EXTENSIONS
+    # Extra check for Office files which might be detected as zip/ole
+    office_mimes = [
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/msword',
+        'application/vnd.ms-excel'
+    ]
+    if kind and kind.mime in office_mimes:
+        return True
+        
+    return False
 
 def upload_to_cloudinary(file_path, folder="imza_gayrimenkul"):
     """Yerel dosyayı Cloudinary'ye yükler."""

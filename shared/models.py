@@ -7,6 +7,7 @@ from shared.extensions import db
 # 1. CORE & SHARED MODELS
 from modules.core.models import HeroSlide, SystemSetting, UserInteraction, IncomingDoc
 from modules.notification.models import Notification
+from modules.cms.models import CMSPost
 from modules.audit.models import AuditLog
 
 # 2. BUSINESS MODULE MODELS

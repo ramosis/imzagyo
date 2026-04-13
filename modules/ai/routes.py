@@ -32,13 +32,18 @@ def analyze_investor():
     
     winning = max(scores, key=scores.get)
     profiles = {
-        "A": {"title": "Vizyoner", "desc": "Kendi fırsatını yaratmayı seviyorsunuz."},
-        "B": {"title": "Stratejik", "desc": "Güven ve istikrar odaklısınız."},
-        "C": {"title": "Analitik", "desc": "Veri ve ROI sizin için her şey."},
-        "D": {"title": "Detaycı", "desc": "Kusursuz planlama ve risk analizi."}
+        "A": {"title": "Vizyoner Yatırımcı", "desc": "Geleceğin potansiyelini öngören ve yüksek getiri odaklı stratejik hamlelere açık profil."},
+        "B": {"title": "İstikrar Odaklı", "desc": "Güvenli liman arayışında olan, risklerden arındırılmış ve sürdürülebilir büyüme hedefleyen yatırımcı."},
+        "C": {"title": "Rasyonel Analist", "desc": "Veriye dayalı karar veren, ROI verimliliğini her şeyin önünde tutan matematiksel zihin yapısı."},
+        "D": {"title": "Stratejik Planlamacı", "desc": "Kusursuz zamanlama ve detaylı risk analizi ile portföyünü profesyonelce yöneten profil."}
     }
     res = profiles.get(winning, profiles["B"])
-    return jsonify({"winning_profile": winning, "public_title": res["title"], "public_desc": res["desc"]})
+    return jsonify({
+        "winning_profile": winning, 
+        "public_title": res["title"], 
+        "public_desc": res["desc"],
+        "luxury_diagnostic": res["title"]
+    })
 
 @ai_bp.route('/lmetrics/collect', methods=['POST'])
 def collect_interaction():

@@ -112,6 +112,8 @@ def create_app(init_database=False):
     from modules.maintenance import maintenance_bp
     from modules.compass import compass_bp
     from modules.neighborhood import neighborhood_bp
+    from modules.cms import cms_bp
+    from modules.notification import notification_bp
     from modules.auth.service import setup_oauth
     
     setup_oauth(app)
@@ -123,6 +125,8 @@ def create_app(init_database=False):
     app.register_blueprint(finance_bp, url_prefix='/api/v1/finance')
     app.register_blueprint(neighborhood_bp, url_prefix='/api/neighborhood')
     app.register_blueprint(media_bp, url_prefix='/api/v1/media')
+    app.register_blueprint(cms_bp, url_prefix='/api/v1/cms')
+    app.register_blueprint(notification_bp, url_prefix='/api/v1/notices')
     app.register_blueprint(ai_bp, url_prefix='/api/v1/ai')
     app.register_blueprint(legal_bp, url_prefix='/api/v1/legal')
     app.register_blueprint(automation_bp, url_prefix='/api/v1/automation')

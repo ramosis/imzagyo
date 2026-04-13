@@ -38,3 +38,40 @@ def delete_media(media_id):
         conn.execute('DELETE FROM portfoy_medya WHERE id = ?', (media_id,))
         conn.commit()
     return jsonify({'status': 'deleted'}), 200
+
+@media_bp.route('/vault', methods=['GET'])
+@login_required
+def get_media_vault():
+    # Placeholder: In a real app this would query a 'general_media' table
+    # For now, we list files in the uploads/general directory if it exists
+    import os
+    from flask import current_app
+    vault_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'general')
+    if not os.path.exists(vault_path):
+        return jsonify([]), 200
+        
+    files = []
+    for f in os.listdir(vault_path):
+        files.append({
+            'name': f,
+            'url': f'/uploads/general/{f}',
+            'type': f.split('.')[-1] if '.' in f else 'file'
+        })
+    return jsonify(files), 200
+@media_bp.route('/vault/<filename>', methods=['DELETE'])
+@login_required
+def delete_vault_media(filename):
+    import os
+    from flask import current_app
+    # Security: check if moving out of general folder is prevented
+    if '..' in filename or filename.startswith('/'):
+        return jsonify({'error': 'Geçersiz dosya adı'}), 400
+        
+    vault_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'general', filename)
+    if os.path.exists(vault_path):
+        try:
+            os.remove(vault_path)
+            return jsonify({'message': 'Dosya başarıyla silindi'}), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    return jsonify({'error': 'Dosya bulunamadı'}), 404
