@@ -1,0 +1,64 @@
+flowchart TD
+    %% === PROJECT GOALS ===
+    %% Ultimate Goal: Build a premium, high-performance real estate portal and public website for İmza Gayrimenkul with modular backend and luxury UI.
+    %% Current Goal: Reorganize project architecture to eliminate clutter and improve maintainability.
+
+    %% === START ===
+    %% @project_start [start, closed, 2026-04-25, antigravity]
+    project_start("Project Start<br/><sub>Initial development of İmza<br/>Gayrimenkul platform with Flask<br/>and modular architecture</sub>")
+
+    %% @ultimate_goal [end, opened, 2026-04-25, antigravity]
+    ultimate_goal("Platform Launch<br/><sub>Fully stable, high-performance<br/>luxury real estate portal with<br/>automated workflows and AI insights</sub>")
+
+    %% === COMPLETED WORK ===
+    %% @modular_refactor [ai-task, closed, 2026-04-25, antigravity]
+    modular_refactor("Modular Architecture Refactor<br/><sub>Moved contracts to finance module,<br/>removed contracts_bp, and<br/>standardized shared database modules</sub>")
+
+    %% @ui_audit_phase [ai-task, closed, 2026-04-25, antigravity]
+    ui_audit_phase("Navigation & UI Audit<br/><sub>Identified structural issues in<br/>portal-core.js and broken buttons<br/>on the public homepage</sub>")
+
+    %% @overlap_standardization [ai-task, closed, 2026-04-25, antigravity]
+    overlap_standardization("Overlap & Z-Index Standardization<br/><sub>Implemented global Z-scale in<br/>fluid.css and resolved portal<br/>section/header overlap issues</sub>")
+
+    %% @project_cleanup [ai-task, closed, 2026-04-25, antigravity]
+    project_cleanup("Project Reorganization & Cleanup<br/><sub>Consolidating 24 modules into 5 domains,<br/>organizing pages, and cleaning up<br/>root directory clutter</sub>")
+
+    %% === FUTURE WORK ===
+    %% @identity_properties_migration [ai-task, opened, 2026-04-25, antigravity]
+    identity_properties_migration("Core Modules Migration<br/><sub>Migrating Identity and Properties<br/>to backend/core with Blueprint<br/>isolation</sub>")
+
+    %% @final_platform_verification [ai-task, opened, 2026-04-25, antigravity]
+    final_platform_verification("Final Platform Verification<br/><sub>End-to-end testing of all modules,<br/>responsive stability check, and<br/>performance optimization before launch</sub>")
+
+    %% === CONNECTIONS ===
+    project_start --> modular_refactor
+    modular_refactor --> ui_audit_phase
+    ui_audit_phase --> overlap_standardization
+    overlap_standardization --> project_cleanup
+    project_cleanup --> identity_properties_migration
+    identity_properties_migration --> final_platform_verification
+    final_platform_verification -.-> ultimate_goal
+
+    %% === RECENT WORK HIGHLIGHT ===
+    subgraph recent [RECENT]
+        identity_properties_migration
+    end
+
+    %% === STYLES ===
+    %% Closed tasks (soft purple)
+    style project_start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style modular_refactor fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style ui_audit_phase fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style overlap_standardization fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style project_cleanup fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+
+    %% Recent node (highlighted purple)
+    style identity_properties_migration fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+
+    %% Recent subgraph (dashed border)
+    style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
+
+    %% Open tasks (soft green)
+    style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style identity_properties_migration fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style final_platform_verification fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
