@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: ../../
+      dockerfile: infrastructure/config/Dockerfile
+    container_name: imza-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - "../../:/app"
+      - "../../uploads:/app/uploads"
+      - "data_volume:/app/data"
+    restart: always
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+    env_file:
+      - ../../.env
+
+volumes:
+  data_volume:
