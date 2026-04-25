@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takas ve Alım Gücü Sihirbazı | İmza Gayrimenkul</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a192f',
+                        gold: '#c5a059',
+                        soft: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-soft text-gray-800 font-sans p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        <!-- HEADER -->
+        <div class="bg-navy p-6 text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
+            </div>
+            <h2 class="relative z-10 text-2xl md:text-3xl font-bold text-white mb-2">Alım Gücü Sihirbazı</h2>
+            <p class="relative z-10 text-gold text-sm md:text-base">Mevcut varlıklarınızı değerlendirerek maksimum alım
+                gücünüzü keşfedin</p>
+        </div>
+
+        <!-- WIZARD PROGRESS -->
+        <div class="flex justify-between items-center px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+            <div class="flex flex-col items-center">
+                <div
+                    class="w-10 h-10 rounded-full bg-gold text-white flex items-center justify-center font-bold shadow-md">
+                    1</div>
+                <span class="text-xs font-bold mt-2 text-navy">Nakit</span>
+            </div>
+            <div class="flex-1 h-1 mx-4 bg-gray-200"></div>
+            <div class="flex flex-col items-center opacity-50">
+                <div
+                    class="w-10 h-10 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">
+                    2</div>
+                <span class="text-xs font-bold mt-2 text-gray-400">Takas</span>
+            </div>
+            <div class="flex-1 h-1 mx-4 bg-gray-200"></div>
+            <div class="flex flex-col items-center opacity-50">
+                <div
+                    class="w-10 h-10 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">
+                    3</div>
+                <span class="text-xs font-bold mt-2 text-gray-400">Sonuç</span>
+            </div>
+        </div>
+
+        <!-- FORM CONTENT -->
+        <div class="p-8">
+
+            <!-- STEP 1: Nakit & Beden -->
+            <div id="step-1" class="space-y-6">
+                <h3 class="text-xl font-bold text-navy border-b pb-2">Nakit Bütçeniz</h3>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Mevcut Nakit Tutarı (TL)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₺</span>
+                        <input type="number"
+                            class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all text-lg font-medium"
+                            placeholder="Örn: 5.000.000">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Kredi Kullanma Durumu</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label
+                            class="flex items-center justify-center p-4 border border-gold bg-gold/5 rounded-xl cursor-pointer">
+                            <input type="radio" name="kredi" class="hidden" checked>
+                            <span class="font-bold text-navy">Kredi Kullanacağım</span>
+                        </label>
+                        <label
+                            class="flex items-center justify-center p-4 border border-gray-200 hover:border-gray-300 rounded-xl cursor-pointer transition-colors">
+                            <input type="radio" name="kredi" class="hidden">
+                            <span class="font-bold text-gray-500">Sadece Özkaynak</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end">
+                    <button
+                        class="px-8 py-3 bg-navy text-white rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-navy/20 flex items-center gap-2">
+                        Devam Et <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Takas (Örnek Görünüm - Hidden sınıfı yok ki rahatça geliştirebilesiniz) -->
+            <div id="step-2" class="space-y-6 mt-12 border-t pt-12">
+                <h3 class="text-xl font-bold text-navy border-b pb-2">Takas Edilecek Varlıklar (Opsiyonel)</h3>
+
+                <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-gray-700"><i class="fa-solid fa-car text-gold mr-2"></i> Araç Takası
+                        </h4>
+                        <button class="text-xs font-bold text-white bg-green-600 px-3 py-1 rounded-full">+ Ekle</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" placeholder="Marka / Model (Örn: Mercedes E200d)"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm">
+                        <input type="number" placeholder="Tahmini Araç Değeri (TL)"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm">
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-gray-700"><i class="fa-solid fa-house text-gold mr-2"></i> Gayrimenkul
+                            Takası</h4>
+                        <button class="text-xs font-bold text-white bg-green-600 px-3 py-1 rounded-full">+ Ekle</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" placeholder="Konum / Tip (Örn: Kadıköy 3+1)"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm">
+                        <input type="number" placeholder="Tahmini Mülk Değeri (TL)"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm">
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-between">
+                    <button
+                        class="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+                        Geri
+                    </button>
+                    <button
+                        class="px-8 py-3 bg-gold text-white rounded-xl font-bold hover:bg-yellow-600 transition-colors shadow-lg shadow-gold/20 flex items-center gap-2">
+                        Alım Gücünü Hesapla <i class="fa-solid fa-calculator"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Sonuç (Örnek Görünüm) -->
+            <div id="step-3" class="space-y-6 mt-12 border-t pt-12">
+                <div
+                    class="text-center p-8 bg-gradient-to-br from-navy to-slate-800 rounded-2xl shadow-xl relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 text-gold/10 text-9xl">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <p class="text-gray-300 font-medium mb-2 relative z-10">Maksimum Alım Gücünüz (Tahmini)</p>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gold relative z-10 tracking-tight">16.500.000 ₺</h2>
+
+                    <div class="mt-6 flex flex-wrap justify-center gap-4 relative z-10">
+                        <span class="px-4 py-2 bg-white/10 rounded-lg text-sm text-gray-200"><i
+                                class="fa-solid fa-wallet mr-2"></i>Nakit: 5M₺</span>
+                        <span class="px-4 py-2 bg-white/10 rounded-lg text-sm text-gray-200"><i
+                                class="fa-solid fa-car mr-2"></i>Araç: 3.5M₺</span>
+                        <span class="px-4 py-2 bg-white/10 rounded-lg text-sm text-gray-200"><i
+                                class="fa-solid fa-landmark mr-2"></i>Kredi Limiti: 8M₺</span>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center"><i
+                            class="fa-solid fa-star text-gold mr-2"></i> Size Uygun Portföyler (Örnek)</h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Örnek Kart -->
+                        <div
+                            class="border border-gray-200 p-4 rounded-xl flex gap-4 hover:border-gold transition-colors cursor-pointer">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=200&fit=crop"
+                                class="w-24 h-24 rounded-lg object-cover">
+                            <div class="flex flex-col justify-center">
+                                <h4 class="font-bold text-navy text-sm">Boğaz Manzaralı Villa</h4>
+                                <p class="text-xs text-gray-500 my-1">Sarıyer, İstanbul</p>
+                                <p class="font-bold text-gold text-sm">15.000.000 ₺</p>
+                                <span
+                                    class="inline-block mt-1 text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded w-max">Takasa
+                                    Uygun</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
