@@ -370,6 +370,41 @@ def set_primary_identity(identity_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+@auth_bp.route('/emergency-reset', methods=['GET'])
+def emergency_reset():
+    """TEMPORARY: Resets the admin password to admin123 for recovery."""
+    try:
+        from .service import AuthService
+        from shared.extensions import db
+        from .models import User
+        
+        # Check if admin exists
+        admin = User.query.filter_by(username='admin').first()
+        new_hash = AuthService.hash_password('admin123')
+        
+        if admin:
+            admin.password_hash = new_hash
+            admin.is_active = True
+            admin.is_admin = True
+            admin.role = 'super_admin'
+            db.session.commit()
+            return jsonify({'message': 'Admin password reset to admin123 successfully.'}), 200
+        else:
+            # Create if missing
+            new_admin = User(
+                username='admin',
+                password_hash=new_hash,
+                role='super_admin',
+                is_admin=True,
+                email='admin@imzaemlak.com',
+                email_verified=True
+            )
+            db.session.add(new_admin)
+            db.session.commit()
+            return jsonify({'message': 'Admin user was missing and has been created with password admin123.'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @auth_bp.route('/audit-log', methods=['GET'])
 @require_permission('admin')
 def get_audit_log():

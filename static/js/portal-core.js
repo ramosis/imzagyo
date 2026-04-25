@@ -146,32 +146,6 @@ function showSection(sectionId, btnElement) {
         loader();
     }
 }
-function switchRole(role) {
-    console.log("[İMZA] Rol değiştiriliyor:", role);
-    localStorage.setItem('imza_portal_role', role);
-    
-    // UI Update
-    const badge = document.getElementById('sidebar-user-role');
-    if (badge) {
-        badge.innerText = role.charAt(0).toUpperCase() + role.slice(1);
-    }
-    
-    // Sidebar Filter
-    document.querySelectorAll('#sidebar .nav-item').forEach(btn => {
-        if (btn.hasAttribute('data-access')) {
-            const access = btn.getAttribute('data-access');
-            if (access === 'admin' && role !== 'admin') {
-                btn.classList.add('hidden');
-            } else if (access === 'broker' && role === 'standart') {
-                btn.classList.add('hidden');
-            } else {
-                btn.classList.remove('hidden');
-            }
-        loaders[loaderKey]();
-    } else {
-        console.warn("[İmza Portal] Loader bulunamadı veya tanım yok:", loaderKey);
-    }
-}
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -349,55 +323,76 @@ function checkAuth() {
 }
 
 async function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const userField = document.getElementById('username');
+    const passField = document.getElementById('password');
     const errorDiv = document.getElementById('login-error');
     const loginBtn = document.getElementById('login-btn');
     const loginBtnText = document.getElementById('login-btn-text');
 
+    if (!userField || !passField) return;
+    
+    const username = userField.value.trim();
+    const password = passField.value;
+
     if (!username || !password) {
-        errorDiv.classList.remove('hidden');
-        errorDiv.querySelector('span').textContent = 'Lütfen tüm alanları doldurun.';
+        showLoginError('Lütfen tüm alanları doldurun.');
         return;
     }
 
-    // Loading state
+    // Loading State
     loginBtn.disabled = true;
-    loginBtn.classList.add('opacity-70', 'cursor-not-allowed');
+    loginBtn.classList.add('opacity-70', 'cursor-wait');
     if (loginBtnText) loginBtnText.textContent = 'Giriş Yapılıyor...';
-    errorDiv.classList.add('hidden');
+    if (errorDiv) errorDiv.classList.add('hidden');
 
     try {
+        console.log("[İMZA] Giriş denemesi:", username);
         const response = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
 
+        const data = await response.json();
+
         if (response.ok) {
-            const data = await response.json();
-            // Ensure storage is written before reload
+            console.log("[İMZA] Giriş başarılı!");
             localStorage.setItem('imza_admin_token', data.token);
             localStorage.setItem('imza_admin_role', data.role);
             localStorage.setItem('imza_admin_username', data.username || username);
             
-            // Give a tiny moment for mobile storage sync
-            setTimeout(() => {
-                window.location.reload();
-            }, 100);
+            // Re-sync login section visibility before reload for perceived speed
+            const loginSection = document.getElementById('login-section');
+            if (loginSection) loginSection.classList.add('hidden');
+            
+            window.location.reload();
         } else {
-            const errorData = await response.json().catch(() => ({}));
-            errorDiv.classList.remove('hidden');
-            errorDiv.querySelector('span').textContent = errorData.error || 'Giriş bilgileri hatalı (Şifre veya Kullanıcı adı yanlış).';
+            console.warn("[İMZA] Giriş başarısız:", data.error);
+            showLoginError(data.error || 'Giriş bilgileri hatalı (Şifre veya Kullanıcı adı yanlış).');
         }
     } catch (error) {
         console.error('Login error:', error);
-        errorDiv.classList.remove('hidden');
-        errorDiv.querySelector('span').textContent = 'Bir hata oluştu. Sunucuya erişilemiyor.';
+        showLoginError('Sunucu bağlantı hatası. Lütfen internetinizi kontrol edin.');
     } finally {
-        loginBtn.disabled = false;
-        loginBtn.classList.remove('opacity-70', 'cursor-not-allowed');
-        if (loginBtnText) loginBtnText.textContent = 'Güvenli Giriş';
+        if (loginBtn) {
+            loginBtn.disabled = false;
+            loginBtn.classList.remove('opacity-70', 'cursor-wait');
+            if (loginBtnText) loginBtnText.textContent = 'Güvenli Giriş';
+        }
+    }
+}
+
+function showLoginError(msg) {
+    const errorDiv = document.getElementById('login-error');
+    if (errorDiv) {
+        errorDiv.classList.remove('hidden');
+        const span = errorDiv.querySelector('span');
+        if (span) span.textContent = msg;
+        
+        // Shake animation reset
+        errorDiv.classList.remove('animate-shake');
+        void errorDiv.offsetWidth; // trigger reflow
+        errorDiv.classList.add('animate-shake');
     }
 }
 
@@ -717,7 +712,7 @@ function renderLeadPipeline(leads) {
             <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar kanban-list" data-stage-id="${stage.id}">
                 ${stageLeads.map(l => `
                     <div class="kanban-card bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gold/30 transition-all cursor-pointer group relative" 
-                         id="lead-card-${l.id}" onclick="editLead('${l.id}')">
+                         id="lead-card-${l.id}" data-lead-id="${l.id}">
                         <div class="flex justify-between items-start mb-2">
                             <span class="font-bold text-navy text-sm leading-tight">${l.name}</span>
                             <span class="text-[10px] font-black ${l.ai_score >= 80 ? 'text-emerald-500' : 'text-gold'}">%${l.ai_score || 0}</span>
@@ -787,28 +782,6 @@ async function openQuickWhatsApp(id) {
 }
 
 // --- EXPENSES ---
-async function fetchExpenses() {
-    try {
-        const res = await apiFetch(`${API_BASE}/expenses`);
-        const data = await res.json();
-        const tbody = document.getElementById('expenses-table-body');
-        if (!tbody) return;
-        tbody.innerHTML = data.length === 0 ? '<tr><td colspan="6" class="p-8 text-center text-gray-400">Kayıt yok.</td></tr>' : '';
-        data.forEach(e => {
-            const tr = document.createElement('tr');
-            tr.className = 'border-b border-gray-50 hover:bg-gray-50';
-            const badge = e.status === 'approved' ? '<span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[10px] font-bold">ONAYLI</span>' : '<span class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded text-[10px] font-bold">BEKLİYOR</span>';
-            tr.innerHTML = `
-                <td class="px-6 py-4 text-gray-500">${e.date}</td>
-                <td class="px-6 py-4 font-bold text-navy">${e.username}</td>
-                <td class="px-6 py-4 text-xs tracking-wider">${e.category}</td>
-                <td class="px-6 py-4 font-bold text-red-600">${e.amount.toLocaleString()} ₺</td>
-                <td class="px-6 py-4">${badge}</td>
-                <td class="px-6 py-4 text-right">${e.status === 'pending' ? `<button onclick="approveExpense(${e.id})" class="text-green-500"><i class="fa-solid fa-check"></i></button>` : ''}</td>`;
-            tbody.appendChild(tr);
-        });
-    } catch (e) { console.error(e); }
-}
 
 async function approveExpense(id) {
     if (!confirm('Harcamayı onaylamak istiyor musunuz?')) return;
@@ -1237,6 +1210,21 @@ function showToast(message, type = 'info') {
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
+    
+    // CRM Pipeline Event Delegation
+    const pipelineContainer = document.getElementById('pipeline-container');
+    if (pipelineContainer) {
+        pipelineContainer.addEventListener('click', (e) => {
+            const card = e.target.closest('.kanban-card');
+            if (card) {
+                const leadId = card.getAttribute('data-lead-id');
+                if (leadId && typeof editLead === 'function') {
+                    editLead(leadId);
+                }
+            }
+        });
+    }
+
     const catSelect = document.getElementById('p-kategori');
     if (catSelect) {
         catSelect.innerHTML = '<option value="">Seçiniz...</option>';
@@ -1270,14 +1258,6 @@ function closeTemplateModal() { document.getElementById('template-modal')?.class
 function closePartyModal() { document.getElementById('party-modal')?.classList.add('hidden'); }
 
 // --- CRUD HANDLERS ---
-async function deletePortfolio(id) {
-    if (!confirm('Bu portföyü silmek istediğinize emin misiniz?')) return;
-    try {
-        const res = await apiFetch(`${API_BASE}/portfolios/${id}`, { method: 'DELETE' });
-        if (res.ok) { showToast('Portföy silindi', 'success'); fetchAllPortfolios(); }
-        else showToast('Silme hatası', 'error');
-    } catch (e) { showToast('Bağlantı hatası', 'error'); }
-}
 
 async function editPortfolio(id) {
     openPortfolioModal();
@@ -1665,7 +1645,7 @@ async function fetchContracts() {
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="6" class="py-20 text-center animate-pulse text-gray-400 font-serif italic">Sözleşmeler taranıyor...</td></tr>';
     try {
-        const res = await apiFetch(`${API_BASE}/contracts/`);
+        const res = await apiFetch(`${API_BASE}/finance/contracts/`);
         const result = await res.json();
         const contracts = result.data || [];
         tbody.innerHTML = contracts.length ? '' : '<tr><td colspan="6" class="py-20 text-center text-gray-400 font-serif italic">Arşivde kayıtlı sözleşme bulunamadı.</td></tr>';
@@ -1676,7 +1656,6 @@ async function fetchContracts() {
                     <td class="px-6 py-4 font-mono text-[10px] text-gray-400">#${c.contract_number}</td>
                     <td class="px-6 py-4 font-bold text-navy">${c.contract_type}</td>
                     <td class="px-6 py-4 text-xs font-semibold text-gray-600">${c.price} ${c.currency}</td>
-                    <td class="px-6 py-4"><span class="px-2 py-0.5 bg-modern/10 text-modern rounded text-[10px] font-bold uppercase">${c.status}</span></td>
                     <td class="px-6 py-4 text-[10px] text-gray-400">${dateStr}</td>
                     <td class="px-6 py-4 text-right">
                         <button onclick="downloadContractPdf(${c.id})" class="text-navy hover:text-gold transition-colors p-2"><i class="fa-solid fa-file-pdf"></i></button>
@@ -1701,6 +1680,32 @@ async function fetchPayroll() {
         if (contractCount) contractCount.textContent = data.active_contracts_count || 0;
         if (netTotal) netTotal.textContent = new Intl.NumberFormat('tr-TR').format(data.net_profit || 0) + ' ' + (data.currency || '₺');
     } catch (e) { console.warn("Payroll summary update failed"); }
+}
+
+async function fetchContracts() {
+    const tbody = document.getElementById('contracts-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="6" class="py-20 text-center animate-pulse text-gray-400 font-serif italic">Sözleşmeler taranıyor...</td></tr>';
+    try {
+        const res = await apiFetch(`${API_BASE}/finance/contracts/`);
+        const result = await res.json();
+        const contracts = result.data || [];
+        tbody.innerHTML = contracts.length ? '' : '<tr><td colspan="6" class="py-20 text-center text-gray-400 font-serif italic">Arşivde kayıtlı sözleşme bulunamadı.</td></tr>';
+        contracts.forEach(c => {
+            const dateStr = c.created_at ? c.created_at.split('T')[0] : '-';
+            tbody.innerHTML += `
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors group">
+                    <td class="px-6 py-4 font-mono text-[10px] text-gray-400">#${c.contract_number}</td>
+                    <td class="px-6 py-4 font-bold text-navy">${c.contract_type}</td>
+                    <td class="px-6 py-4 text-xs font-semibold text-gray-600">${c.price} ${c.currency}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-0.5 bg-modern/10 text-modern rounded text-[10px] font-bold uppercase">${c.status}</span></td>
+                    <td class="px-6 py-4 text-[10px] text-gray-400">${dateStr}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="downloadContractPdf(${c.id})" class="text-navy hover:text-gold transition-colors p-2"><i class="fa-solid fa-file-pdf"></i></button>
+                    </td>
+                </tr>`;
+        });
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="6" class="py-20 text-center text-red-400">Yükleme hatası.</td></tr>'; }
 }
 
 async function fetchGlobalVisibility() {
@@ -1971,23 +1976,6 @@ async function fetchMediaVault() {
     } catch (e) { tableBody.innerHTML = '<tr><td colspan="4" class="py-20 text-center text-red-400">Dosyalar listelenirken hata oluştu.</td></tr>'; }
 }
 
-async function fetchNotices() {
-    const container = document.getElementById('notices-container');
-    if (!container) return;
-    container.innerHTML = '<div class="p-10 text-center animate-pulse">Duyurular alınıyor...</div>';
-    try {
-        const res = await apiFetch(`${API_BASE}/notices`);
-        const notices = await res.json();
-        container.innerHTML = notices.length ? '' : '<div class="p-20 text-center text-gray-400">Yeni duyuru bulunmuyor.</div>';
-        notices.forEach(n => {
-            const div = document.createElement('div');
-            div.className = "p-4 border-b border-gray-100 flex gap-4 hover:bg-gray-50 transition-colors";
-            div.innerHTML = `<div class="w-10 h-10 rounded-full bg-navy/10 flex items-center justify-center text-navy shrink-0"><i class="fa-solid fa-bullhorn"></i></div>
-                             <div><h4 class="font-bold text-navy">${n.title}</h4><p class="text-sm text-gray-500">${n.message}</p>
-                             <span class="text-xs text-gray-300">${n.created_at.split('T')[0]}</span></div>`;
-            container.appendChild(div);
-        });
-    } catch (e) { container.innerHTML = '<div class="p-10 text-center text-red-400">Hata oluştu.</div>'; }
 }
 
 // --- DELETION HARDENING HANDLERS ---

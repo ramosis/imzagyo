@@ -105,18 +105,29 @@ from authlib.integrations.flask_client import OAuth
 oauth = OAuth()
 
 def setup_oauth(app):
-    """Configures OAuth client and registers providers."""
+    """Configures OAuth client and registers providers with robust error handling."""
     oauth.init_app(app)
     
-    oauth.register(
-        name='google',
-        client_id=os.getenv('GOOGLE_CLIENT_ID'),
-        client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-        client_kwargs={
-            'scope': 'openid email profile'
-        }
-    )
+    google_id = os.getenv('GOOGLE_CLIENT_ID')
+    google_secret = os.getenv('GOOGLE_CLIENT_SECRET')
+    
+    if not google_id or not google_secret:
+        app.logger.warning("GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing. Google Login will not function.")
+        return
+
+    try:
+        oauth.register(
+            name='google',
+            client_id=google_id,
+            client_secret=google_secret,
+            server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+            client_kwargs={
+                'scope': 'openid email profile'
+            }
+        )
+        app.logger.info("Google OAuth provider registered successfully.")
+    except Exception as e:
+        app.logger.error(f"Failed to register Google OAuth provider: {e}")
 
 class UnifiedAuthService:
     @staticmethod
