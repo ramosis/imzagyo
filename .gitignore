@@ -62,3 +62,15 @@ test_coverage_output.txt
 api_calls_portal.txt
 test_results.txt
 git_push_output.log
+
+# IDE & Editor
+cline_mcp_settings.json
+.vscode/
+.idea/
+
+# Infrastructure generated
+infrastructure/scripts/logs/
+infrastructure/scripts/*.log
+
+# Backup folders
+*_BACKUP/
