@@ -1,30 +1,42 @@
-# İmza Gayrimenkul Platform v2
+# İmza Gayrimenkul
 
-Modern, modüler ve lüks gayrimenkul yönetim platformu.
+## Proje Yapısı (Aşama 1 Sonrası)
 
-## 📁 Proje Yapısı
+### Kök Dizin (Sadece Gerekli Dosyalar)
+- `app.py` / `wsgi.py` — Flask entry point'leri
+- `requirements.txt` — Python bağımlılıkları
+- `data/` — SQLite veritabanı (runtime)
+- `uploads/` — Yüklenen dosyalar (runtime)
+- `logs/` — Uygulama logları (runtime)
 
-- **🟦 backend/**: Flask çekirdek uygulama ve Blueprint tabanlı modüller (Core/Addons).
-- **🟨 frontend/**: Çoklu alan adı destekli frontend yapısı (Investment, Neighborhood, Portal).
-- **🟪 infrastructure/**: Konfigürasyon, dokümantasyon ve yardımcı scriptler.
-- **🟩 mobile/**: React Native / Expo mobil uygulama.
-- **💾 data/ & uploads/**: Veritabanı ve medya dosyaları.
+### Backend
+- `app/` — Flask app factory, scheduler (Aşama 2'de backend/app/ olacak)
+- `modules/` — İş modülleri (Aşama 2'de backend/core/ + addons/ olacak)
+- `shared/` — Ortak servisler, modeller (Aşama 2'de backend/shared/ olacak)
 
-## 🚀 Hızlı Başlatma
+### Frontend
+- `pages/` — HTML sayfaları (Aşama 2'de frontend/ altına taşınacak)
+- `static/` — CSS, JS, images (Aşama 2'de frontend/ altına taşınacak)
+
+### Mobil & Eklentiler
+- `mobile/` — React Native / Expo app
+- `extension/` / `extension-pro/` — Tarayıcı eklentileri
+
+### Altyapı
+- `infrastructure/` — Docker, scriptler, dokümanlar, nginx config
+- `tests/` — Testler
+- `archived/` — Legacy kodlar
+
+## Başlatma
 
 ```bash
-# Bağımlılıkları yükle
-pip install -r requirements.txt
-
-# Uygulamayı başlat
+# Geliştirme
 python app.py
+
+# Docker
+docker-compose -f infrastructure/config/docker-compose.yml up
 ```
 
-## 🛠️ Mimari Prensipler
-
-- **İzolasyon**: Her modül kendi Blueprint'i ile izole edilmiştir.
-- **Genişletilebilirlik**: Yeni özellikler `addons` klasörüne eklenerek dinamik olarak yüklenebilir.
-- **Hibrit Frontend**: Aynı backend üzerinden `imzaemlak.com` ve `imzamahalle.com` domainleri yönetilir.
-
----
-*İmza Gayrimenkul Geliştirme Ekibi*
+## Domain'ler
+- **imzaemlak.com** — Gayrimenkul & Yatırım
+- **imzamahalle.com** — Mahalle & Site Yönetimi
