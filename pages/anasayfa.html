@@ -288,7 +288,7 @@
             width: 100%;
             height: 100%;
             background-color: #0a192f;
-            z-index: 99999;
+            z-index: var(--z-curtain);
             pointer-events: none;
             transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
@@ -360,7 +360,7 @@
     </div>
 
     <!-- Header (Sticky) -->
-    <header class="fixed w-full z-50 transition-all duration-300 border-b border-gray-100 shadow-sm">
+    <header class="fixed w-full z-header-premium transition-all duration-300 border-b border-black/5 glass-header header-animate">
         <nav class="w-full glass-panel border-b border-gray-100 shadow-sm">
             <div class="header-nav-inner" style="margin-left: auto; margin-right: auto;">
                 <div class="flex justify-between items-center h-24">

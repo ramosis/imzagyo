@@ -435,11 +435,11 @@
     <!-- ANA PORTAL ARAYÜZÜ (Giriş yapıldıktan sonra gösterilir) -->
     <div id="portal-app" class="flex w-full h-full hidden">
         <!-- Sidebar Overlay (Mobile) -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-navy/60 backdrop-blur-sm z-[1000] hidden lg:hidden animate-fade-in"></div>
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-navy/60 backdrop-blur-sm z-[2000] hidden lg:hidden animate-fade-in"></div>
 
         <!-- SIDEBAR -->
         <aside id="sidebar"
-            class="w-72 glass-dark flex flex-col h-full shrink-0 fixed inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 lg:relative lg:inset-0 transition-transform duration-300 z-[1001] shadow-2xl lg:shadow-none">
+            class="w-72 glass-dark flex flex-col h-full shrink-0 fixed inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 lg:relative lg:inset-0 transition-transform duration-300 z-[2001] shadow-2xl lg:shadow-none">
             <!-- Mobil Kapatma Butonu -->
             <button type="button" onclick="toggleSidebar()" class="lg:hidden absolute top-4 right-4 text-white/40 hover:text-gold z-20">
                 <i class="fa-solid fa-xmark text-2xl"></i>
@@ -693,7 +693,7 @@
         <main class="flex-1 flex flex-col h-full overflow-hidden bg-gray-50 relative">
 
             <!-- Header (Top bar) -->
-            <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0 z-10">
+            <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0 z-header-premium">
                 <div class="luxury-container flex justify-between items-center w-full">
                     <h2 id="page-title" class="text-xl font-serif font-bold text-navy flex items-center gap-3">
                         <i class="fa-solid fa-chart-pie text-gold text-lg"></i> Dashboard Özet
@@ -1557,7 +1557,7 @@
                     <!-- Portföy Yönetimi Bitiş -->
 
                     <!-- Section: Bölgesel Görünürlük Merkezi (Phase 6) -->
-                    <div id="global-sync-section" class="content-section hidden relative z-50 pointer-events-auto">
+                    <div id="global-sync-section" class="content-section hidden relative z-base pointer-events-auto">
                         <div class="mb-10 flex justify-between items-end">
                             <div>
                                 <p class="text-gold text-[10px] font-black uppercase tracking-[0.3em] mb-2">Uluslararası Görünürlük</p>
@@ -3247,12 +3247,9 @@
 
 
     <!-- ================= LOGOUT CONFIRM MODAL ================= -->
-
-
-    <!-- ================= LOGOUT CONFIRM MODAL ================= -->
     <div id="logout-confirm-modal"
-        class="fixed inset-0 z-50 hidden bg-navy/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden p-8 relativetext-center">
+        class="fixed inset-0 z-[3000] hidden bg-navy/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden p-8 relative text-center">
             <div
                 class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>

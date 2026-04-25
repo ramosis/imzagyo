@@ -35,7 +35,28 @@
 
     /* Header & Layout */
     --header-height: clamp(5rem, 4rem + 2vh, 6rem);
+
+    /* --- Z-Index Hierarchy (Standardized) --- */
+    --z-base: 0;
+    --z-sticky: 50;
+    --z-dropdown: 100;
+    --z-header: 1000;
+    --z-overlay: 4000;
+    --z-modal: 5000;
+    --z-toast: 9000;
+    --z-curtain: 10000;
 }
+
+/* Z-Index Utility Classes */
+.z-base { z-index: var(--z-base); }
+.z-sticky-standard { z-index: var(--z-sticky); }
+.z-dropdown-premium { z-index: var(--z-dropdown); }
+.z-header-premium { z-index: var(--z-header) !important; }
+.z-overlay-premium { z-index: var(--z-overlay) !important; }
+.z-modal-premium { z-index: var(--z-modal) !important; }
+.z-toast-premium { z-index: var(--z-toast) !important; }
+.z-curtain-premium { z-index: var(--z-curtain) !important; }
+
 
 /* 1600px Üstü İçin Sabitleme (Excessive scaling protection) */
 @media screen and (min-width: 1600px) {
