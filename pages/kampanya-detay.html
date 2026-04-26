@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Özel Yatırım Fırsatı | İmza Gayrimenkul</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    
+    <!-- İMZA LENS -->
+    <link rel="stylesheet" href="../static/js/imzalens/imza-lens.css?v=1.3">
+    <script src="../static/js/imzalens/imza-lens.core.js?v=1.3"></script>
+    <script src="../static/js/imzalens/imza-lens.ui.js?v=1.3"></script>
+    <script src="../static/js/imzalens/imza-lens-metrics.js?v=1.3"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a192f',
+                        gold: '#c5a059',
+                        prestij: '#c5a059',
+                        soft: '#f8fafc',
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .brand-pattern {
+            background-image: radial-gradient(#c5a059 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .bento-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-8px);
+        }
+    </style>
+</head>
+
+<body class="bg-soft text-navy antialiased font-sans">
+
+    <!-- Header -->
+    <header class="fixed w-full z-50 glass-panel border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center cursor-pointer" onclick="location.href='anasayfa.html'">
+                    <i class="fa-solid fa-signature text-gold text-2xl mr-3"></i>
+                    <div class="flex flex-col">
+                        <span class="font-serif font-bold text-xl tracking-widest text-navy leading-none uppercase">İMZA</span>
+                        <span class="text-gold text-[7px] tracking-[0.4em] uppercase font-bold mt-1">Lansman & Kampanya</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <button onclick="ImzaLensUI.openDemandForm('syo-detay')" class="hidden md:block bg-navy text-gold px-8 py-2.5 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-gold hover:text-navy transition-all shadow-lg">Hemen Başvur</button>
+                    <a href="anasayfa.html" class="text-navy hover:text-gold transition-colors text-xl"><i class="fa-solid fa-house"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="relative pt-20 h-[80vh] overflow-hidden flex items-center">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1920');"></div>
+        <div class="absolute inset-0 bg-navy/60 backdrop-blur-[1px]"></div>
+        <div class="absolute inset-0 brand-pattern opacity-20"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-4 bg-gold/20 backdrop-blur-md px-4 py-1.5 rounded-full mb-8 border border-gold/30">
+                    <span class="text-gold text-[10px] font-bold uppercase tracking-widest">Özel Lansman</span>
+                    <div class="w-1 h-1 bg-gold rounded-full"></div>
+                    <span class="text-white text-[10px] font-bold uppercase tracking-widest">Sınırlı Yatırım Fırsatı</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-serif text-white mb-6 leading-tight uppercase tracking-tighter">
+                    Geleceğinize <span class="text-gold italic">İmza</span> Atın
+                </h1>
+                <p class="text-lg md:text-xl text-gray-200 font-light mb-10 leading-relaxed max-w-2xl">
+                    İstanbul'un parlayan yıldızı Çatalca bölgesinde, avantajlı ödeme planları ile yatırım fırsatı sizi bekliyor.
+                </p>
+                <div class="flex flex-wrap gap-6">
+                    <button onclick="ImzaLensUI.openDemandForm('syo-detay')" class="px-10 py-5 bg-gold text-navy font-bold uppercase tracking-widest hover:bg-white transition-all duration-500 rounded-full shadow-2xl shadow-gold/30">
+                        Başvuru Yap
+                    </button>
+                    <button onclick="document.getElementById('bento-info').scrollIntoView({behavior:'smooth'})" class="px-10 py-5 border border-white/30 text-white font-bold uppercase tracking-widest hover:bg-white hover:text-navy transition-all duration-500 rounded-full backdrop-blur-md">
+                        Detayları Keşfet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Overlay -->
+    <div class="relative -mt-10 z-20">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="bg-white p-6 md:p-8 rounded-[3rem] shadow-xl border border-gray-100 flex flex-wrap items-center justify-center gap-12">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-signature text-navy text-2xl"></i>
+                    <span class="font-serif font-bold text-navy tracking-widest uppercase text-xl">İMZA</span>
+                </div>
+                <div class="h-8 w-px bg-gray-200 hidden md:block"></div>
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-gem text-gold text-2xl"></i>
+                    <span class="font-bold text-navy text-xs uppercase tracking-[0.2em] whitespace-nowrap">Sağlık Yatırım Ortaklığı</span>
+                </div>
+                <div class="h-8 w-px bg-gray-200 hidden md:block"></div>
+                <div class="flex items-center gap-3 opacity-60">
+                    <i class="fa-solid fa-shield-check text-navy text-xl"></i>
+                    <span class="font-bold text-navy text-[10px] uppercase tracking-widest">Güvenceli Portföy</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bento Info Section -->
+    <section id="bento-info" class="py-24 md:py-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <h2 class="text-3xl md:text-5xl font-serif font-bold text-navy mb-6 uppercase tracking-tighter">Neden Bu Proje?</h2>
+                <div class="w-16 h-1 bg-gold mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
+                <!-- Card 1 -->
+                <div class="md:col-span-2 bg-white p-10 rounded-[3.5rem] bento-card border border-gray-50 shadow-sm relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                    <i class="fa-solid fa-location-dot text-gold text-4xl mb-8"></i>
+                    <h3 class="text-2xl font-serif font-bold mb-4">Stratejik Lokasyon</h3>
+                    <p class="text-gray-400 font-light leading-relaxed">Çatalca'nın gelişim aksında yer alan arsamız, yeni havalimanı ve ana arterlere sadece 15 dakika mesafede yer almaktadır.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-navy p-10 rounded-[3.5rem] bento-card text-white relative overflow-hidden">
+                    <div class="absolute inset-0 brand-pattern opacity-10"></div>
+                    <i class="fa-solid fa-chart-line-up text-gold text-4xl mb-8"></i>
+                    <h3 class="text-xl font-serif font-bold mb-4 uppercase">Yüksek Kazanç</h3>
+                    <p class="text-gray-400 text-xs font-light leading-relaxed">Projeksiyonlarımıza göre 2026 sonunda bölgedeki değer artış beklentisi %45+ civarındadır.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-gold p-10 rounded-[3.5rem] bento-card text-navy flex flex-col justify-between">
+                    <i class="fa-solid fa-file-contract text-2xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2 uppercase tracking-tight">Hemen Tapu</h3>
+                        <p class="text-[11px] font-medium opacity-80 uppercase tracking-widest">Güvenli Yatırım</p>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-white p-10 rounded-[3.5rem] bento-card border border-gray-50 md:col-span-2 shadow-sm flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-20 h-20 bg-soft rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-credit-card text-gold text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-serif font-bold mb-3">Kolay Ödeme</h3>
+                        <p class="text-gray-400 font-light leading-relaxed">Peşinatta %10 indirim veya 24 ay vade seçeneği ile yatırımınızı hemen başlatın.</p>
+                    </div>
+                </div>
+
+                <!-- Card 5 (CTA Card) -->
+                <div class="md:col-span-2 bg-gradient-to-br from-gold/10 to-transparent p-10 rounded-[3.5rem] bento-card border border-gold/20 flex flex-col justify-center items-center text-center">
+                    <h3 class="text-2xl font-serif font-bold mb-6 text-navy">Sınırlı Sayıda Parsel!</h3>
+                    <button onclick="ImzaLensUI.openDemandForm('syo-detay')" class="bg-navy text-gold px-12 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-gold hover:text-navy transition-all shadow-xl">
+                        Yerinizi Ayırtın
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp Bridge -->
+    <section class="bg-navy py-12 border-t border-white/5 relative overflow-hidden">
+        <div class="absolute inset-0 brand-pattern opacity-10"></div>
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+            <div class="text-center md:text-left">
+                <h4 class="text-white text-xl font-serif font-bold mb-2">Hızlı Sorularınız mı Var?</h4>
+                <p class="text-gray-400 text-sm">Yatırım danışmanımızla WhatsApp üzerinden anlık görüşebilirsiniz.</p>
+            </div>
+            <a href="https://wa.me/904440000?text=Arsa%20projeniz%20hakkında%20bilgi%20almak%20istiyorum." target="_blank" class="flex items-center gap-4 bg-[#25D366] text-white px-10 py-5 rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-all shadow-2xl">
+                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                WhatsApp Destek
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-soft py-12 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center mb-6">
+                <i class="fa-solid fa-signature text-gold text-2xl mr-3"></i>
+                <span class="font-serif font-bold text-navy tracking-widest uppercase">İMZA</span>
+            </div>
+            <p class="text-gray-400 text-[10px] uppercase tracking-[0.3em]">© 2026 İmza Gayrimenkul Yatırım</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // İmza Lens Analiz Başlat
+            if (window.ImzaLens) {
+                window.ImzaLens.init('campaign_detail');
+                
+                // Bu sayfaya gelen direkt 'Arsa' ile ilgileniyordur
+                window.ImzaLens.track('arsa');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,52 @@
+/**
+ * İmza Lens - Global Styles (imza-lens.css)
+ * Maybach Animasyonları ve Akıllı UI Stilleri
+ */
+
+/* SSS Ticker Animasyonları */
+.faq-ticker-container {
+    height: 30px; /* Sabit yükseklik, taşmaları önler */
+    position: relative;
+    overflow: hidden;
+}
+
+.faq-ticker-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1.1s cubic-bezier(0.23, 1, 0.32, 1); /* Maybach Speed */
+    pointer-events: none;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
+.faq-ticker-item.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.faq-ticker-item.exit {
+    opacity: 0;
+    transform: translateY(-30px);
+    pointer-events: none;
+}
+
+/* Hover Efektleri */
+.faq-ticker-item:hover {
+    color: #d4af37 !important; /* Gold highlight */
+}
+
+.faq-ticker-item:hover i {
+    opacity: 1 !important;
+}
+
+/* Marka Deseni (Banner için) */
+.brand-pattern {
+    background-image: radial-gradient(#d4af37 0.5px, transparent 0.5px);
+    background-size: 20px 20px;
+}

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yatırımcı Rehberi & Akıllı Araçlar | İmza Gayrimenkul</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+    <link rel="stylesheet" href="../static/css/fluid.css?v=2.0">
+    <script src="../static/js/mobile_polish.js?v=2.0" defer></script>
+    <!-- CountUp.js for number animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.7/countUp.umd.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a192f',
+                        gold: '#c5a059',
+                        soft: '#f8fafc',
+                        modern: '#1e293b',
+                        nature: '#2f4f4f',
+                        natureLight: '#a3b18a'
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .brand-pattern {
+            background-image: radial-gradient(#c5a059 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-animate {
+            animation: slideDown 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-up {
+            opacity: 0;
+            animation: slideUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .lux-curtain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0a192f;
+            z-index: 99999;
+            pointer-events: none;
+            transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lux-curtain.hidden {
+            opacity: 0;
+        }
+
+        /* Custom Input Styling */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus {
+            outline: none;
+            border-color: #c5a059;
+            box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
+            background: #ffffff;
+        }
+
+        .tab-btn.active {
+            background-color: #0a192f;
+            color: #c5a059;
+            border-color: #0a192f;
+        }
+
+        .tool-content {
+            display: none;
+        }
+
+        .tool-content.active {
+            display: block;
+            animation: fadeIn 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <script>
+        function luxNavigate(url) {
+            const curtain = document.querySelector('.lux-curtain');
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
+            curtain.classList.remove('hidden');
+            setTimeout(() => { window.location.href = url; }, 1100);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const curtain = document.querySelector('.lux-curtain');
+            curtain.style.transition = 'opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
+            setTimeout(() => { curtain.classList.add('hidden'); }, 100);
+
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted) curtain.classList.add('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('.html') && !link.target && !e.ctrlKey && !e.shiftKey) {
+                    const targetUrl = link.href;
+                    if (targetUrl.includes('#') || targetUrl.includes('?')) return;
+                    const isInternal = targetUrl.includes(window.location.origin) || !targetUrl.startsWith('http');
+                    if (isInternal) { e.preventDefault(); luxNavigate(targetUrl); }
+                }
+            });
+
+            // Handle URL Parameters for Initial Tab
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialTool = urlParams.get('arac') || 'tapu';
+            document.querySelector(`[data-tab="${initialTool}"]`)?.click();
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'shadow-lg'));
+            document.querySelectorAll('.tool-content').forEach(content => content.classList.remove('active'));
+
+            const selectedBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('active', 'shadow-lg');
+                document.getElementById(`content-${tabId}`).classList.add('active');
+            }
+        }
+    </script>
+</head>
+
+<body class="text-slate-800 antialiased font-sans flex flex-col min-h-screen">
+    <div class="lux-curtain"></div>
+
+    <!-- Header (Sabit) -->
+    <header class="fixed w-full z-50 border-b border-gray-100 bg-white/90 backdrop-blur-md header-animate">
+        <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+        <nav class="luxury-container mx-auto px-4 md:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="anasayfa.html" class="flex items-center group/logo" aria-label="İmza Gayrimenkul Ana Sayfa">
+                    <i class="fa-solid fa-signature text-gold text-2xl mr-3 group-hover/logo:scale-110 transition-transform"></i>
+                    <div class="flex flex-col">
+                        <span class="font-serif font-bold text-xl tracking-widest text-navy leading-none uppercase">İMZA</span>
+                        <span class="text-gold text-[8px] tracking-[0.4em] uppercase font-bold mt-1 text-left">Gayrimenkul</span>
+                    </div>
+                </a>
+                <div class="flex items-center gap-x-6">
+                    <a href="anasayfa.html"
+                        class="hidden sm:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ana Sayfa</a>
+                    <a href="ekip.html"
+                        class="hidden md:inline-block text-navy hover:text-gold transition-colors text-[10px] font-black uppercase tracking-widest">Ekibimiz</a>
+                    <a href="portal.html"
+                        class="bg-navy text-gold px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-wider shadow-lg shadow-navy/20">İmza Portal</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="flex-grow pt-16" id="mainWrapper">
+        <!-- Hero Section -->
+        <section class="snap-section bg-navy relative overflow-hidden py-24 px-4 text-center">
+            <div
+                class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541888086438-e04772ab180e?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center opacity-20">
+            </div>
+            <div class="absolute inset-0 bg-navy/80"></div>
+            <div class="absolute inset-0 brand-pattern opacity-20"></div>
+
+            <div class="relative z-10 luxury-container px-6 animate-up">
+                <h1 class="text-fluid-4xl md:text-5xl font-serif font-bold text-white mb-6 uppercase tracking-tight">
+                    Yatırımcı <span class="text-gold italic">Rehberi</span>
+                </h1>
+                <p class="text-gray-300 max-w-2xl mx-auto text-sm md:text-base leading-relaxed font-light">
+                    Kusursuz kararlar için tasarlanmış akıllı finansal analiz araçları. Tapu harçlarından amortisman
+                    hesaplarına kadar yatırımlarınızı şeffaflıkla kurgulayın.
+                </p>
+            </div>
+        </section>
+
+        <!-- Tools Interface Container -->
+        <section class="snap-section py-16 px-4 md:px-8 bg-soft">
+            <div class="luxury-container px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+                    <!-- Sidebar Navigation -->
+                    <div class="lg:col-span-1 space-y-3">
+                        <button data-tab="tapu" onclick="switchTab('tapu')"
+                            class="tab-btn active w-full text-left px-6 py-5 rounded-2xl border border-gray-200 bg-white hover:border-gold/50 transition-all group flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <i class="fa-solid fa-calculator text-xl opacity-70 group-hover:opacity-100"></i>
+                                <span class="font-bold uppercase tracking-widest text-[11px]">Tapu Harcı</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs opacity-50"></i>
+                        </button>
+                        <button data-tab="roi" onclick="switchTab('roi')"
+                            class="tab-btn w-full text-left px-6 py-5 rounded-2xl border border-gray-200 bg-white hover:border-gold/50 transition-all group flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <i class="fa-solid fa-chart-line text-xl opacity-70 group-hover:opacity-100"></i>
+                                <span class="font-bold uppercase tracking-widest text-[11px]">Amortisman</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs opacity-50"></i>
+                        </button>
+                        <button data-tab="kredi" onclick="switchTab('kredi')"
+                            class="tab-btn w-full text-left px-6 py-5 rounded-2xl border border-gray-200 bg-white hover:border-gold/50 transition-all group flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <i class="fa-solid fa-building-columns text-xl opacity-70 group-hover:opacity-100"></i>
+                                <span class="font-bold uppercase tracking-widest text-[11px]">Konut Kredisi</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs opacity-50"></i>
+                        </button>
+                        <button data-tab="vergi" onclick="switchTab('vergi')"
+                            class="tab-btn w-full text-left px-6 py-5 rounded-2xl border border-gray-200 bg-white hover:border-gold/50 transition-all group flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <i
+                                    class="fa-solid fa-file-invoice-dollar text-xl opacity-70 group-hover:opacity-100"></i>
+                                <span class="font-bold uppercase tracking-widest text-[11px]">Kira Vergisi</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs opacity-50"></i>
+                        </button>
+                    </div>
+
+                    <!-- Main Content Area -->
+                    <div class="lg:col-span-3">
+                        <div
+                            class="bg-white rounded-[2rem] shadow-xl shadow-navy/5 p-8 md:p-12 border border-gray-100 min-h-[500px]">
+
+                            <!-- TAPU HARCI MODÜLÜ -->
+                            <div id="content-tapu" class="tool-content active">
+                                <h2 class="text-2xl font-serif font-bold text-navy mb-2 uppercase tracking-wide">Tapu
+                                    Harcı Maliyetleri</h2>
+                                <p class="text-gray-500 text-sm mb-10 font-light">Alım veya satım işlemi sırasında
+                                    doğacak yasal harç ve döner sermaye bedellerini hesaplayın.</p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Emlak
+                                                Satış Bedeli (TL)</label>
+                                            <input type="number" id="tapu-bedel"
+                                                class="glass-input w-full p-4 rounded-xl text-navy font-bold text-lg"
+                                                placeholder="Örn: 25000000" oninput="calculateTapu()">
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-3 p-4 bg-soft rounded-xl border border-gold/20">
+                                            <i class="fa-solid fa-info-circle text-gold text-lg"></i>
+                                            <p class="text-xs text-navy font-medium leading-relaxed">Tapu harcı oranı
+                                                yasalarca hem alıcıdan hem de satıcıdan ayrı ayrı %2 olarak tahsil
+                                                edilmektedir.</p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="bg-navy rounded-3xl p-8 text-white relative overflow-hidden flex flex-col justify-center">
+                                        <div class="absolute inset-0 brand-pattern opacity-10"></div>
+                                        <div class="relative z-10 space-y-6">
+                                            <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                                                <span
+                                                    class="text-xs font-bold uppercase tracking-widest text-gray-400">Alıcı
+                                                    Payı (%2)</span>
+                                                <span class="text-2xl font-serif font-bold text-gold"
+                                                    id="tapu-alici">₺0</span>
+                                            </div>
+                                            <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                                                <span
+                                                    class="text-xs font-bold uppercase tracking-widest text-gray-400">Satıcı
+                                                    Payı (%2)</span>
+                                                <span class="text-2xl font-serif font-bold text-gold"
+                                                    id="tapu-satici">₺0</span>
+                                            </div>
+                                            <div class="flex justify-between items-end">
+                                                <span
+                                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-white">Toplam
+                                                    Harç Tutarı<br><span
+                                                        class="text-gray-400 font-light tracking-normal lowercase">(Döner
+                                                        sermaye hariç)</span></span>
+                                                <span class="text-3xl font-serif font-bold text-white shadow-gold"
+                                                    id="tapu-toplam">₺0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ROI MODÜLÜ -->
+                            <div id="content-roi" class="tool-content">
+                                <h2 class="text-2xl font-serif font-bold text-navy mb-2 uppercase tracking-wide">Yatırım
+                                    Geri Dönüş Analizi (ROI)</h2>
+                                <p class="text-gray-500 text-sm mb-10 font-light">Mülkün aylık kira getirisi üzerinden
+                                    kendini kaç yılda amorti edeceğini (Kira Çarpanı) ölçün.</p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Emlak
+                                                Satış Bedeli (TL)</label>
+                                            <input type="number" id="roi-bedel"
+                                                class="glass-input w-full p-4 rounded-xl text-navy font-bold text-lg"
+                                                placeholder="Örn: 15000000" oninput="calculateROI()">
+                                        </div>
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Tahmini
+                                                Aylık Kira (TL)</label>
+                                            <input type="number" id="roi-kira"
+                                                class="glass-input w-full p-4 rounded-xl text-navy font-bold text-lg"
+                                                placeholder="Örn: 85000" oninput="calculateROI()">
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="bg-navy rounded-3xl p-8 text-white relative overflow-hidden flex flex-col justify-center">
+                                        <div class="absolute inset-0 brand-pattern opacity-10"></div>
+                                        <div class="relative z-10 space-y-8 text-center">
+                                            <div>
+                                                <p
+                                                    class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
+                                                    Amortisman Süresi</p>
+                                                <div
+                                                    class="text-4xl md:text-5xl font-serif font-bold text-gold flex items-center justify-center gap-2">
+                                                    <span id="roi-yil">-</span> <span
+                                                        class="text-xl text-white font-sans uppercase tracking-widest">YIL</span>
+                                                </div>
+                                            </div>
+                                            <div class="w-16 h-px bg-white/20 mx-auto"></div>
+                                            <div>
+                                                <p
+                                                    class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
+                                                    Yıllık Brüt Getiri Oranı</p>
+                                                <div class="text-3xl font-serif font-bold text-white" id="roi-yuzde">%
+                                                    0.00</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- KREDİ MODÜLÜ -->
+                            <div id="content-kredi" class="tool-content">
+                                <h2 class="text-2xl font-serif font-bold text-navy mb-2 uppercase tracking-wide">Konut
+                                    Kredisi Asistanı</h2>
+                                <p class="text-gray-500 text-sm mb-10 font-light">Banka vade ve faiz oranlarına göre
+                                    aylık eşit taksit tutarınızı ve toplam geri ödemeyi planlayın.</p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Kredi
+                                                Tutarı (TL)</label>
+                                            <input type="number" id="kredi-tutar"
+                                                class="glass-input w-full p-4 rounded-xl text-navy font-bold text-lg"
+                                                placeholder="Örn: 5000000" oninput="calculateKredi()">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label
+                                                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Vade
+                                                    (Ay)</label>
+                                                <input type="number" id="kredi-vade"
+                                                    class="glass-input w-full p-4 rounded-xl text-navy font-bold text-lg"
+                                                    value="120" oninput="calculateKredi()">
+                                            </div>
+                                            <div>
+                                                <label
+                                                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Faiz
+                                                    Oranı (%)</label>
+                                                <input type="number" step="0.01" id="kredi-faiz"
+                                                    class="glass-input w-full p-4 rounded-xl text-navy font-bold text-lg"
+                                                    value="3.50" oninput="calculateKredi()">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="bg-navy rounded-3xl p-8 text-white relative overflow-hidden flex flex-col justify-center">
+                                        <div class="absolute inset-0 brand-pattern opacity-10"></div>
+                                        <div class="relative z-10 space-y-6">
+                                            <div class="flex flex-col items-center border-b border-white/10 pb-6 mb-2">
+                                                <span
+                                                    class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Aylık
+                                                    Ödeme Tutarınız</span>
+                                                <span class="text-4xl lg:text-5xl font-serif font-bold text-gold"
+                                                    id="kredi-aylik">₺0</span>
+                                            </div>
+                                            <div class="flex justify-between items-end">
+                                                <span
+                                                    class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Toplam
+                                                    Geri Ödeme</span>
+                                                <span class="text-xl font-serif font-bold text-white"
+                                                    id="kredi-toplam">₺0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VERGİ MODÜLÜ -->
+                            <div id="content-vergi" class="tool-content">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h2 class="text-2xl font-serif font-bold text-navy uppercase tracking-wide">Kira
+                                        Geliri (GMSİ) Matrahı</h2>
+                                    <span
+                                        class="bg-gold/20 text-gold text-[8px] font-black px-2 py-1 rounded uppercase">Tahminleyici</span>
+                                </div>
+                                <p class="text-gray-500 text-sm mb-10 font-light">Gayrimenkul Sermaye İradı beyanına
+                                    istinaden, istisnalar hariç basitleştirilmiş vergi dilimi hesaplaması.</p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Aylık
+                                                Kira Geliriniz (Menkul/Mesken)</label>
+                                            <input type="number" id="vergi-kira"
+                                                class="glass-input w-full p-4 rounded-xl text-navy font-bold text-lg"
+                                                placeholder="Örn: 60000" oninput="calculateVergi()">
+                                        </div>
+                                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                            <p class="text-[11px] text-gray-500 font-medium leading-relaxed italic">
+                                                * Bu hesaplama istisna tutarları (2024: 33.000 TL) ve %15 gider indirimi
+                                                (götürü gider varsayımı) baz alınarak ortalama vergi dilimlerinden kaba
+                                                bir vizyon sunar. Resmi beyan yerine geçmez.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="bg-navy rounded-3xl p-8 text-white relative overflow-hidden flex flex-col justify-center">
+                                        <div class="absolute inset-0 brand-pattern opacity-10"></div>
+                                        <div class="relative z-10 space-y-6">
+                                            <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                                                <span
+                                                    class="text-xs font-bold uppercase tracking-widest text-gray-400">Yıllık
+                                                    Brüt Gelir</span>
+                                                <span class="text-xl font-serif font-bold text-white"
+                                                    id="vergi-yillik-brut">₺0</span>
+                                            </div>
+                                            <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                                                <span
+                                                    class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1 block">Vergiye
+                                                    Tabi Matrah<br><span class="text-[8px] opacity-70">(İstisna & Gider
+                                                        Sonrası)</span></span>
+                                                <span class="text-xl font-serif font-bold text-white"
+                                                    id="vergi-matrah">₺0</span>
+                                            </div>
+                                            <div class="flex justify-between items-end">
+                                                <span
+                                                    class="text-xs font-bold uppercase tracking-widest text-gold">Tahmini
+                                                    Yıllık Vergi</span>
+                                                <span class="text-3xl font-serif font-bold text-gold"
+                                                    id="vergi-toplam">₺0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="snap-section bg-navy text-white text-center py-12 border-t border-white/10 sm:hidden">
+        <div class="luxury-container px-4 flex flex-col items-center justify-center">
+            <h2 class="font-serif font-bold text-2xl tracking-[0.4em] uppercase mb-4 text-gold">İMZA</h2>
+            <p class="text-[10px] font-bold tracking-[0.6em] text-gray-500 uppercase mb-8">Yatırımcı Rehberi © 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        // Formatter for Turkish currency
+        const tlf = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+        // CountUp Animators Object Array Cache
+        const formatCurrencyNum = (val) => tlf.format(val);
+        const countUpOptions = {
+            duration: 1.5,
+            useEasing: true,
+            formattingFn: formatCurrencyNum
+        };
+
+        // Tapu Hesaplama (%2 + %2)
+        function calculateTapu() {
+            let bedel = parseFloat(document.getElementById('tapu-bedel').value) || 0;
+            let pay = bedel * 0.02;
+            let toplam = pay * 2;
+            document.getElementById('tapu-alici').innerText = tlf.format(pay);
+            document.getElementById('tapu-satici').innerText = tlf.format(pay);
+            document.getElementById('tapu-toplam').innerText = tlf.format(toplam);
+        }
+
+        // Amortisman Hesaplama (Yıl ve ROI %)
+        function calculateROI() {
+            let bedel = parseFloat(document.getElementById('roi-bedel').value) || 0;
+            let kira = parseFloat(document.getElementById('roi-kira').value) || 0;
+
+            if (bedel > 0 && kira > 0) {
+                let yillikKira = kira * 12;
+                let yil = bedel / yillikKira;
+                let yuzde = (yillikKira / bedel) * 100;
+
+                document.getElementById('roi-yil').innerText = yil.toFixed(1);
+                document.getElementById('roi-yuzde').innerText = "% " + yuzde.toFixed(2);
+            } else {
+                document.getElementById('roi-yil').innerText = "-";
+                document.getElementById('roi-yuzde').innerText = "% 0.00";
+            }
+        }
+
+        // Kredi Hesaplama (PMT formülü)
+        function calculateKredi() {
+            let tutar = parseFloat(document.getElementById('kredi-tutar').value) || 0;
+            let vade = parseFloat(document.getElementById('kredi-vade').value) || 0;
+            let faiz = parseFloat(document.getElementById('kredi-faiz').value) || 0;
+
+            if (tutar > 0 && vade > 0 && faiz > 0) {
+                let r = faiz / 100;
+                // PMT = P * r * (1 + r)^n / ((1 + r)^n - 1)
+                let aylik = tutar * r * Math.pow(1 + r, vade) / (Math.pow(1 + r, vade) - 1);
+                let toplam = aylik * vade;
+
+                document.getElementById('kredi-aylik').innerText = tlf.format(aylik);
+                document.getElementById('kredi-toplam').innerText = tlf.format(toplam);
+            } else {
+                document.getElementById('kredi-aylik').innerText = "₺0";
+                document.getElementById('kredi-toplam').innerText = "₺0";
+            }
+        }
+
+        // Vergi (Kira) Hesaplama
+        function calculateVergi() {
+            let kira = parseFloat(document.getElementById('vergi-kira').value) || 0;
+            let yillik = kira * 12;
+
+            // Kaba GMSİ Hesaplama: 2024 Mesken İstisnası (33.000 TL)
+            let istisna = 33000;
+            let matrah = 0;
+            let vergi = 0;
+
+            if (yillik > istisna) {
+                // Kalan üzerinden %15 götürü gider düşümü
+                let kalan = yillik - istisna;
+                matrah = kalan - (kalan * 0.15);
+
+                // Basit Vergi Dilimi (Tahmini Lineer %15 ile %40 arası kabaca %25 ortalama hesabı)
+                // Gerçek hesaplama dilimli yapılır, bu bir UX örneğidir.
+                if (matrah <= 110000) vergi = matrah * 0.15;
+                else if (matrah <= 230000) vergi = 16500 + (matrah - 110000) * 0.20;
+                else if (matrah <= 870000) vergi = 40500 + (matrah - 230000) * 0.27;
+                else vergi = 213300 + (matrah - 870000) * 0.35;
+            }
+
+            document.getElementById('vergi-yillik-brut').innerText = tlf.format(yillik);
+            document.getElementById('vergi-matrah').innerText = tlf.format(matrah);
+            document.getElementById('vergi-toplam').innerText = tlf.format(vergi);
+        }
+    </script>
+</body>
+
+</html>
+</body>
+
+</html>

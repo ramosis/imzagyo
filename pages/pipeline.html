@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline | Satış Hunisi Kanban</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #0f172a; color: #f8fafc; overflow-x: hidden; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .kanban-column { min-height: 70vh; transition: background 0.3s; }
+        .kanban-card { cursor: grab; transition: all 0.2s ease; border-left: 4px solid #3b82f6; }
+        .kanban-card:active { cursor: grabbing; transform: scale(0.98); }
+        .ghost-card { opacity: 0.4; background: #334155 !important; }
+        .column-header { background: linear-gradient(90deg, #1e293b, #0f172a); }
+        .score-bar { height: 4px; background: #334155; border-radius: 2px; overflow: hidden; }
+        .score-fill { height: 100%; transition: width 1s ease-out; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
+        #detail-modal { display: none; }
+        #detail-modal.active { display: flex; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Satış Hunisi</h1>
+                <p class="text-slate-400 text-sm mt-1">Adaylarınızı sürükleyip bırakarak süreci yönetin.</p>
+            </div>
+            <button onclick="window.location.href='/portal'" class="px-6 py-2 glass rounded-xl text-sm font-medium hover:bg-white/10 transition-colors">Portala Dön</button>
+        </header>
+
+        <!-- Kanban Board -->
+        <div id="kanban-board" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- New Lead -->
+            <div class="flex flex-col h-full">
+                <div class="column-header p-4 rounded-t-2xl border-b border-white/5 flex justify-between items-center">
+                    <span class="font-semibold text-blue-400 flex items-center gap-2">
+                        <i class="fas fa-plus-circle"></i> Yeni Aday
+                    </span>
+                    <span id="count-new" class="text-xs bg-slate-800 px-2 py-1 rounded-full">0</span>
+                </div>
+                <div id="col-new" data-status="New" class="kanban-column p-3 glass rounded-b-2xl space-y-3"></div>
+            </div>
+
+            <!-- Contacted -->
+            <div class="flex flex-col h-full">
+                <div class="column-header p-4 rounded-t-2xl border-b border-white/5 flex justify-between items-center">
+                    <span class="font-semibold text-amber-400 flex items-center gap-2">
+                        <i class="fas fa-phone"></i> İletişim Kuruldu
+                    </span>
+                    <span id="count-contacted" class="text-xs bg-slate-800 px-2 py-1 rounded-full">0</span>
+                </div>
+                <div id="col-contacted" data-status="Contacted" class="kanban-column p-3 glass rounded-b-2xl space-y-3"></div>
+            </div>
+
+            <!-- Proposal -->
+            <div class="flex flex-col h-full">
+                <div class="column-header p-4 rounded-t-2xl border-b border-white/5 flex justify-between items-center">
+                    <span class="font-semibold text-indigo-400 flex items-center gap-2">
+                        <i class="fas fa-file-invoice-dollar"></i> Teklif Verildi
+                    </span>
+                    <span id="count-proposal" class="text-xs bg-slate-800 px-2 py-1 rounded-full">0</span>
+                </div>
+                <div id="col-proposal" data-status="Proposal" class="kanban-column p-3 glass rounded-b-2xl space-y-3"></div>
+            </div>
+
+            <!-- Closed -->
+            <div class="flex flex-col h-full">
+                <div class="column-header p-4 rounded-t-2xl border-b border-white/5 flex justify-between items-center">
+                    <span class="font-semibold text-emerald-400 flex items-center gap-2">
+                        <i class="fas fa-check-double"></i> Satış Kapandı
+                    </span>
+                    <span id="count-closed" class="text-xs bg-slate-800 px-2 py-1 rounded-full">0</span>
+                </div>
+                <div id="col-closed" data-status="Closed" class="kanban-column p-3 glass rounded-b-2xl space-y-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm items-center justify-center p-4">
+        <div class="glass w-full max-w-2xl rounded-[2rem] overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-8 border-b border-white/5 flex justify-between items-start">
+                <div>
+                    <h2 id="modal-lead-name" class="text-2xl font-bold text-white mb-2">Aday Detayı</h2>
+                    <div class="flex items-center gap-3">
+                        <span id="modal-interest-tag" class="px-3 py-1 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-full">Villa</span>
+                        <span id="modal-score-badge" class="px-3 py-1 bg-orange-500/10 text-orange-400 text-[10px] font-bold uppercase tracking-wider rounded-full">%85 Sıcak</span>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-8 overflow-y-auto space-y-8">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="fas fa-shoe-prints text-blue-400"></i> Dijital Yolculuk (Digital Footprint)
+                    </h3>
+                    <div id="timeline-container" class="relative pl-8 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-white/5">
+                        <!-- Timeline items -->
+                        <div class="animate-pulse space-y-4">
+                            <div class="h-4 bg-white/5 rounded w-3/4"></div>
+                            <div class="h-4 bg-white/5 rounded w-1/2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-8 border-t border-white/5 bg-slate-900/50 flex justify-end gap-4">
+                <button onclick="closeModal()" class="px-6 py-2 text-sm text-slate-400 hover:text-white">Kapat</button>
+                <button class="px-8 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition-colors">WhatsApp Mesajı Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchLeads() {
+            try {
+                const response = await fetch('/api/v1/pipeline/leads');
+                const leads = await response.json();
+                renderLeads(leads);
+            } catch (error) {
+                console.error('Error fetching leads:', error);
+            }
+        }
+
+        function renderLeads(leads) {
+            const columns = {
+                'New': document.getElementById('col-new'),
+                'Contacted': document.getElementById('col-contacted'),
+                'Proposal': document.getElementById('col-proposal'),
+                'Closed': document.getElementById('col-closed')
+            };
+
+            // Clear columns
+            Object.values(columns).forEach(col => col.innerHTML = '');
+
+            leads.forEach(lead => {
+                const card = document.createElement('div');
+                card.className = 'kanban-card p-4 bg-slate-800/50 rounded-xl hover:bg-slate-700/50 hover:shadow-lg transition-all border border-white/5 active:rotate-2';
+                card.setAttribute('data-id', lead.id);
+                card.onclick = (e) => {
+                    if(!e.target.closest('button')) openModal(lead.id);
+                };
+                
+                const scoreColor = lead.ai_score >= 70 ? 'bg-orange-400' : (lead.ai_score >= 40 ? 'bg-blue-400' : 'bg-slate-500');
+                const scoreBg = lead.ai_score >= 70 ? 'bg-orange-400/20' : (lead.ai_score >= 40 ? 'bg-blue-400/20' : 'bg-slate-500/20');
+                const scoreText = lead.ai_score >= 70 ? 'text-orange-400' : (lead.ai_score >= 40 ? 'text-blue-400' : 'text-slate-500');
+
+                // Content
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-medium text-slate-100 text-sm">${lead.name}</h4>
+                            <p class="text-[10px] text-slate-500 mt-0.5">${lead.intent_category || 'Genel'}</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                             <div class="text-[10px] font-bold ${scoreText} px-2 py-0.5 rounded-md ${scoreBg}">%${lead.ai_score}</div>
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-slate-400 space-y-1.5 mb-4">
+                        <p class="truncate"><i class="fas fa-envelope mr-2 opacity-30"></i> ${lead.email}</p>
+                        <p class="truncate text-blue-300/80"><i class="fas fa-home mr-2 opacity-30"></i> ${lead.property_title || 'Genel İlgili'}</p>
+                    </div>
+                    <div class="score-bar mb-4">
+                        <div class="score-fill ${scoreColor}" style="width: ${lead.ai_score}%"></div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex -space-x-1.5">
+                            <div class="w-5 h-5 rounded-full bg-indigo-500 border border-slate-900 flex items-center justify-center text-[7px] font-bold">SY</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] text-slate-500">Dün</span>
+                            <button class="w-6 h-6 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-[10px] text-slate-400"><i class="fas fa-ellipsis-v"></i></button>
+                        </div>
+                    </div>
+                `;
+                
+                const col = columns[lead.status_label] || columns['New'];
+                col.appendChild(card);
+            });
+
+            updateCounts();
+        }
+
+        async function openModal(leadId) {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('active');
+            
+            try {
+                const res = await fetch(`\/api/v1/leads/${leadId}/footprint`);
+                const data = await res.json();
+                
+                document.getElementById('modal-lead-name').innerText = data.lead_name ? `Aday Analizi: ${data.lead_name}` : `Aday Analizi: ${leadId}`;
+                document.getElementById('modal-interest-tag').innerText = "Premium Müşteri";
+                document.getElementById('modal-score-badge').innerText = `%${data.ai_score || 0} SICAKLIK`;
+                
+                const timeline = document.getElementById('timeline-container');
+                timeline.innerHTML = data.timeline.map((t, idx) => {
+                    let color = 'bg-slate-500';
+                    let icon = 'fa-circle';
+                    
+                    if (t.type === 'pipeline') { color = 'bg-emerald-500'; icon = 'fa-exchange-alt'; }
+                    else if (t.type === 'lmetrics') { color = 'bg-blue-500'; icon = 'fa-mouse-pointer'; }
+                    else if (t.type === 'tool') { color = 'bg-orange-500'; icon = 'fa-calculator'; }
+                    else if (t.type === 'system') { color = 'bg-indigo-500'; icon = 'fa-user-plus'; }
+
+                    return `
+                    <div class="relative mb-6">
+                        <div class="absolute -left-[27px] top-1 w-3 h-3 rounded-full border-2 border-slate-900 ${color} shadow-[0_0_8px_rgba(0,0,0,0.5)]"></div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">${new Date(t.timestamp).toLocaleString('tr-TR', {dateStyle: 'short', timeStyle: 'short'})}</span>
+                            <span class="text-sm text-slate-200 mt-1 font-semibold flex items-center gap-2">
+                                <i class="fas ${icon} text-[10px] ${color.replace('bg-', 'text-')}"></i> ${t.title}
+                            </span>
+                            <span class="text-xs text-slate-400 mt-1.5 leading-relaxed max-w-sm">${t.description || ''}</span>
+                        </div>
+                    </div>
+                `}).join('') || '<p class="text-xs text-slate-500">Etkileşim geçmişi bulunamadı.</p>';
+                
+            } catch (err) {
+                console.error(err);
+                document.getElementById('timeline-container').innerHTML = '<p class="text-xs text-red-400">Analiz verisi yüklenemedi.</p>';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
+
+        function updateCounts() {
+            document.getElementById('count-new').innerText = document.getElementById('col-new').children.length;
+            document.getElementById('count-contacted').innerText = document.getElementById('col-contacted').children.length;
+            document.getElementById('count-proposal').innerText = document.getElementById('col-proposal').children.length;
+            document.getElementById('count-closed').innerText = document.getElementById('col-closed').children.length;
+        }
+
+        async function updateLeadStatus(leadId, newStatus) {
+            try {
+                const response = await fetch(`\/api/v1/pipeline/leads/${leadId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!response.ok) throw new Error('Status update failed');
+                console.log(`Lead ${leadId} updated to ${newStatus}`);
+            } catch (error) {
+                console.error('Error updating lead status:', error);
+                alert('Durum güncellenemedi, lütfen sayfayı yenileyin.');
+            }
+        }
+
+        // Initialize SortableJS for each column
+        document.querySelectorAll('.kanban-column').forEach(el => {
+            new Sortable(el, {
+                group: 'leads',
+                animation: 250,
+                ghostClass: 'ghost-card',
+                onEnd: async function (evt) {
+                    const leadId = evt.item.getAttribute('data-id');
+                    const newStatus = evt.to.getAttribute('data-status');
+                    await updateLeadStatus(leadId, newStatus);
+                    updateCounts();
+                }
+            });
+        });
+
+        // Initial Load
+        fetchLeads();
+    </script>
+</body>
+</html>
