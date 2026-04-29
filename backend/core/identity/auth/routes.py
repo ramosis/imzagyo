@@ -2,7 +2,7 @@ import os
 import datetime
 import secrets
 import jwt
-from flask import Blueprint, request, jsonify, g
+from . import auth_bp\nfrom flask import Blueprint, request, jsonify, g
 from backend.app.extensions import limiter
 from backend.shared.core.utils import sanitize_input
 from backend.shared.schemas import user_schema, ValidationError

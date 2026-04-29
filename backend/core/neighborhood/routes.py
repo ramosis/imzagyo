@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from . import neighborhood_bp\nfrom flask import Blueprint, request, jsonify
 from backend.shared.database import get_db_connection
 from backend.core.identity.auth.decorators import login_required
 from .service import NeighborhoodService

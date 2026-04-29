@@ -34,6 +34,9 @@ def create_app(config_name="dev"):
     return app
 
 def register_core_modules(app):
+    from .routes import main_bp
+    app.register_blueprint(main_bp)
+
     """Core modules that are essential for the system."""
     from backend.core.identity.auth import auth_bp
     from backend.core.properties.portfolio import portfolio_bp

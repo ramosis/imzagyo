@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from . import mobile_bp\nfrom flask import Blueprint, request, jsonify
 from backend.core.identity.auth.service import AuthService
 
 mobile_bp = Blueprint('mobile_api', __name__)
