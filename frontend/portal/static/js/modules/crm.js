@@ -52,6 +52,7 @@ async function fetchLeads(filterType = 'all') {
             tbody.innerHTML = data.length === 0 ? '<tr><td colspan="6" class="p-8 text-center text-gray-400 font-serif italic">Seçilen filtrede aday bulunmuyor.</td></tr>' : '';
             data.forEach(l => {
                 const dateStr = l.created_at ? new Date(l.created_at).toLocaleString('tr-TR') : '-';
+                const segment = l.segment || l.tags || 'Genel'; // 4E.2: Duplicate column handling
                 const tr = document.createElement('tr');
                 tr.className = 'border-b border-gray-50 hover:bg-gray-50 group transition-colors';
                 tr.innerHTML = `
@@ -65,7 +66,7 @@ async function fetchLeads(filterType = 'all') {
                     </td>
                     <td class="px-6 py-4">
                         <span class="px-2 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest ${l.source === 'ai_rotasi' ? 'bg-gold/10 text-gold shadow-sm' : 'bg-gray-100 text-gray-600'}">
-                            ${l.source || 'Genel'}
+                            ${segment}
                         </span>
                     </td>
                     <td class="px-6 py-4">
@@ -126,7 +127,9 @@ function renderLeadPipeline(leads) {
                 <span class="text-[10px] font-bold text-gray-400 bg-white px-2 py-0.5 rounded-full border border-gray-100">${stageLeads.length}</span>
             </div>
             <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar kanban-list" data-stage-id="${stage.id}">
-                ${stageLeads.map(l => `
+                ${stageLeads.map(l => {
+                    const segment = l.segment || l.tags || 'Genel'; // 4E.2 Fix
+                    return `
                     <div class="kanban-card bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gold/30 transition-all cursor-pointer group relative" 
                          id="lead-card-${l.id}" data-lead-id="${l.id}">
                         <div class="flex justify-between items-start mb-2">
@@ -138,12 +141,54 @@ function renderLeadPipeline(leads) {
                             <div class="flex -space-x-2">
                                 <div class="w-6 h-6 rounded-full bg-navy/10 border-2 border-white flex items-center justify-center text-[8px] font-bold text-navy uppercase">${l.name ? l.name[0] : '?'}</div>
                             </div>
-                            <span class="text-[10px] text-gray-400">${l.phone || ''}</span>
+                            <span class="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded">${segment}</span>
                         </div>
                     </div>
-                `).join('')}
+                `}).join('')}
             </div>
         `;
         container.appendChild(stageEl);
     });
+}
+
+// 4E.1: Pipeline Stage Default Değerleri
+async function fetchPipelineStages() {
+    try {
+        const base = typeof API_BASE !== 'undefined' ? API_BASE : '/api/v1';
+        const stages = typeof apiFetch !== 'undefined' ? await apiFetch(`${base}/crm/pipeline-stages/`) : await fetch(`${base}/crm/pipeline-stages/`).then(r => r.json());
+        if (!stages || stages.length === 0) {
+            console.warn('No pipeline stages found');
+            return [];
+        }
+        return stages;
+    } catch (err) {
+        console.error('Failed to load pipeline stages:', err);
+        return [];
+    }
+}
+
+async function createLead(leadData) {
+    const stages = await fetchPipelineStages();
+    const defaultStage = stages.find(s => s.is_default) || stages[0];
+    
+    if (!defaultStage) {
+        if (typeof showToast === 'function') showToast('Pipeline stage bulunamadı', 'error');
+        return;
+    }
+    
+    leadData.pipeline_stage_id = defaultStage.id;
+    
+    try {
+        const base = typeof API_BASE !== 'undefined' ? API_BASE : '/api/v1';
+        return typeof apiFetch !== 'undefined' ? await apiFetch(`${base}/crm/leads/`, {
+            method: 'POST',
+            body: JSON.stringify(leadData)
+        }) : await fetch(`${base}/crm/leads/`, {
+            method: 'POST',
+            body: JSON.stringify(leadData),
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch (err) {
+        console.error('Create Lead error:', err);
+    }
 }

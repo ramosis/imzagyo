@@ -1,4 +1,45 @@
 // --- PORTFOLIO (CRUD) ---
+document.addEventListener('DOMContentLoaded', () => {
+    initPortfolioEvents();
+});
+
+function initPortfolioEvents() {
+    const tableBody = document.getElementById('portfolios-table-body');
+    const gridContainer = document.getElementById('portfolio-grid');
+    
+    // Event delegation for table buttons
+    if (tableBody) {
+        tableBody.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            
+            if (btn.classList.contains('delete-portfolio-btn')) {
+                const id = btn.dataset.portfolioId;
+                deletePortfolio(id);
+            } else if (btn.classList.contains('edit-portfolio-btn')) {
+                const id = btn.dataset.portfolioId;
+                editPortfolio(id);
+            } else if (btn.classList.contains('media-portfolio-btn')) {
+                const id = btn.dataset.portfolioId;
+                if (typeof openMediaManager === 'function') openMediaManager(id);
+            }
+        });
+    }
+    
+    // Event delegation for grid buttons
+    if (gridContainer) {
+        gridContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            
+            if (btn.classList.contains('edit-portfolio-btn')) {
+                const id = btn.dataset.portfolioId;
+                editPortfolio(id);
+            }
+        });
+    }
+}
+
 async function fetchAllPortfolios() {
     try {
         const base = typeof API_BASE !== 'undefined' ? API_BASE : '/api/v1';
@@ -17,7 +58,7 @@ async function fetchAllPortfolios() {
                         <h4 class="font-bold text-navy text-sm mb-1 truncate" title="${p.baslik1}">${p.baslik1}</h4>
                         <p class="text-[10px] text-gray-400 mb-4 tracking-tighter uppercase truncate"><i class="fa-solid fa-location-dot"></i> ${p.lokasyon}</p>
                         <div class="flex justify-between items-center"><span class="text-gold font-bold text-sm">${p.fiyat}</span>
-                        <div class="flex gap-2"><button onclick="editPortfolio(${p.id})" class="text-xs text-navy font-bold">Düzenle</button></div></div>
+                        <div class="flex gap-2"><button data-portfolio-id="${p.id}" class="edit-portfolio-btn text-xs text-navy font-bold">Düzenle</button></div></div>
                     </div>
                 </div>`;
             });
@@ -33,9 +74,9 @@ async function fetchAllPortfolios() {
                     <td class="py-3 px-6 font-bold text-navy truncate max-w-[200px]" title="${item.title}">${item.title}</td>
                     <td class="py-3 px-6 font-bold text-slate-700">${item.price}</td>
                     <td class="py-3 px-6 text-right flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="openMediaManager('${item.id}')" class="text-emerald-500 p-2 bg-emerald-50 rounded shadow hover:bg-emerald-100 transition-colors" title="Medya Yönetimi"><i class="fa-solid fa-camera"></i> Medya</button>
-                        <button onclick="editPortfolio('${item.id}')" class="text-blue-500 p-2"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deletePortfolio('${item.id}')" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
+                        <button data-portfolio-id="${item.id}" class="media-portfolio-btn text-emerald-500 p-2 bg-emerald-50 rounded shadow hover:bg-emerald-100 transition-colors" title="Medya Yönetimi"><i class="fa-solid fa-camera pointer-events-none"></i> Medya</button>
+                        <button data-portfolio-id="${item.id}" class="edit-portfolio-btn text-blue-500 p-2"><i class="fa-solid fa-pen pointer-events-none"></i></button>
+                        <button data-portfolio-id="${item.id}" class="delete-portfolio-btn text-red-500 p-2"><i class="fa-solid fa-trash pointer-events-none"></i></button>
                     </td>
                 </tr>`;
             });

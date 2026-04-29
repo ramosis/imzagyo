@@ -16,13 +16,18 @@ async function approveExpense(id) {
     }
 }
 
-// Stubs for future implementation based on the portal logic
 async function fetchExpenses() {
     console.log('Fetching expenses...');
 }
 
 async function fetchContracts() {
-    console.log('Fetching contracts...');
+    try {
+        const base = typeof API_BASE !== 'undefined' ? API_BASE : '/api/v1';
+        // YENİ (Aşama 2'de taşınan endpoint)
+        return typeof apiFetch !== 'undefined' ? await apiFetch(`${base}/finance/contracts/`) : await fetch(`${base}/finance/contracts/`);
+    } catch (err) {
+        console.error('Fetch Contracts error:', err);
+    }
 }
 
 async function fetchTaxes() {
