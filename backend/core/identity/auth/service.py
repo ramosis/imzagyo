@@ -1,0 +1,197 @@
+import os
+import datetime
+import hashlib
+import jwt
+import bcrypt
+from flask import request, jsonify, g
+from backend.app.extensions import limiter
+import json
+
+def get_jwt_secret():
+    return os.environ.get("JWT_SECRET", "dev-secret-key")
+
+# Permission Map
+PERMISSIONS = {
+    'admin': ['*'],
+    'super_admin': ['*'],
+    'broker': ['*'],
+    'danisman': ['portfolio.view', 'portfolio.create', 'leads.view', 'leads.edit'],
+    'employee': ['portfolio.view', 'leads.view'],
+    'contractor': ['portfolio.view', 'projects.view'],
+    'owner': ['portfolio.view'],
+    'tenant': ['portfolio.view'],
+    'partner': ['portfolio.view', 'projects.view'],
+    'vip': ['portfolio.view'],
+    'm_sahibi': ['portfolio.view'],
+    'kiraci': ['portfolio.view'],
+    'standart': ['portfolio.view']
+}
+
+INNER_ROLES = ["admin", "super_admin", "broker", "danisman", "m_sahibi"]
+
+class AuthService:
+    @staticmethod
+    def hash_password(password: str) -> str:
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hashed.decode('utf-8')
+
+    @staticmethod
+    def verify_password(plain_password: str, stored_hash: str, user_id: int = None) -> bool:
+        if not stored_hash or not plain_password:
+            return False
+            
+        if stored_hash.startswith('$2b$') or stored_hash.startswith('$2a$') or stored_hash.startswith('$2y$'):
+            try:
+                return bcrypt.checkpw(plain_password.encode('utf-8'), stored_hash.encode('utf-8'))
+            except ValueError:
+                return False
+        else:
+            # Legacy SHA256 Fallback
+            legacy_hash = hashlib.sha256(plain_password.encode('utf-8')).hexdigest()
+            if legacy_hash == stored_hash:
+                if user_id:
+                    # Seamless Migration
+                    new_hash = AuthService.hash_password(plain_password)
+                    from backend.shared.database import get_db_connection
+                    with get_db_connection() as conn:
+                        conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (new_hash, user_id))
+                return True
+            return False
+
+    @staticmethod
+    def get_current_user():
+        token = request.headers.get('Authorization')
+        if not token:
+            return None
+            
+        if token.startswith('Bearer ey'):
+            jwt_token = token.split(' ')[1]
+            try:
+                payload = jwt.decode(jwt_token, get_jwt_secret(), algorithms=["HS256"])
+                user_id = payload.get('user_id')
+                if user_id:
+                    from backend.shared.database import get_db_connection
+                    with get_db_connection() as conn:
+                        user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+                        if user:
+                            user_dict = dict(user)
+                            user_dict['circle'] = payload.get('circle')
+                            user_dict['app_route'] = payload.get('app_route')
+                            return user_dict
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+                return None
+        return None
+
+    @staticmethod
+    def has_permission(role: str, permission: str) -> bool:
+        if not role in PERMISSIONS:
+            return False
+        user_perms = PERMISSIONS[role]
+        return '*' in user_perms or permission in user_perms
+
+    @staticmethod
+    def get_app_route_for_role(role: str) -> str:
+        if role in ["admin", "super_admin", "broker", "danisman", "m_sahibi"]:
+            return "both"
+        elif role in ["vip"]:
+            return "investment"
+        return "neighborhood"
+
+class UnifiedAuthService:
+    @staticmethod
+    def audit_log(user_id: int, action: str, details: dict):
+        from backend.shared.database import get_db_connection
+        with get_db_connection() as conn:
+            conn.execute('''
+                INSERT INTO auth_audit_log (user_id, action, details)
+                VALUES (?, ?, ?)
+            ''', (user_id, action, json.dumps(details)))
+
+    @staticmethod
+    def link_identity(user_id: int, provider: str, provider_id: str, email: str, is_verified: bool = False):
+        from backend.shared.database import get_db_connection
+        with get_db_connection() as conn:
+            existing = conn.execute(
+                'SELECT * FROM user_identities WHERE provider = ? AND provider_id = ? AND deleted_at IS NULL',
+                (provider, provider_id)
+            ).fetchone()
+            
+            if existing:
+                if existing['user_id'] != user_id:
+                    raise Exception("Bu hesap başka bir kullanıcıya bağlı.")
+                return 
+            
+            count = conn.execute('SELECT COUNT(*) FROM user_identities WHERE user_id = ? AND deleted_at IS NULL', (user_id,)).fetchone()[0]
+            is_primary = count == 0
+
+            conn.execute('''
+                INSERT INTO user_identities (user_id, provider, provider_id, email, is_verified, is_primary)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (user_id, provider, provider_id, email, is_verified, is_primary))
+            
+            UnifiedAuthService.audit_log(user_id, 'link', {'provider': provider, 'email': email})
+
+    @staticmethod
+    def unlink_identity(user_id: int, identity_id: int):
+        from backend.shared.database import get_db_connection
+        with get_db_connection() as conn:
+            identity = conn.execute(
+                'SELECT * FROM user_identities WHERE id = ? AND user_id = ? AND deleted_at IS NULL', 
+                (identity_id, user_id)
+            ).fetchone()
+            
+            if not identity:
+                raise Exception("Kimlik bulunamadı veya zaten silinmiş.")
+                
+            if identity['is_primary']:
+                raise Exception("Ana kimlik silinemez. Önce başka bir kimliği ana yapın.")
+
+            conn.execute(
+                'UPDATE user_identities SET deleted_at = CURRENT_TIMESTAMP, is_primary = FALSE WHERE id = ?',
+                (identity_id,)
+            )
+            
+            UnifiedAuthService.audit_log(user_id, 'unlink', {'provider': identity['provider'], 'identity_id': identity_id})
+
+    @staticmethod
+    def set_primary_identity(user_id: int, identity_id: int):
+        from backend.shared.database import get_db_connection
+        with get_db_connection() as conn:
+            identity = conn.execute(
+                'SELECT * FROM user_identities WHERE id = ? AND user_id = ? AND deleted_at IS NULL', 
+                (identity_id, user_id)
+            ).fetchone()
+            if not identity:
+                raise Exception("Geçerli bir kimlik bulunamadı.")
+                
+            conn.execute('UPDATE user_identities SET is_primary = 0 WHERE user_id = ?', (user_id,))
+            conn.execute('UPDATE user_identities SET is_primary = 1 WHERE id = ?', (identity_id,))
+            
+            UnifiedAuthService.audit_log(user_id, 'set_primary', {'provider': identity['provider'], 'identity_id': identity_id})
+
+    @staticmethod
+    def get_user_identities(user_id: int):
+        from backend.shared.database import get_db_connection
+        with get_db_connection() as conn:
+            rows = conn.execute(
+                'SELECT id, provider, provider_id, email, is_verified, is_primary, deleted_at FROM user_identities WHERE user_id = ? AND deleted_at IS NULL',
+                (user_id,)
+            ).fetchall()
+            return [dict(r) for r in rows]
+            
+    @staticmethod
+    def get_audit_logs(user_id: int = None, limit: int = 50):
+        from backend.shared.database import get_db_connection
+        with get_db_connection() as conn:
+            if user_id:
+                rows = conn.execute(
+                    'SELECT * FROM auth_audit_log WHERE user_id = ? ORDER BY created_at DESC LIMIT ?',
+                    (user_id, limit)
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    'SELECT * FROM auth_audit_log ORDER BY created_at DESC LIMIT ?',
+                    (limit,)
+                ).fetchall()
+            return [dict(r) for r in rows]

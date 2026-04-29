@@ -4,9 +4,15 @@ try:
 except ImportError:
     pass
 
-from modules.core.factory import create_app
-from shared.extensions import socketio
+import sys
 import os
+from pathlib import Path
+
+# Add project root to sys.path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from backend.app.factory import create_app
+from backend.app.extensions import socketio
 
 # Uygulama instance'ını yeni Core modülünden oluştur.
 app = create_app()

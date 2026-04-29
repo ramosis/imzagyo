@@ -1,1 +1,1 @@
-# imzagyo backend core init
+# backend.core package

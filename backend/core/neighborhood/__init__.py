@@ -1,2 +1,1 @@
-# Neighborhood Core Module
-# Includes resident management, dues, and local services
+from .routes import neighborhood_bp

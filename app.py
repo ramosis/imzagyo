@@ -1,10 +1,12 @@
-""" 
-İmza Gayrimenkul - Main Application Entry Point
-Uygulama artık tam App Factory pattern ve modüler Core yapısını kullanıyor. (Phase 28 Unification)
-"""
-from modules.core.factory import create_app
-from shared.extensions import socketio
 import os
+import sys
+from pathlib import Path
+
+# Add project root to sys.path for absolute imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from backend.app.factory import create_app
+from backend.app.extensions import socketio
 
 # Uygulama instance'ını yeni Core modülünden oluştur.
 app = create_app()
