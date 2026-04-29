@@ -1,11 +1,11 @@
 from flask import Blueprint
 
 neighborhood_bp = Blueprint(
-    \'neighborhood\',
+    'neighborhood',
     __name__,
-    template_folder=\'templates\',
-    static_folder=\'static\',
-    static_url_path=\'/static/neighborhood\'
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/static/neighborhood'
 )
 
 from . import routes
