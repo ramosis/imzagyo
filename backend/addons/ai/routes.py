@@ -1,4 +1,5 @@
-from . import ai_bp\nfrom flask import Blueprint, request, jsonify
+from . import ai_bp
+from flask import Blueprint, request, jsonify
 from backend.app.extensions import limiter
 from .service import AIService
 

@@ -1,4 +1,5 @@
-from . import crm_bp\nfrom flask import Blueprint, request, jsonify, g
+from . import crm_bp
+from flask import Blueprint, request, jsonify, g
 from backend.shared.database import get_db_connection
 from backend.core.identity.auth.decorators import require_permission
 from .service import CRMService

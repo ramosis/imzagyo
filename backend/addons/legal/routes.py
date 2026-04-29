@@ -1,4 +1,5 @@
-from . import legal_bp\nfrom flask import Blueprint, request, jsonify
+from . import legal_bp
+from flask import Blueprint, request, jsonify
 from backend.shared.database import get_db_connection
 
 legal_bp = Blueprint('legal', __name__)

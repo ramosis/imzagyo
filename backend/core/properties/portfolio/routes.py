@@ -1,5 +1,6 @@
 import os
-from . import portfolio_bp\nfrom flask import Blueprint, request, jsonify, render_template, g
+from . import portfolio_bp
+from flask import Blueprint, request, jsonify, render_template, g
 from backend.shared.database import get_db_connection
 from backend.app.extensions import cache
 from .service import PropertyService
