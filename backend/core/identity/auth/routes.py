@@ -8,7 +8,7 @@ from backend.shared.core.utils import sanitize_input
 from backend.shared.schemas import user_schema, ValidationError
 from .service import AuthService, UnifiedAuthService, INNER_ROLES, get_jwt_secret
 from .repository import UserRepository
-from ..decorators import require_permission, login_required, require_inner_circle
+from .decorators import require_permission, login_required, require_inner_circle
 
 auth_bp = Blueprint('auth', __name__)
 
