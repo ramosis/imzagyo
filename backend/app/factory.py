@@ -1,18 +1,41 @@
 import os
 import logging
-from flask import Flask
-from .extensions import db, migrate, cache, limiter, babel, csrf, socketio, login_manager
-from .config import config_by_name
+import sentry_sdk
+import structlog
+from flask import Flask, jsonify
+from sentry_sdk.integrations.flask import FlaskIntegration
+from .extensions import db, migrate, cache, limiter, babel, csrf, socketio, login_manager, compress
+from .config import config_map
 
-def create_app(config_name="dev"):
-    # Point to frontend directory relative to this file
-    # backend/app/factory.py -> backend/app -> backend -> root -> frontend
+def create_app(config_name='development'):
+    config_class = config_map.get(config_name, config_map['development'])
+    # Sentry Initialization (Only if DSN is provided)
+    sentry_dsn = os.environ.get("SENTRY_DSN")
+    if sentry_dsn:
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            integrations=[FlaskIntegration()],
+            traces_sample_rate=1.0,
+            environment=config_name
+        )
+
+    # Structlog Setup
+    structlog.configure(
+        processors=[
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.JSONRenderer()
+        ],
+        context_class=dict,
+        logger_factory=structlog.PrintLoggerFactory(),
+        cache_logger_on_first_use=True,
+    )
+
     app = Flask(__name__, 
                 template_folder='../../frontend/pages',
                 static_folder='../../frontend/static')
     
     # Load configuration
-    app.config.from_object(config_by_name[config_name])
+    app.config.from_object(config_class)
     
     # Initialize Extensions
     db.init_app(app)
@@ -23,6 +46,16 @@ def create_app(config_name="dev"):
     csrf.init_app(app)
     socketio.init_app(app)
     login_manager.init_app(app)
+    compress.init_app(app)
+    
+    # Error Handlers
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({"error": "Resource not found"}), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        return jsonify({"error": "Internal server error"}), 500
     
     # 🧱 REGISTER CORE MODULES
     register_core_modules(app)
@@ -35,20 +68,20 @@ def create_app(config_name="dev"):
 
 def register_core_modules(app):
     from .routes import main_bp
-    app.register_blueprint(main_bp)
-
-    """Core modules that are essential for the system."""
     from backend.core.identity.auth import auth_bp
     from backend.core.properties.portfolio import portfolio_bp
     from backend.core.sales.crm import crm_bp
     from backend.core.sales.finance import finance_bp
     from backend.core.neighborhood import neighborhood_bp
+    from backend.core.sales.marketing import marketing_bp
     
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(portfolio_bp)
-    app.register_blueprint(crm_bp, url_prefix='/crm')
-    app.register_blueprint(finance_bp, url_prefix='/finance')
-    app.register_blueprint(neighborhood_bp, url_prefix='/neighborhood')
+    app.register_blueprint(main_bp)
+    app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
+    app.register_blueprint(portfolio_bp, url_prefix='/api/v1/portfolio')
+    app.register_blueprint(crm_bp, url_prefix='/api/v1/crm')
+    app.register_blueprint(finance_bp, url_prefix='/api/v1/finance')
+    app.register_blueprint(neighborhood_bp, url_prefix='/api/v1/neighborhood')
+    app.register_blueprint(marketing_bp, url_prefix='/api/v1/marketing')
 
 def register_addons(app, enabled_addons):
     """Dynamic addon loading based on configuration."""
@@ -68,4 +101,3 @@ def register_addons(app, enabled_addons):
                 app.register_blueprint(mobile_bp, url_prefix='/mobile')
         except ImportError as e:
             app.logger.error(f"Failed to load addon {addon}: {e}")
-
