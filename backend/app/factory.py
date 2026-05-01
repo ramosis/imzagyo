@@ -2,7 +2,8 @@ import os
 import logging
 import sentry_sdk
 import structlog
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 from sentry_sdk.integrations.flask import FlaskIntegration
 from .extensions import db, migrate, cache, limiter, babel, csrf, socketio, login_manager, compress
 from .config import config_map
@@ -42,6 +43,35 @@ def create_app(config_name='development'):
     login_manager.init_app(app)
     compress.init_app(app)
     
+    # CORS configuration
+    if config_name == 'production':
+        CORS(app, resources={
+            r"/api/*": {
+                "origins": app.config.get('CORS_ORIGINS', []),
+                "supports_credentials": True
+            }
+        })
+    else:
+        CORS(app)
+
+    @app.after_request
+    def add_security_headers(response):
+        """Add security headers."""
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://kit.fontawesome.com https://accounts.google.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://ka-f.fontawesome.com; "
+            "font-src 'self' https://fonts.gstatic.com https://ka-f.fontawesome.com; "
+            "img-src 'self' data: https://res.cloudinary.com; "
+            "connect-src 'self' https://ka-f.fontawesome.com;"
+        )
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        return response
+
     @app.after_request
     def add_cache_headers(response):
         """Add cache headers for static files."""
@@ -55,6 +85,9 @@ def create_app(config_name='development'):
         return response
 
     # Error Handlers
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return jsonify({'error': 'Rate limit exceeded'}), 429
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({"error": "Resource not found"}), 404
