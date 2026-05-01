@@ -42,6 +42,18 @@ def create_app(config_name='development'):
     login_manager.init_app(app)
     compress.init_app(app)
     
+    @app.after_request
+    def add_cache_headers(response):
+        """Add cache headers for static files."""
+        if request.path.startswith('/static/'):
+            # CSS/JS: 1 hafta cache
+            if request.path.endswith(('.css', '.js')):
+                response.headers['Cache-Control'] = 'public, max-age=604800'
+            # Images: 1 ay cache
+            elif request.path.endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg')):
+                response.headers['Cache-Control'] = 'public, max-age=2592000'
+        return response
+
     # Error Handlers
     @app.errorhandler(404)
     def not_found(error):
