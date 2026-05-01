@@ -1,5 +1,6 @@
-from flask import Blueprint, send_from_directory, request, make_response
+from flask import Blueprint, send_from_directory, request, make_response, jsonify
 import os
+from datetime import datetime
 
 main_bp = Blueprint('main', __name__)
 
@@ -26,3 +27,11 @@ def portal_modal(modal_name):
 @main_bp.route('/pipeline')
 def pipeline_page():
     return send_from_directory('frontend/portal/pages', 'pipeline.html')
+
+@main_bp.route('/health')
+def health_check():
+    return jsonify({
+        'status': 'healthy',
+        'version': '1.0.0',
+        'timestamp': datetime.utcnow().isoformat()
+    }), 200

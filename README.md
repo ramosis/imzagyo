@@ -1,41 +1,61 @@
-# İmza Gayrimenkul
+# İmza Gayrimenkul — Production Guide
 
-## Proje Yapısı (Aşama 1 Sonrası)
+## Proje Yapısı
 
-### Kök Dizin (Sadece Gerekli Dosyalar)
-- `app.py` / `wsgi.py` — Flask entry point'leri
+### Kök Dizin
+- `app.py` / `wsgi.py` — Flask entry point'leri (Dev / Prod)
 - `requirements.txt` — Python bağımlılıkları
-- `data/` — SQLite veritabanı (runtime)
-- `uploads/` — Yüklenen dosyalar (runtime)
-- `logs/` — Uygulama logları (runtime)
-
-### Backend
-- `app/` — Flask app factory, scheduler (Aşama 2'de backend/app/ olacak)
-- `modules/` — İş modülleri (Aşama 2'de backend/core/ + addons/ olacak)
-- `shared/` — Ortak servisler, modeller (Aşama 2'de backend/shared/ olacak)
-
-### Frontend
-- `pages/` — HTML sayfaları (Aşama 2'de frontend/ altına taşınacak)
-- `static/` — CSS, JS, images (Aşama 2'de frontend/ altına taşınacak)
-
-### Mobil & Eklentiler
-- `mobile/` — React Native / Expo app
-- `extension/` / `extension-pro/` — Tarayıcı eklentileri
+- `frontend/` — Tüm HTML ve Static dosyalar (Modüler yapı)
+- `backend/` — Flask uygulaması, core modüller ve paylaşılan servisler
 
 ### Altyapı
-- `infrastructure/` — Docker, scriptler, dokümanlar, nginx config
-- `tests/` — Testler
-- `archived/` — Legacy kodlar
+- `infrastructure/config/` — Docker, .env.example, logrotate
+- `infrastructure/nginx/` — Nginx domain yapılandırmaları
+- `infrastructure/scripts/` — Deployment ve veritabanı scriptleri
 
-## Başlatma
+## Hızlı Başlangıç
+
+### Development
+```bash
+# Bağımlılıkları yükle
+pip install -r requirements.txt
+
+# Config ayarla
+cp infrastructure/config/.env.example .env
+# .env dosyasını kendi anahtarlarınızla düzenleyin
+
+# Başlat
+python app.py
+```
+
+### Production (Docker)
+```bash
+docker-compose -f infrastructure/config/docker-compose.prod.yml up -d --build
+```
+
+## Test
 
 ```bash
-# Geliştirme
-python app.py
+# Tüm testleri çalıştır
+pytest -v
 
-# Docker
-docker-compose -f infrastructure/config/docker-compose.yml up
+# Coverage raporu al
+pytest --cov=backend --cov-report=html
 ```
+
+## Deployment
+
+```bash
+# Otomatik deploy scriptini kullan
+chmod +x infrastructure/scripts/deploy.sh
+./infrastructure/scripts/deploy.sh
+```
+
+## Mimarî ve Durum
+- **Faz 5 (Production Stabilizasyonu):** TAMAMLANDI.
+- **Güvenlik:** CSP, HSTS, Rate Limiting ve CORS aktif.
+- **İzleme:** Sentry ve Structured Logging (structlog) aktif.
+- **Performans:** Gzip sıkıştırma ve Tarayıcı Cache başlıkları yapılandırıldı.
 
 ## Domain'ler
 - **imzaemlak.com** — Gayrimenkul & Yatırım
