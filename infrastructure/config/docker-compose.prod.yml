@@ -14,24 +14,20 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SENTRY_DSN=${SENTRY_DSN}
       - FLASK_ENV=production
+      - GIT_COMMIT=${GIT_COMMIT:-unknown}
+      - LOG_SERVER_URL=http://logserver:5001
     depends_on:
       - db
       - redis
     networks:
       - imza-network
     deploy:
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 10s
-        failure_action: rollback
-      rollback_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
+      replicas: 1
+      resources:
+        limits:
+          memory: 300M
+        reservations:
+          memory: 150M
 
   db:
     image: postgres:15-alpine
@@ -45,12 +41,20 @@ services:
       - ./backups:/backups
     networks:
       - imza-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     networks:
       - imza-network
+    deploy:
+      resources:
+        limits:
+          memory: 64M
 
   nginx:
     image: nginx:alpine
@@ -66,18 +70,85 @@ services:
       - app
     networks:
       - imza-network
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
 
-  certbot:
-    image: certbot/certbot
+  prometheus:
+    image: prom/prometheus:v2.48.0
     restart: unless-stopped
     volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../monitoring/rules:/etc/prometheus/rules
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=7d'
+      - '--storage.tsdb.retention.size=5GB'
+      - '--web.enable-lifecycle'
+    profiles:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    networks:
+      - imza-network
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    profiles:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    networks:
+      - imza-network
+
+  logserver:
+    image: python:3.11-slim
+    restart: unless-stopped
+    command: python /app/infrastructure/scripts/log-server.py
+    volumes:
+      - ../..:/app
+    environment:
+      - FLASK_APP=/app/infrastructure/scripts/log-server.py
+    deploy:
+      resources:
+        limits:
+          memory: 80M
+    networks:
+      - imza-network
+
+  alertwebhook:
+    image: python:3.11-slim
+    restart: unless-stopped
+    command: python /app/infrastructure/scripts/alert-webhook.py
+    volumes:
+      - ../..:/app
+    environment:
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    deploy:
+      resources:
+        limits:
+          memory: 50M
+    networks:
+      - imza-network
 
 volumes:
   postgres_data:
+  prometheus_data:
+  grafana_data:
 
 networks:
   imza-network:

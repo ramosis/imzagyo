@@ -1,0 +1,30 @@
+groups:
+  - name: imza-app
+    interval: 60s
+    rules:
+      - alert: AppDown
+        expr: up{job="imza-app"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "İmza Gayrimenkul App is DOWN"
+          description: "Application on {{ $labels.instance }} has been down for more than 2 minutes."
+          
+      - alert: HighErrorRate
+        expr: rate(flask_http_request_total{status=~"5.."}[5m]) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP 5xx Error Rate"
+          description: "Error rate is above 5% on {{ $labels.instance }}."
+          
+      - alert: DiskFull
+        expr: node_filesystem_avail_bytes / node_filesystem_size_bytes < 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk Almost Full"
+          description: "Less than 5% disk space remaining on {{ $labels.instance }}."
