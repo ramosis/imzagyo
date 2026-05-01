@@ -23,3 +23,58 @@ def add_lead():
 def get_pipeline():
     pipeline = CRMService.get_pipeline_data()
     return jsonify(pipeline), 200
+
+# --- CUSTOMER PORTAL API ---
+
+@crm_bp.route('/api/v1/customer/transactions', methods=['GET'])
+def get_customer_transactions():
+    """Müşterinin dahil olduğu tüm işlemleri listeler."""
+    # current_user'dan contact_id'yi bulmamız lazım
+    # Şimdilik g.user üzerinden user_id ile eşleşen contact'ı buluyoruz
+    user = getattr(g, 'user', None)
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    from .models import Contact, Transaction
+    from backend.shared.database import db_session
+    
+    contact = db_session.query(Contact).filter_by(user_id=user['id']).first()
+    if not contact:
+        return jsonify({'error': 'Customer record not found'}), 404
+        
+    transactions = db_session.query(Transaction).filter_by(client_id=contact.id).all()
+    
+    return jsonify([{
+        'id': t.id,
+        'type': t.type,
+        'status': t.status,
+        'price': t.price,
+        'created_at': t.created_at.isoformat()
+    } for t in transactions]), 200
+
+@crm_bp.route('/api/v1/customer/transactions/<int:id>/timeline', methods=['GET'])
+def get_transaction_timeline(id):
+    """Belirli bir işlemin zaman çizelgesini getirir."""
+    user = getattr(g, 'user', None)
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    from .models import Contact, Transaction, TransactionEvent
+    from backend.shared.database import db_session
+    
+    # Güvenlik kontrolü: İşlem bu müşteriye mi ait?
+    contact = db_session.query(Contact).filter_by(user_id=user['id']).first()
+    transaction = db_session.query(Transaction).get(id)
+    
+    if not transaction or (transaction.client_id != contact.id and user['role'] != 'admin'):
+        return jsonify({'error': 'Access denied'}), 403
+        
+    events = db_session.query(TransactionEvent).filter_by(transaction_id=id, is_public=True).order_by(TransactionEvent.event_date.asc()).all()
+    
+    return jsonify([{
+        'id': e.id,
+        'title': e.title_tr,
+        'description': e.description_tr,
+        'date': e.event_date.isoformat(),
+        'type': e.type
+    } for e in events]), 200

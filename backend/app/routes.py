@@ -28,6 +28,10 @@ def portal_modal(modal_name):
 def pipeline_page():
     return send_from_directory('frontend/portal/pages', 'pipeline.html')
 
+@main_bp.route('/customer-portal')
+def customer_portal():
+    return send_from_directory('frontend/portal/pages', 'customer_portal.html')
+
 @main_bp.route('/health')
 def health_check():
     return jsonify({
