@@ -1,32 +1,42 @@
-# Python tabanlı hafif bir imaj kullanıyoruz
-FROM python:3.10-slim
+# Stage 1: Builder
+FROM python:3.11-slim as builder
 
-# Çalışma dizinini ayarla
 WORKDIR /app
 
-# Sistem bağımlılıklarını yükle (Gerekli temel paketler)
+# Build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Stage 2: Production
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Bağımlılıkları kopyala ve yükle
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy Python packages from builder
+COPY --from=builder /root/.local /root/.local
+ENV PATH=/root/.local/bin:$PATH
 
-# Uygulama kodunu kopyala
-COPY . .
+# Copy application
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
+COPY infrastructure/ ./infrastructure/
+COPY app.py wsgi.py requirements.txt ./
 
-# Uploads ve DB için yazma izinlerini kontrol et
-RUN mkdir -p uploads data && chmod -R 777 uploads data
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
 
-# Uygulama portunu (8000) dışarı aç
 EXPOSE 8000
 
-# Healthcheck: Uygulama sağliğini kontrol et
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/ || exit 1
-
-# Uygulamayı başlat
-# Üretim ortamı için Gunicorn kullanıyoruz. 1GB RAM kısıtı nedeniyle 
-# 1 adet Gevent worker kullanarak maksimum stabiliteyi sağlıyoruz.
-CMD ["gunicorn", "-w", "1", "-k", "gevent", "-b", "0.0.0.0:8000", "wsgi:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "wsgi:application"]

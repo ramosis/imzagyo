@@ -1,0 +1,75 @@
+name: CD — Deploy to Production
+
+on:
+  workflow_dispatch:  # Manuel trigger
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production  # Require approval
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
+
+    - name: Backup database before deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
+          pg_dump ${{ secrets.PROD_DATABASE_URL }} > /backups/imza_$(date +%Y%m%d_%H%M).sql
+          echo "✅ Database backup complete"
+        EOF
+
+    - name: Deploy to production
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
+          cd /var/www/imzagyo
+          
+          # Maintenance mode
+          touch maintenance.flag
+          
+          # Git pull
+          git pull origin main
+          
+          # Dependencies
+          source venv/bin/activate
+          pip install -r requirements.txt
+          
+          # Database migrations
+          export DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
+          cd infrastructure/migrations
+          alembic upgrade head
+          cd ../..
+          
+          # Restart
+          sudo systemctl restart imzagyo
+          sleep 5
+          
+          # Health check
+          curl -f http://localhost:8000/health || {
+            echo "❌ Health check failed, rolling back..."
+            git reset --hard HEAD~1
+            sudo systemctl restart imzagyo
+            exit 1
+          }
+          
+          # Remove maintenance mode
+          rm maintenance.flag
+          
+          echo "✅ Production deployment complete"
+        EOF
+
+    - name: Notify Slack
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

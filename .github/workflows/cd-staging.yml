@@ -1,0 +1,44 @@
+name: CD — Deploy to Staging
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
+
+    - name: Deploy to staging server
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} << 'EOF'
+          cd /var/www/imzagyo-staging
+          git pull origin develop
+          
+          # Virtual env
+          source venv/bin/activate
+          pip install -r requirements.txt
+          
+          # Database migrations
+          export DATABASE_URL=${{ secrets.STAGING_DATABASE_URL }}
+          cd infrastructure/migrations
+          alembic upgrade head
+          cd ../..
+          
+          # Restart services
+          sudo systemctl restart imzagyo-staging
+          
+          # Health check
+          sleep 5
+          curl -f http://localhost:8001/health || exit 1
+          
+          echo "✅ Staging deployment complete"
+        EOF

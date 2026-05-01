@@ -1,21 +1,74 @@
-name: Imza GYO CI
+name: CI — Test & Lint
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    
     services:
-      redis:
-        image: redis
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: imza_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
-          - 6379:6379
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Alembic migrations
+      env:
+        DATABASE_URL: postgresql://test:test@localhost:5432/imza_test
+      run: |
+        cd infrastructure/migrations
+        alembic upgrade head
+        cd ../..
+
+    - name: Run tests with coverage
+      env:
+        DATABASE_URL: postgresql://test:test@localhost:5432/imza_test
+        JWT_SECRET_KEY: test-secret-key
+      run: |
+        pytest tests/ -v --cov=backend --cov-report=xml --cov-report=term
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+
+  lint:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     
@@ -23,17 +76,19 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-        
-    - name: Install dependencies
+
+    - name: Install linting tools
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-flask pytest-cov
-        
-    - name: Run tests
-      env:
-        FLASK_ENV: testing
-        FLASK_SECRET_KEY: "test-key-ci"
-        DATABASE_URL: "sqlite:///:memory:"
-      run: |
-        python -m pytest tests/ -v --cov=modules --cov=shared
+        pip install flake8 black isort mypy
+
+    - name: Run flake8
+      run: flake8 backend/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Run black check
+      run: black --check backend/
+
+    - name: Run isort check
+      run: isort --check-only backend/
+
+    - name: Run mypy
+      run: mypy backend/ --ignore-missing-imports

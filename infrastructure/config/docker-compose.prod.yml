@@ -2,53 +2,83 @@ version: '3.8'
 
 services:
   app:
-    build: 
-      context: ../../
+    build:
+      context: ../..
       dockerfile: infrastructure/config/Dockerfile
-    container_name: imza_app
-    restart: always
-    env_file:
-      - ../../.env
+    image: imzagyo/app:${GIT_COMMIT:-latest}
+    restart: unless-stopped
     environment:
-      - DATABASE_URL=postgresql://imza:password@db:5432/imza
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - SENTRY_DSN=${SENTRY_DSN}
       - FLASK_ENV=production
     depends_on:
       - db
+      - redis
     networks:
-      - imza_network
+      - imza-network
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
 
   db:
     image: postgres:15-alpine
-    container_name: imza_db
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: imza
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: imza
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
     networks:
-      - imza_network
-  
+      - imza-network
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - imza-network
+
   nginx:
     image: nginx:alpine
-    container_name: imza_nginx
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ../nginx/conf.d:/etc/nginx/conf.d
-      - ../nginx/ssl:/etc/nginx/ssl
-      - ../../frontend/static:/var/www/static
+      - ./nginx:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
     depends_on:
       - app
     networks:
-      - imza_network
+      - imza-network
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
-networks:
-  imza_network:
-    driver: bridge
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 volumes:
   postgres_data:
+
+networks:
+  imza-network:
+    driver: bridge

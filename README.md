@@ -45,6 +45,33 @@ pytest --cov=backend --cov-report=html
 
 ## Deployment
 
+## CI/CD Pipeline
+
+| Ortam | Branch | Trigger | URL |
+|-------|--------|---------|-----|
+| CI Test | PR / push | Otomatik | GitHub Actions |
+| Staging | `develop` | Otomatik | https://staging.imzaemlak.com |
+| Production | `main` / tag | Manuel onay | https://imzaemlak.com |
+
+### Deployment Akışı
+
+1. **Staging:** `develop` branch'ine yapılan her push otomatik olarak staging ortamına deploy edilir.
+2. **Production:** `main` branch'ine yapılan push'lar veya yeni tag'ler (`v*`) GitHub Actions üzerinden manuel onay bekler. Onay sonrası veritabanı yedeği alınır ve blue-green deployment yapılır.
+
+### Rollback Prosedürü
+
+Herhangi bir hata durumunda (Health Check başarısız olursa), sistem otomatik olarak bir önceki stable commit'e geri döner. Manuel rollback için:
+
+```bash
+# SSH ile sunucuya bağlan
+ssh user@imzaemlak.com
+cd /var/www/imzagyo
+git reset --hard <stable-tag-veya-commit>
+sudo systemctl restart imzagyo
+```
+
+## Geliştirme Kuralları
+
 ```bash
 # Otomatik deploy scriptini kullan
 chmod +x infrastructure/scripts/deploy.sh
