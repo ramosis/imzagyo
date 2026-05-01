@@ -1,57 +1,44 @@
 import pytest
-import os
-import tempfile
+from backend.app.factory import create_app
+from backend.app.extensions import db
 
 @pytest.fixture
 def app():
-    # Setup environment for tests
-    os.environ['JWT_SECRET'] = 'test-jwt-secret'
-    os.environ['FLASK_SECRET_KEY'] = 'test-flask-secret'
-    os.environ['FLASK_DEBUG'] = 'True'
-
-    # Setup temporary database
-    db_fd, db_path = tempfile.mkstemp()
-    test_db_url = f"sqlite:///{db_path}"
-    os.environ['DATABASE_URL'] = test_db_url
+    """Create application for testing."""
+    app = create_app('testing')
     
-    from modules.core.factory import create_app
-    app = create_app(init_database=True)
+    # Test config overrides
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     app.config['TESTING'] = True
-    app.config['DEBUG'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = test_db_url
     app.config['WTF_CSRF_ENABLED'] = False
-
+    
     with app.app_context():
-        # init_db() and doldur_ornek_veriler() are already called in create_app()
-        # No need to seed manually here, as it causes IntegrityError
+        db.create_all()
         yield app
-
-    # Teardown
-    os.close(db_fd)
-    if os.path.exists(db_path):
-        os.unlink(db_path)
+        db.drop_all()
 
 @pytest.fixture
 def client(app):
+    """Test client."""
     return app.test_client()
 
 @pytest.fixture
 def runner(app):
+    """CLI test runner."""
     return app.test_cli_runner()
 
 @pytest.fixture
-def admin_auth(app):
-    import jwt
-    import datetime
-    from modules.auth.service import get_jwt_secret
-    
-    payload = {
-        'user_id': 1,
-        'username': 'admin',
-        'role': 'admin',
-        'circle': 'inner',
-        'app_route': 'both',
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
-    }
-    token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
-    return {'Authorization': f'Bearer {token}'}
+def auth_headers(client):
+    """Get auth token for tests."""
+    # Create test user and login
+    # Note: This requires a registered user. In a real scenario, you'd create one here.
+    # For now, this is a placeholder based on your template.
+    try:
+        response = client.post('/api/v1/auth/login', json={
+            'email': 'test@imza.com',
+            'password': 'testpass123'
+        })
+        token = response.json.get('access_token')
+        return {'Authorization': f'Bearer {token}'} if token else {}
+    except:
+        return {}

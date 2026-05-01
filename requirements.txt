@@ -23,6 +23,8 @@ flask-socketio
 pytest
 pytest-flask
 pytest-cov
+factory-boy
+faker
 marshmallow>=3.0.0
 beautifulsoup4
 pdfkit
