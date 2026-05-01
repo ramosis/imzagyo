@@ -7,28 +7,22 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from .extensions import db, migrate, cache, limiter, babel, csrf, socketio, login_manager, compress
 from .config import config_map
 
+from backend.shared.services.logger import configure_logging
+
 def create_app(config_name='development'):
     config_class = config_map.get(config_name, config_map['development'])
-    # Sentry Initialization (Only if DSN is provided)
-    sentry_dsn = os.environ.get("SENTRY_DSN")
-    if sentry_dsn:
+    
+    # Configure logging
+    configure_logging()
+    
+    # Sentry Initialization (Production only)
+    if config_name == 'production' and os.getenv('SENTRY_DSN'):
         sentry_sdk.init(
-            dsn=sentry_dsn,
+            dsn=os.getenv('SENTRY_DSN'),
             integrations=[FlaskIntegration()],
-            traces_sample_rate=1.0,
+            traces_sample_rate=0.1,
             environment=config_name
         )
-
-    # Structlog Setup
-    structlog.configure(
-        processors=[
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.processors.JSONRenderer()
-        ],
-        context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(),
-        cache_logger_on_first_use=True,
-    )
 
     app = Flask(__name__, 
                 template_folder='../../frontend/pages',
