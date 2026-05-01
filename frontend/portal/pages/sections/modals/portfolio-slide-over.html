@@ -1,0 +1,142 @@
+<div id="portfolio-modal-backdrop" class="fixed inset-0 bg-navy/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0" onclick="closePortfolioModal()"></div>
+
+<div id="portfolio-slide-over" class="fixed top-0 right-0 h-screen w-full lg:max-w-2xl bg-white/95 backdrop-blur-xl shadow-2xl z-50 transform translate-x-full transition-transform duration-500 cubic-bezier(0.16, 1, 0.3, 1) border-l border-white/20 flex flex-col overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-navy via-modern to-gold"></div>
+    <div class="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
+        <div>
+            <h2 id="portfolio-modal-title" class="text-xl font-serif font-bold text-navy">Yeni İlan Ekle</h2>
+            <div class="flex gap-1 mt-2">
+                <div id="step-ind-1" class="w-8 h-1 bg-gold rounded transition-colors"></div>
+                <div id="step-ind-2" class="w-8 h-1 bg-gray-200 rounded transition-colors"></div>
+                <div id="step-ind-3" class="w-8 h-1 bg-gray-200 rounded transition-colors"></div>
+                <div id="step-ind-4" class="w-8 h-1 bg-gray-200 rounded transition-colors"></div>
+            </div>
+        </div>
+        <button onclick="closePortfolioModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <div class="flex-1 overflow-x-hidden overflow-y-auto p-0 relative">
+        <form id="portfolio-form" class="h-full">
+            <!-- STEP 1 -->
+            <div id="wiz-step-1" class="p-6 transition-all duration-300 absolute inset-0 bg-transparent">
+                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-4"><i class="fa-solid fa-circle-info mr-2"></i> Adım 1: Temel Kimlik</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase tracking-wider mb-2">Sistem ID (URL Path)</label>
+                        <input type="text" id="pf-id" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:border-gold text-sm" placeholder="imz-doga-evleri" required>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase tracking-wider mb-2">Referans No</label>
+                        <input type="text" id="pf-refno" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="IMZ-1234">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase tracking-wider mb-2">Koleksiyon</label>
+                        <select id="pf-koleksiyon" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                            <option value="Prestij Koleksiyonu">Prestij Koleksiyonu</option>
+                            <option value="Modern Koleksiyon">Modern Koleksiyon</option>
+                            <option value="Doğa Koleksiyonu">Doğa Koleksiyonu</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase tracking-wider mb-2">Mülk Tipi (Ekspertiz İçin)</label>
+                        <select id="pf-mulktipi" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm border-gold bg-gold/5">
+                            <option value="Konut">Konut (Daire/Villa)</option>
+                            <option value="Ticari">Ticari/Endüstriyel</option>
+                            <option value="Arsa">Arsa/Arazi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <input type="text" id="pf-fiyat" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="Fiyat (Örn: 15.500.000 ₺)">
+                    <input type="text" id="pf-baslik1" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="Ana Başlık (Örn: Boğaz Manzaralı)">
+                    <input type="text" id="pf-baslik2" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="Alt Başlık (Örn: Modern Villa)">
+                    <input type="text" id="pf-lokasyon" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm" placeholder="Tam Lokasyon (Örn: İSTANBUL, SARIYER)">
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div id="wiz-step-2" class="p-6 transition-all duration-300 absolute inset-0 bg-transparent opacity-0 translate-x-[10px] pointer-events-none hidden">
+                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-4"><i class="fa-solid fa-house mr-2"></i> Adım 2: Fiziksel Metrikler</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Oda/Bölüm</label>
+                        <input type="text" id="pf-oda" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="4+1">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Alan (m²)</label>
+                        <input type="text" id="pf-alan" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="250 m²">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Kat</label>
+                        <input type="text" id="pf-kat" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="2">
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Ekstra Özellikler (Virgülle)</label>
+                        <textarea id="pf-ozellikler" rows="2" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="Güvenlik, Havuz..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Detaylı Hikaye Metni</label>
+                        <textarea id="pf-hikaye" rows="4" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Vurgu İkon CSS</label>
+                        <input type="text" id="pf-icon-renk" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="border-gold">
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div id="wiz-step-3" class="p-6 transition-all duration-300 absolute inset-0 bg-transparent opacity-0 translate-x-[10px] pointer-events-none hidden overflow-y-auto pb-20">
+                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-4"><i class="fa-solid fa-clipboard-check mr-2"></i> Adım 3: Denetim ve Ekspertiz</p>
+                <div id="dynamic-inspection-container"></div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div id="wiz-step-4" class="p-6 transition-all duration-300 absolute inset-0 bg-transparent opacity-0 translate-x-[10px] pointer-events-none hidden">
+                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-4"><i class="fa-regular fa-images mr-2"></i> Adım 4: Medya & Arşiv</p>
+                <div class="mb-6">
+                    <label class="block text-[10px] font-bold text-navy uppercase tracking-wider mb-2">Hero / Vitrin Görseli</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="pf-resim-hero" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm flex-1" placeholder="Dış URL (veya Yükle)">
+                        <div class="relative overflow-hidden inline-block shrink-0">
+                            <button type="button" class="bg-navy hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold w-32 h-full" id="pf-upload-hero-label">Yerel Dosya Seç</button>
+                            <input type="file" id="pf-upload-hero" class="absolute left-0 top-0 opacity-0 cursor-pointer h-full" accept="image/*" onchange="handleImageUpload('pf-upload-hero', 'pf-resim-hero', 'preview-hero')">
+                        </div>
+                    </div>
+                    <img id="preview-hero" class="mt-2 h-24 rounded-lg object-cover hidden" src="" />
+                </div>
+                <div class="mb-6">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Hikaye / İç Görsel (Dış URL)</label>
+                    <input type="text" id="pf-resim-hikaye" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="https://...">
+                </div>
+                <div class="border-t border-gray-100 pt-5">
+                    <p class="text-xs font-bold text-gold uppercase tracking-widest mb-4"><i class="fa-solid fa-user-tie mr-2"></i> Sorumlu Danışman</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <input type="text" id="pf-danisman-isim" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="İsim (Örn: Selim Çınar)">
+                        <input type="text" id="pf-danisman-unvan" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="Ünvan">
+                    </div>
+                    <input type="text" id="pf-danisman-resim" class="w-full px-4 py-2 bg-gray-50 border rounded-lg text-sm" placeholder="Danışman Fotoğrafı URL">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- WIZARD NAV BUTTONS -->
+    <div class="p-6 border-t border-gray-100 bg-gray-50/50 shrink-0 flex gap-4">
+        <button type="button" id="wiz-prev-btn" onclick="wizPrev()" class="hidden w-1/3 bg-white border border-gray-300 hover:bg-gray-50 text-navy font-bold py-3 rounded-lg transition-all uppercase tracking-widest text-xs shadow-sm">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Geri
+        </button>
+        <button type="button" id="wiz-next-btn" onclick="wizNext()" class="flex-1 bg-navy hover:bg-slate-800 text-gold font-bold py-3 rounded-lg transition-all uppercase tracking-widest text-xs shadow-xl shadow-navy/20">
+            Devam Et <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
+        <button type="button" id="wiz-save-btn" onclick="savePortfolio()" class="hidden flex-1 bg-gold hover:bg-yellow-600 text-white font-bold py-3 rounded-lg transition-all uppercase tracking-widest text-xs shadow-xl shadow-gold/20 gold-glow">
+            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Yayına Al
+        </button>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+<div id="maintenance-modal" class="fixed inset-0 bg-black/50 z-[2000] hidden flex items-center justify-center">
+    <div class="bg-white rounded-xl p-8 w-full max-w-md">
+        <h3 class="text-xl font-bold text-navy mb-4">Bakım Talebi Oluştur</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">Portföy</label>
+                <select id="maint-property" class="w-full border p-2 rounded text-sm"></select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">Açıklama</label>
+                <textarea id="maint-desc" class="w-full border p-2 rounded text-sm" rows="3"></textarea>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">Planlanan Tarih</label>
+                <input type="date" id="maint-date" class="w-full border p-2 rounded text-sm">
+            </div>
+        </div>
+        <div class="mt-6 flex justify-end gap-2">
+            <button onclick="closeMaintenanceModal()" class="px-4 py-2 text-gray-500">İptal</button>
+            <button onclick="saveMaintenance()" class="px-4 py-2 bg-navy text-white rounded">Kaydet</button>
+        </div>
+    </div>
+</div>

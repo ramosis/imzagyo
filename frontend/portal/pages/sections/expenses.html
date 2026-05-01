@@ -1,0 +1,34 @@
+<section id="expenses-section" class="content-section flex flex-col h-full bg-white hidden">
+    <div class="px-8 py-6 border-b border-gray-100 shrink-0">
+        <div class="flex justify-between items-end">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-serif font-bold text-navy">Harcama Yönetimi</h2>
+                <p class="text-sm text-gray-500">Personel masrafları ve ofis giderleri.</p>
+            </div>
+            <button onclick="openExpenseModal()"
+                class="bg-gray-50 border border-gray-300 text-navy font-bold py-3 px-6 rounded-lg transition-all text-xs uppercase tracking-widest hover:bg-gray-100 shadow-sm flex items-center gap-2">
+                <i class="fa-solid fa-receipt text-gold"></i> Fiş Ekle
+            </button>
+        </div>
+    </div>
+    <div class="flex-1 overflow-auto p-8">
+        <div
+            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left premium-table">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4 font-bold text-xs">Tarih</th>
+                            <th class="px-6 py-4 font-bold text-xs">Personel</th>
+                            <th class="px-6 py-4 font-bold text-xs">Kategori</th>
+                            <th class="px-6 py-4 font-bold text-xs">Tutar</th>
+                            <th class="px-6 py-4 font-bold text-xs">Durum</th>
+                            <th class="px-6 py-4 text-right">Onay</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenses-table-body" class="text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

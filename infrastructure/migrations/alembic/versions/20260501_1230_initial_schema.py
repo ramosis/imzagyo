@@ -85,6 +85,22 @@ def upgrade():
         sa.PrimaryKeyConstraint('id')
     )
 
+    # contacts table
+    op.create_table('contacts',
+        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column('user_id', sa.Integer(), nullable=True),
+        sa.Column('name', sa.String(length=100), nullable=False),
+        sa.Column('email', sa.String(length=120), nullable=True),
+        sa.Column('phone', sa.String(length=20), nullable=True),
+        sa.Column('category', sa.String(length=50), nullable=True),
+        sa.Column('status', sa.String(length=50), nullable=True),
+        sa.Column('source', sa.String(length=100), nullable=True),
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.ForeignKeyConstraint(['user_id'], ['users.id']),
+        sa.PrimaryKeyConstraint('id')
+    )
+
     # properties table
     op.create_table('properties',
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -120,6 +136,7 @@ def upgrade():
 def downgrade():
     op.drop_table('property_images')
     op.drop_table('properties')
+    op.drop_table('contacts')
     op.drop_table('password_resets')
     op.drop_table('auth_audit_log')
     op.drop_table('user_identities')

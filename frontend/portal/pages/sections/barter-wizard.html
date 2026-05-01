@@ -1,0 +1,138 @@
+<div id="barter-wizard-section" class="content-section flex flex-col h-full bg-white hidden">
+    <div class="px-8 py-6 border-b border-gray-100 shrink-0">
+        <div class="flex justify-between items-end">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-serif font-bold text-navy">Alım Gücü Sihirbazı</h2>
+                <p class="text-sm text-gray-500">Mevcut varlıklarınızı değerlendirerek maksimum alım gücünüzü keşfedin.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-auto p-8 relative">
+        <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+            <!-- HEADER -->
+            <div class="bg-navy p-6 text-center relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
+                </div>
+                <h2 class="relative z-10 text-2xl md:text-3xl font-bold text-gold mb-2">Sihirbaz
+                </h2>
+            </div>
+
+            <!-- WIZARD PROGRESS -->
+            <div class="flex justify-between items-center px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                <div class="flex flex-col items-center">
+                    <div class="w-10 h-10 rounded-full bg-gold text-white flex items-center justify-center font-bold shadow-md">1</div>
+                    <span class="text-xs font-bold mt-2 text-navy">Nakit</span>
+                </div>
+                <div class="flex-1 h-1 mx-4 bg-gray-200"></div>
+                <div class="flex flex-col items-center opacity-50">
+                    <div class="w-10 h-10 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">2</div>
+                    <span class="text-xs font-bold mt-2 text-gray-400">Takas</span>
+                </div>
+                <div class="flex-1 h-1 mx-4 bg-gray-200"></div>
+                <div class="flex flex-col items-center opacity-50">
+                    <div class="w-10 h-10 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">3</div>
+                    <span class="text-xs font-bold mt-2 text-gray-400">Sonuç</span>
+                </div>
+            </div>
+
+            <!-- FORM CONTENT -->
+            <div class="p-8">
+                <!-- STEP 1: Nakit & Beden -->
+                <div id="step-1" class="space-y-6">
+                    <h3 class="text-xl font-bold text-navy border-b pb-2">Nakit Bütçeniz</h3>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Mevcut Nakit Tutarı (TL)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₺</span>
+                            <input type="number" id="bw-cash"
+                                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all text-lg font-medium"
+                                placeholder="Örn: 5.000.000">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Kredi Kullanma Durumu</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="flex items-center justify-center p-4 border border-gray-200 hover:border-gold rounded-xl cursor-pointer transition-colors has-[:checked]:border-gold has-[:checked]:bg-gold/5">
+                                <input type="radio" name="kredi" value="yes" class="hidden" onchange="toggleCreditInput(true)">
+                                <span class="font-bold text-navy">Kredi Kullanacağım</span>
+                            </label>
+                            <label class="flex items-center justify-center p-4 border border-gray-200 hover:border-gray-300 rounded-xl cursor-pointer transition-colors has-[:checked]:bg-gray-100">
+                                <input type="radio" name="kredi" value="no" class="hidden" checked onchange="toggleCreditInput(false)">
+                                <span class="font-bold text-gray-500">Sadece Özkaynak</span>
+                            </label>
+                        </div>
+                        <div id="bw-credit-input-div" class="hidden mt-4">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Planlanan Kredi Tutarı (TL)</label>
+                            <input type="number" id="bw-credit" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Örn: 2.000.000">
+                        </div>
+                    </div>
+                    <div class="pt-4 flex justify-end">
+                        <button onclick="barterNext(2)" type="button" class="px-8 py-3 bg-navy text-white rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-navy/20 flex items-center gap-2">
+                            Devam Et <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- STEP 2: Takas -->
+                <div id="step-2" class="space-y-6 mt-12 border-t pt-12">
+                    <h3 class="text-xl font-bold text-navy border-b pb-2">Takas Edilecek Varlıklar (Opsiyonel)</h3>
+                    
+                    <!-- Araç Takası -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-navy"><i class="fa-solid fa-car text-gold mr-2"></i> Araç Takası</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                            <input type="text" id="bw-car-brand" placeholder="Marka (Örn: Mercedes-Benz)" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                            <input type="text" id="bw-car-model" placeholder="Model (Örn: E200d)" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                            <input type="number" id="bw-car-val" placeholder="Tahmini Araç Değeri (TL)" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                        </div>
+                    </div>
+
+                    <!-- Mülk Takası -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-navy"><i class="fa-solid fa-building text-gold mr-2"></i> Gayrimenkul Takası</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                            <select id="bw-prop-type" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                                <option value="">Mülk Türü Seçin</option>
+                                <option value="konut">Konut / Daire</option>
+                                <option value="arsa">Arsa / Arazi</option>
+                                <option value="isyeri">İşyeri / Ofis</option>
+                            </select>
+                            <input type="text" id="bw-prop-loc" placeholder="Konum (İlçe/Mahalle)" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                            <input type="number" id="bw-prop-val" placeholder="Tahmini Mülk Değeri (TL)" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-between">
+                        <button onclick="barterPrev(1)" type="button" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition-colors">Geri</button>
+                        <button onclick="calculateBarterPower()" type="button" class="px-8 py-3 bg-gold text-white rounded-xl font-bold hover:bg-yellow-600 transition-colors shadow-lg shadow-gold/20 flex items-center gap-2">
+                            Alım Gücünü Hesapla <i class="fa-solid fa-calculator"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- STEP 3: Sonuç -->
+                <div id="step-3" class="space-y-6 mt-12 border-t pt-12">
+                    <div class="text-center p-8 bg-gradient-to-br from-navy to-slate-800 rounded-2xl shadow-xl relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 text-gold/10 text-9xl"><i class="fa-solid fa-chart-pie"></i></div>
+                        <p class="text-gray-300 font-medium mb-2 relative z-10">Maksimum Alım Gücünüz (Tahmini)</p>
+                        <h2 id="bw-total-power" class="text-4xl md:text-5xl font-bold text-gold relative z-10 tracking-tight">0 ₺</h2>
+                        <div class="mt-6 flex flex-wrap justify-center gap-4 relative z-10">
+                            <span class="px-4 py-2 bg-white/10 rounded-lg text-sm text-gray-200"><i class="fa-solid fa-wallet mr-2"></i>Nakit: <span id="bw-res-cash">0</span></span>
+                            <span class="px-4 py-2 bg-white/10 rounded-lg text-sm text-gray-200"><i class="fa-solid fa-car mr-2"></i>Takas: <span id="bw-res-barter">0</span></span>
+                            <span class="px-4 py-2 bg-white/10 rounded-lg text-sm text-gray-200"><i class="fa-solid fa-landmark mr-2"></i>Kredi: <span id="bw-res-credit">0</span></span>
+                        </div>
+                    </div>
+                    <div class="flex justify-center mt-6">
+                        <button onclick="barterPrev(1)" type="button" class="px-8 py-3 bg-transparent border-2 border-navy text-navy rounded-xl font-bold hover:bg-navy hover:text-white transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i> Yeni Hesaplama
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

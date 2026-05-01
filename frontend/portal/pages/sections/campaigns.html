@@ -1,0 +1,103 @@
+<div id="campaigns-section" class="content-section hidden animate-fade-in">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h2 class="text-4xl font-black text-navy tracking-tight mb-2 uppercase italic">Pazarlama <span class="text-gold">Otomasyonu</span></h2>
+            <p class="text-gray-500 text-sm font-medium">Doğru kişiye, doğru zamanda, doğru mesajı ulaştırın.</p>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="flex gap-2 mb-8 bg-gray-200/50 p-1.5 rounded-2xl w-fit">
+        <button onclick="switchCampaignTab('manual')" id="campaign-tab-btn-manual" class="campaign-tab-btn active px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Manuel Gönderim
+        </button>
+        <button onclick="switchCampaignTab('automation')" id="campaign-tab-btn-automation" class="campaign-tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-navy">
+            <i class="fa-solid fa-robot"></i> Otomasyon Kuralları
+        </button>
+        <button onclick="switchCampaignTab('templates')" id="campaign-tab-btn-templates" class="campaign-tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-navy">
+            <i class="fa-solid fa-message"></i> Şablonlar
+        </button>
+    </div>
+
+    <!-- Tab Content: Manual Campaigns -->
+    <div id="campaign-tab-content-manual" class="campaign-tab-content">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-navy flex items-center gap-2 uppercase tracking-tight">
+                <span class="w-2 h-2 bg-modern rounded-full"></span> Kampanya Geçmişi
+            </h3>
+            <button onclick="openCampaignModal()" class="bg-navy hover:bg-slate-800 text-gold px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Yeni Gönderim
+            </button>
+        </div>
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse premium-table">
+                    <thead>
+                        <tr>
+                            <th class="p-6">Başlık & Konu</th>
+                            <th class="p-6">Tür</th>
+                            <th class="p-6">Hedef Kitle</th>
+                            <th class="p-6">Gönderim</th>
+                            <th class="p-6">Tarih</th>
+                            <th class="p-6 text-right">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="campaigns-table-body" class="text-sm divide-y divide-gray-50">
+                        <tr><td colspan="6" class="p-8 text-center text-gray-400">Yükleniyor...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Automation Rules -->
+    <div id="campaign-tab-content-automation" class="campaign-tab-content hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-navy flex items-center gap-2 uppercase tracking-tight">
+                <span class="w-2 h-2 bg-gold rounded-full"></span> Akıllı Kurallar
+            </h3>
+            <div class="flex gap-3">
+                <button onclick="runAutomationNow()" class="text-sm font-bold text-navy/60 hover:text-navy transition-colors">
+                    <i class="fa-solid fa-play mr-1"></i> Şimdi Çalıştır
+                </button>
+                <button onclick="openRuleModal()" class="bg-gold hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Yeni Kural
+                </button>
+            </div>
+        </div>
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse premium-table">
+                    <thead>
+                        <tr>
+                            <th class="p-6">Kural Adı</th>
+                            <th class="p-6">Tetikleyici</th>
+                            <th class="p-6">Aksiyon</th>
+                            <th class="p-6">Durum</th>
+                            <th class="p-6 text-right">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="automation-rules-table-body" class="text-sm divide-y divide-gray-50">
+                        <tr><td colspan="5" class="p-8 text-center text-gray-400">Kurallar yükleniyor...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Message Templates -->
+    <div id="campaign-tab-content-templates" class="campaign-tab-content hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-navy flex items-center gap-2 uppercase tracking-tight">
+                <span class="w-2 h-2 bg-modern rounded-full"></span> Kayıtlı Şablonlar
+            </h3>
+            <button onclick="openTemplateModal()" class="bg-modern hover:bg-opacity-90 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Yeni Şablon
+            </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6" id="templates-grid">
+            <!-- JS ile doldurulacak -->
+            <div class="p-8 text-center text-gray-400 col-span-full">Şablonlar yükleniyor...</div>
+        </div>
+    </div>
+</div>

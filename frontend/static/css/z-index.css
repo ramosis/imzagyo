@@ -1,0 +1,19 @@
+/* z-index.css — Tüm z-index değerleri burada tanımlı */
+:root {
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-sidebar: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-toast: 600;
+    --z-tooltip: 700;
+}
+
+/* Kullanım Örnekleri */
+.sidebar { z-index: var(--z-sidebar); }
+.modal { z-index: var(--z-modal); }
+.toast { z-index: var(--z-toast); }
+.fixed.inset-0.bg-navy\/80 { z-index: var(--z-modal-backdrop); } /* Modal backdrops */
+.fixed.inset-0.bg-black\/50 { z-index: var(--z-modal-backdrop); }
+.z-50 { z-index: var(--z-modal); } /* Tailwind utility override if needed */

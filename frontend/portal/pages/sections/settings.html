@@ -1,0 +1,37 @@
+<section id="settings-section" class="content-section flex flex-col h-full bg-white hidden">
+    <div class="px-8 py-6 border-b border-gray-100 shrink-0">
+        <h2 class="text-2xl font-serif font-bold text-navy">Genel Ayarlar</h2>
+        <p class="text-sm text-gray-500">Profil bilgilerinizi ve uygulama tercihlerini yönetin.</p>
+    </div>
+    <div class="flex-1 overflow-auto p-8">
+        <div class="max-w-2xl space-y-8">
+            <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                <h3 class="text-sm font-bold text-navy uppercase tracking-widest mb-4">Profil Bilgileri</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ad Soyad</label>
+                        <input type="text" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm" value="Selim Çetinkaya">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">E-Posta</label>
+                        <input type="email" class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm" value="selim@imzaemlak.com">
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                <h3 class="text-sm font-bold text-navy uppercase tracking-widest mb-4">Bildirim Tercihleri</h3>
+                <div class="space-y-3">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" checked class="w-4 h-4 rounded text-gold focus:ring-gold border-gray-300">
+                        <span class="text-sm text-navy">Yeni aday geldiğinde e-posta gönder</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" checked class="w-4 h-4 rounded text-gold focus:ring-gold border-gray-300">
+                        <span class="text-sm text-navy">Haftalık performans raporu al</span>
+                    </label>
+                </div>
+            </div>
+            <button class="bg-navy text-gold px-8 py-3 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all">Ayarları Kaydet</button>
+        </div>
+    </div>
+</section>

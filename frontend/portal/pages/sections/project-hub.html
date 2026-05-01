@@ -1,0 +1,50 @@
+<section id="project-hub-section" class="content-section hidden animate-fade-in p-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+            <h2 class="text-4xl font-black text-navy tracking-tighter mb-2 uppercase italic">Proje <span class="text-gold">Masası</span></h2>
+            <p class="text-gray-500 text-sm font-medium">Lansmanlar, gayrimenkul projeleri ve başvuru takibi.</p>
+        </div>
+        <div class="flex gap-2 bg-gray-100 p-1.5 rounded-2xl">
+            <button onclick="filterProjectHub('active')" id="hub-tab-active" class="hub-tab-btn active px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Aktif</button>
+            <button onclick="filterProjectHub('archive')" id="hub-tab-archive" class="hub-tab-btn px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-navy transition-all">Arşiv</button>
+        </div>
+    </div>
+
+    <!-- Proje Kartları Grid -->
+    <div id="project-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Örnek Proje Kartı: Sağlıkçılar -->
+        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-navy/5 overflow-hidden group hover:border-gold/30 transition-all">
+            <div class="h-48 relative overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1545459720-aac273a27763?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                <div class="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent"></div>
+                <div class="absolute top-6 left-6 flex gap-2">
+                    <span class="bg-emerald-500 text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Lansmanda</span>
+                </div>
+            </div>
+            <div class="p-8">
+                <h3 class="text-xl font-bold text-navy mb-2">Sağlık Yatırım Ortaklığı</h3>
+                <p class="text-gray-400 text-xs mb-6 leading-relaxed">Geleceğinize imza atan özel arsa ve konut projesi.</p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-gray-50 p-4 rounded-2xl">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Başvuru</p>
+                        <p class="text-xl font-black text-navy" id="hub-lead-count-syo">124</p>
+                    </div>
+                    <div class="bg-gold/5 p-4 rounded-2xl border border-gold/10">
+                        <p class="text-[9px] font-bold text-gold/60 uppercase tracking-widest mb-1">Niyet Skoru</p>
+                        <p class="text-xl font-black text-gold">%88</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="showSection('leads', null, 'Sağlık')" class="flex-1 bg-navy text-white text-[10px] font-bold py-3.5 rounded-xl uppercase tracking-widest hover:bg-slate-800 transition-all">
+                        Başvuruları Gör
+                    </button>
+                    <button onclick="window.location.href='/pipeline?project=syo'" class="w-12 h-12 flex items-center justify-center border border-gray-100 rounded-xl text-navy hover:text-gold hover:border-gold/30 transition-all">
+                        <i class="fa-solid fa-diagram-project"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

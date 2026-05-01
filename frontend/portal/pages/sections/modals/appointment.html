@@ -1,0 +1,40 @@
+<div id="appointment-modal-v2" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
+    <div class="bg-white rounded-[2rem] w-full max-w-lg p-8 shadow-2xl relative">
+        <button onclick="closeAppointmentModalV2()" class="absolute top-6 right-6 text-gray-400 hover:text-navy transition-colors">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+        <h3 class="text-2xl font-serif font-bold text-navy mb-6"><i class="fa-regular fa-calendar-plus text-gold mr-2"></i> Yeni Randevu</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">Müşteri Adı *</label>
+                <input type="text" id="appt2-client" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none" placeholder="Ad Soyad">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">Telefon</label>
+                <input type="tel" id="appt2-phone" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none" placeholder="05XX XXX XX XX">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">Randevu Konusu *</label>
+                <select id="appt2-purpose" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none text-navy font-medium">
+                    <option value="gosterim">Portföy Gösterimi</option>
+                    <option value="sozlesme">Sözleşme İmzası</option>
+                    <option value="kapora">Kapora Görüşmesi</option>
+                    <option value="expertiz">Expertiz / Değerleme</option>
+                    <option value="sanal_tur">Sanal Tur</option>
+                    <option value="diger">Diğer</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">Tarih ve Saat *</label>
+                <input type="datetime-local" id="appt2-datetime" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">Notlar</label>
+                <textarea id="appt2-notes" rows="2" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none resize-none" placeholder="Ek bilgiler..."></textarea>
+            </div>
+            <button onclick="saveAppointmentV2()" class="w-full bg-navy hover:bg-slate-800 text-gold py-4 rounded-xl font-bold text-sm uppercase tracking-widest transition-all mt-2">
+                <i class="fa-solid fa-calendar-check mr-2"></i> Randevuyu Kaydet
+            </button>
+        </div>
+    </div>
+</div>

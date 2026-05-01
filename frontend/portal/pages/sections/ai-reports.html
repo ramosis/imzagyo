@@ -1,0 +1,33 @@
+<section id="ai-reports-section" class="content-section hidden animate-fade-in p-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-32 h-32 bg-gold/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
+        <div class="relative z-10">
+            <h2 class="text-3xl font-black text-navy tracking-tight mb-1 uppercase font-serif italic"><i class="fa-solid fa-brain text-gold mr-3"></i> AI Analiz <span class="text-gold">Raporları</span></h2>
+            <p class="text-gray-500 text-sm font-medium">Yatırımcı profili, niyet skoru ve davranışsal analiz merkezi.</p>
+        </div>
+        <div class="flex gap-3 relative z-10">
+            <button onclick="fetchAiReports()" class="bg-gray-100 hover:bg-gray-200 text-navy px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                <i class="fa-solid fa-rotate"></i> Yenile
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] shadow-xl shadow-navy/5 border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="premium-table w-full text-left">
+                <thead>
+                    <tr class="bg-gray-50/50 border-b border-gray-100">
+                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Müşteri</th>
+                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">AI Profil Teşhisi</th>
+                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Bütçe / Hacim</th>
+                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Skor</th>
+                        <th class="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="ai-reports-table-body" class="divide-y divide-gray-50 text-sm">
+                    <tr><td colspan="5" class="py-20 text-center text-gray-400 font-medium">Veriler AI motorundan çekiliyor...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

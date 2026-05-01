@@ -1,32 +1,53 @@
 from typing import List, Dict, Any, Optional
-from backend.shared.database import get_db_connection
+from backend.shared.database import db_session
+from .models import Property
 
 class PropertyRepository:
     @staticmethod
     def get_all(filters: Dict[str, Any] = None, lang: str = 'tr') -> List[Dict[str, Any]]:
-        with get_db_connection() as conn:
-            query = "SELECT * FROM properties WHERE is_active = 1"
-            # Filtering logic would go here
-            rows = conn.execute(query).fetchall()
-            return [dict(r) for r in rows]
+        query = db_session.query(Property).filter_by(is_active=True)
+        # Filtering logic would go here
+        rows = query.all()
+        return [{
+            'id': r.id,
+            'title': getattr(r, f'title_{lang}'),
+            'price': r.price,
+            'location': getattr(r, f'location_{lang}'),
+            'type': r.type
+        } for r in rows]
 
     @staticmethod
     def get_by_id(property_id: int, lang: str = 'tr') -> Optional[Dict[str, Any]]:
-        with get_db_connection() as conn:
-            row = conn.execute("SELECT * FROM properties WHERE id = ?", (property_id,)).fetchone()
-            return dict(row) if row else None
+        r = db_session.query(Property).get(property_id)
+        if not r: return None
+        return {
+            'id': r.id,
+            'title': getattr(r, f'title_{lang}'),
+            'price': r.price,
+            'location': getattr(r, f'location_{lang}'),
+            'type': r.type,
+            'description': getattr(r, f'description_{lang}')
+        }
 
     @staticmethod
     def get_featured(lang: str = 'tr') -> List[Dict[str, Any]]:
-        with get_db_connection() as conn:
-            rows = conn.execute("SELECT * FROM properties WHERE is_featured = 1 AND is_active = 1 LIMIT 6").fetchall()
-            return [dict(r) for r in rows]
+        rows = db_session.query(Property).filter_by(is_featured=True, is_active=True).limit(6).all()
+        return [{
+            'id': r.id,
+            'title': getattr(r, f'title_{lang}'),
+            'price': r.price,
+            'location': getattr(r, f'location_{lang}'),
+            'type': r.type
+        } for r in rows]
 
     @staticmethod
     def create(data: Dict[str, Any]) -> int:
-        with get_db_connection() as conn:
-            cursor = conn.execute(
-                "INSERT INTO properties (title_tr, price, location_tr, type) VALUES (?, ?, ?, ?)",
-                (data.get('title'), data.get('price'), data.get('location'), data.get('type'))
-            )
-            return cursor.lastrowid
+        new_prop = Property(
+            title_tr=data.get('title'),
+            price=data.get('price'),
+            location_tr=data.get('location'),
+            type=data.get('type')
+        )
+        db_session.add(new_prop)
+        db_session.commit()
+        return new_prop.id

@@ -1,18 +1,29 @@
 from typing import List, Dict, Any
-from backend.shared.database import get_db_connection
+from backend.shared.database import db_session
+from .models import Contact
 
 class CRMRepository:
     @staticmethod
     def get_leads() -> List[Dict[str, Any]]:
-        with get_db_connection() as conn:
-            rows = conn.execute("SELECT * FROM contacts WHERE category = 'lead'").fetchall()
-            return [dict(r) for r in rows]
+        leads = db_session.query(Contact).filter_by(category='lead').all()
+        return [{
+            'id': l.id,
+            'name': l.name,
+            'email': l.email,
+            'phone': l.phone,
+            'status': l.status,
+            'source': l.source
+        } for l in leads]
 
     @staticmethod
     def create_lead(data: Dict[str, Any]) -> int:
-        with get_db_connection() as conn:
-            cursor = conn.execute(
-                "INSERT INTO contacts (name, email, phone, category, source) VALUES (?, ?, ?, 'lead', ?)",
-                (data.get('name'), data.get('email'), data.get('phone'), data.get('source'))
-            )
-            return cursor.lastrowid
+        new_lead = Contact(
+            name=data.get('name'),
+            email=data.get('email'),
+            phone=data.get('phone'),
+            category='lead',
+            source=data.get('source')
+        )
+        db_session.add(new_lead)
+        db_session.commit()
+        return new_lead.id

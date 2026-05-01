@@ -1,15 +1,25 @@
 from typing import List, Dict, Any
-from backend.shared.database import get_db_connection
+from backend.shared.database import db_session
+from .models import Announcement, Facility
 
 class NeighborhoodRepository:
     @staticmethod
     def get_announcements() -> List[Dict[str, Any]]:
-        with get_db_connection() as conn:
-            rows = conn.execute("SELECT * FROM announcements ORDER BY created_at DESC").fetchall()
-            return [dict(r) for r in rows]
+        rows = db_session.query(Announcement).order_by(Announcement.created_at.desc()).all()
+        return [{
+            'id': r.id,
+            'title': r.title,
+            'content': r.content,
+            'category': r.category,
+            'created_at': r.created_at.isoformat()
+        } for r in rows]
 
     @staticmethod
     def get_facilities() -> List[Dict[str, Any]]:
-        with get_db_connection() as conn:
-            rows = conn.execute("SELECT * FROM neighborhood_facilities").fetchall()
-            return [dict(r) for r in rows]
+        rows = db_session.query(Facility).all()
+        return [{
+            'id': r.id,
+            'name': r.name,
+            'type': r.type,
+            'status': r.status
+        } for r in rows]

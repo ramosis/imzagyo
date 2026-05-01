@@ -1,0 +1,373 @@
+<div id="contract-builder-section" class="content-section hidden">
+    <div class="max-w-4xl mx-auto">
+        <!-- Wizard Header -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm mb-8">
+            <h2 class="text-2xl font-serif font-bold text-navy mb-2">Sözleşme ve Taraf Yönetimi</h2>
+            <p class="text-gray-500 text-sm">Dinamik sözleşme hazırlama ve taraf yönetimi sihirbazı.
+            </p>
+
+            <!-- Wizard Steps -->
+            <div class="flex items-center justify-between mt-8 relative">
+                <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0">
+                </div>
+                <div id="con-wiz-progress"
+                    class="absolute top-1/2 left-0 w-0 h-0.5 bg-gold -translate-y-1/2 z-0 transition-all duration-500">
+                </div>
+
+                <div class="con-wiz-step active relative z-10 flex flex-col items-center gap-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-navy text-white flex items-center justify-center font-bold border-4 border-white shadow-md transition-all">
+                        1</div>
+                    <span
+                        class="text-[10px] font-bold uppercase tracking-wider text-navy">Taraflar</span>
+                </div>
+                <div class="con-wiz-step relative z-10 flex flex-col items-center gap-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold border-4 border-white shadow-md transition-all">
+                        2</div>
+                    <span
+                        class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Portföy
+                        &
+                        Şartlar</span>
+                </div>
+                <div class="con-wiz-step relative z-10 flex flex-col items-center gap-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold border-4 border-white shadow-md transition-all">
+                        3</div>
+                    <span
+                        class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Önizleme</span>
+                </div>
+                <div class="con-wiz-step relative z-10 flex flex-col items-center gap-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold border-4 border-white shadow-md transition-all">
+                        4</div>
+                    <span
+                        class="text-[10px] font-bold uppercase tracking-wider text-gray-400">İmzalama</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Parties Selection -->
+        <div id="con-step-1" class="con-wiz-content">
+            <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                <h3 class="text-lg font-bold text-navy mb-4">Sözleşme Taraflarını Belirleyin</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 1. Taraf (Satıcı) -->
+                    <div class="border border-gray-200 rounded-xl p-5">
+                        <h4 class="font-bold text-navy mb-3 flex items-center gap-2">
+                            <span
+                                class="w-6 h-6 rounded-full bg-navy text-white flex items-center justify-center text-xs">1</span>
+                            1. Taraf (Satıcı/Ev Sahibi)
+                        </h4>
+                        <div class="relative mb-4">
+                            <i
+                                class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="seller-search"
+                                placeholder="TC Kimlik No veya Ad ile ara..."
+                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                        </div>
+                        <div id="seller-results" class="max-h-40 overflow-y-auto mb-3 hidden">
+                            <!-- Satıcı sonuçları buraya gelecek -->
+                        </div>
+                        <div id="seller-selected"
+                            class="min-h-[100px] border-2 border-dashed border-gray-200 rounded-lg p-4 flex flex-col items-center justify-center text-gray-400 text-center">
+                            <i class="fa-solid fa-user-plus text-2xl mb-2"></i>
+                            <p class="text-sm">Satıcı seçilmemiş</p>
+                        </div>
+                        <button type="button" id="add-seller-btn"
+                            class="w-full mt-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
+                            Yeni Satıcı Ekle
+                        </button>
+                    </div>
+
+                    <!-- 2. Taraf (Alıcı) -->
+                    <div class="border border-gray-200 rounded-xl p-5">
+                        <h4 class="font-bold text-navy mb-3 flex items-center gap-2">
+                            <span
+                                class="w-6 h-6 rounded-full bg-navy text-white flex items-center justify-center text-xs">2</span>
+                            2. Taraf (Alıcı/Kiracı)
+                        </h4>
+                        <div class="relative mb-4">
+                            <i
+                                class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="buyer-search"
+                                placeholder="TC Kimlik No veya Ad ile ara..."
+                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                        </div>
+                        <div id="buyer-results" class="max-h-40 overflow-y-auto mb-3 hidden">
+                            <!-- Alıcı sonuçları buraya gelecek -->
+                        </div>
+                        <div id="buyer-selected"
+                            class="min-h-[100px] border-2 border-dashed border-gray-200 rounded-lg p-4 flex flex-col items-center justify-center text-gray-400 text-center">
+                            <i class="fa-solid fa-user-plus text-2xl mb-2"></i>
+                            <p class="text-sm">Alıcı seçilmemiş</p>
+                        </div>
+                        <button type="button" id="add-buyer-btn"
+                            class="w-full mt-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
+                            Yeni Alıcı Ekle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Çoklu Taraf Ekleme -->
+                <div class="mt-6 pt-6 border-t border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-navy">Ek Taraflar</h4>
+                        <button type="button" id="add-extra-party-btn"
+                            class="text-xs bg-gold/10 text-gold px-3 py-1 rounded-full hover:bg-gold/20 transition-colors">
+                            <i class="fa-solid fa-plus mr-1"></i> Yeni Taraf
+                        </button>
+                    </div>
+                    <div id="extra-parties-container" class="space-y-3">
+                        <!-- Ek taraflar buraya eklenecek -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Property & Conditions -->
+        <div id="con-step-2" class="con-wiz-content hidden">
+            <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                <h3 class="text-lg font-bold text-navy mb-4">Portföy ve Sözleşme Şartlarını
+                    Belirleyin
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Portföy
+                            Seçimi</label>
+                        <div class="relative">
+                            <i
+                                class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="property-search" placeholder="Portföy ara..."
+                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                        </div>
+                        <div id="property-results" class="mt-2 max-h-40 overflow-y-auto hidden">
+                            <!-- Portföy sonuçları buraya gelecek -->
+                        </div>
+                        <div id="property-selected"
+                            class="mt-3 min-h-[80px] border-2 border-dashed border-gray-200 rounded-lg p-4 flex flex-col items-center justify-center text-gray-400 text-center">
+                            <i class="fa-solid fa-building text-2xl mb-2"></i>
+                            <p class="text-sm">Portföy seçilmemiş</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Sözleşme
+                            Türü</label>
+                        <select id="contract-type"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                            <option value="">Sözleşme türü seçiniz</option>
+                            <option value="satış">Satış Sözleşmesi</option>
+                            <option value="kira">Kira Sözleşmesi</option>
+                            <option value="satış_vaadi">Satış Vaadi Sözleşmesi</option>
+                            <option value="yetkili_satış">Yetkili Satış Sözleşmesi</option>
+                        </select>
+
+                        <label
+                            class="block text-xs font-bold text-navy uppercase tracking-wider mt-4 mb-2">Özel
+                            Şartlar</label>
+                        <textarea id="special-conditions" rows="3"
+                            placeholder="Varsa özel şartları buraya girin..."
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Preview -->
+        <div id="con-step-3" class="con-wiz-content hidden">
+            <div class="bg-white rounded-xl p-8 border border-gray-100 shadow-sm font-serif">
+                <div class="text-center mb-8 border-b pb-8">
+                    <h2 class="text-2xl font-bold uppercase tracking-widest text-navy"
+                        id="preview-title">SÖZLEŞME ÖNİZLEME</h2>
+                    <p class="text-gray-500 mt-2" id="preview-subtitle">Satış Vaadi Sözleşmesi</p>
+                </div>
+                <div id="preview-content" class="text-sm leading-relaxed space-y-6 text-gray-800">
+                    <!-- Önizleme içeriği -->
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fa-solid fa-file-contract text-4xl mb-4"></i>
+                        <p>Sözleşme önizlemesi oluşturuluyor...</p>
+                    </div>
+                </div>
+                <div class="mt-12 pt-8 border-t grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold text-navy mb-3">Taraf 1 (Satıcı/Ev Sahibi)</h4>
+                        <div id="preview-seller"
+                            class="border border-gray-200 rounded-lg p-4 text-sm">
+                            <p class="text-gray-400">Seçili taraf yok</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-navy mb-3">Taraf 2 (Alıcı/Kiracı)</h4>
+                        <div id="preview-buyer"
+                            class="border border-gray-200 rounded-lg p-4 text-sm">
+                            <p class="text-gray-400">Seçili taraf yok</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 pt-6 border-t" id="preview-extra-parties">
+                    <h4 class="font-bold text-navy mb-3">Ek Taraflar</h4>
+                    <div id="preview-extra-parties-list" class="space-y-3">
+                        <p class="text-gray-400 text-sm">Ek taraf bulunmamaktadır.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Signing -->
+        <div id="con-step-4" class="con-wiz-content hidden">
+            <div class="bg-white rounded-xl p-8 border border-gray-100 shadow-sm">
+                <div class="text-center mb-8">
+                    <div
+                        class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-file-contract text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-navy mb-2">Sözleşme Hazır</h2>
+                    <p class="text-gray-600">Sözleşmeniz başarıyla oluşturuldu. Şimdi dijital
+                        imzalama
+                        adımına geçebilirsiniz.</p>
+                </div>
+
+                <div class="bg-gold/5 border border-gold/20 rounded-xl p-6 mb-8">
+                    <h3 class="font-bold text-navy mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-shield text-gold"></i> Dijital İmza
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4">Müşterinize dijital imza için tek
+                        kullanımlık
+                        bir şifre gönderilecek. Şifreyi müşteriye iletiniz ve aşağıya girmesini
+                        isteyiniz.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="customer-phone"
+                                class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Müşteri
+                                Telefonu</label>
+                            <input type="text" id="customer-phone" placeholder="Telefon numarası"
+                                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                        </div>
+                        <div>
+                            <label for="sign-password"
+                                class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Tek
+                                Kullanımlık Şifre</label>
+                            <input type="text" id="sign-password" placeholder="Şifre" maxlength="6"
+                                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold text-center font-mono text-lg tracking-widest">
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex justify-center">
+                        <button type="button" id="send-sms-btn"
+                            class="px-6 py-2 bg-navy text-white rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Şifre Gönder
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-center gap-4">
+                    <button type="button" id="download-pdf-btn"
+                        class="px-6 py-3 bg-white border border-gray-200 text-navy rounded-lg font-bold hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> PDF İndir
+                    </button>
+                    <button type="button" id="send-email-btn"
+                        class="px-6 py-3 bg-white border border-gray-200 text-navy rounded-lg font-bold hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-envelope"></i> E-posta Gönder
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wizard Navigation -->
+        <div class="flex items-center justify-between mt-8">
+            <button type="button" id="con-prev-btn" onclick="conWizPrev()"
+                class="px-6 py-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 font-bold transition-all opacity-0 pointer-events-none">
+                Geri
+            </button>
+            <div class="flex gap-4">
+                <button type="button" id="con-next-btn" onclick="conWizNext()"
+                    class="px-8 py-2 rounded-lg bg-navy text-white hover:bg-navy/90 font-bold shadow-lg shadow-navy/20 transition-all">
+                    İleri
+                </button>
+                <button type="button" id="con-save-btn" onclick="finalizeContract()"
+                    class="px-8 py-2 rounded-lg bg-gold text-white hover:bg-gold/90 font-bold shadow-lg shadow-gold/20 transition-all hidden">
+                    Sözleşmeyi Tamamla
+                </button>
+            </div>
+        </div>
+
+        <!-- Party Modal -->
+        <div id="party-modal"
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-md">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-navy">Yeni Taraf Ekle</h3>
+                    <button type="button" onclick="closePartyModal()" aria-label="Kapat" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <input type="hidden" id="party-modal-type">
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">TC
+                            Kimlik No / VKN</label>
+                        <input type="text" id="party-tc-vkn"
+                            placeholder="TC Kimlik No veya Vergi Numarası"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Ad
+                            Soyad / Ünvan</label>
+                        <input type="text" id="party-name" placeholder="Ad Soyad veya Şirket Ünvanı"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Telefon</label>
+                        <input type="text" id="party-phone" placeholder="Telefon numarası"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">E-posta</label>
+                        <input type="email" id="party-email" placeholder="E-posta adresi"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Taraf
+                            Türü</label>
+                        <select id="party-type"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold">
+                            <option value="individual">Bireysel</option>
+                            <option value="corporate">Kurumsal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="p-6 border-t border-gray-100 flex gap-3">
+                    <button type="button" onclick="closePartyModal()"
+                        class="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors">
+                        İptal
+                    </button>
+                    <button type="button" onclick="saveNewParty()"
+                        class="flex-1 py-2.5 bg-navy text-white rounded-lg font-bold text-sm hover:bg-slate-800 transition-colors">
+                        Ekle
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doğum Günleri Widget -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mt-6">
+            <h3 class="font-serif font-bold text-lg text-navy mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-gift text-modern"></i> Yaklaşan Doğum Günleri
+            </h3>
+            <div id="dashboard-birthdays-list" class="space-y-3">
+                <p class="text-gray-400 text-xs">Yükleniyor...</p>
+            </div>
+        </div>
+    </div>
+</div>

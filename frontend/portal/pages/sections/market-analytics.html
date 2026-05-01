@@ -1,0 +1,51 @@
+<div id="market-analytics-section" class="content-section hidden animate-fade-in">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h2 class="text-4xl font-black text-navy tracking-tight mb-2 uppercase italic">Pazar <span class="text-indigo-500">Analitiği</span></h2>
+            <p class="text-gray-500 text-sm font-medium">Bölgesel trendler, fiyat değişimleri ve ROI projeksiyonları.</p>
+        </div>
+        <div class="flex gap-3">
+            <select id="analytics-region" class="bg-white border border-gray-200 px-4 py-2 rounded-xl text-sm font-bold text-navy outline-none focus:ring-2 focus:ring-indigo-500/20">
+                <option value="all">Tüm Bölgeler</option>
+                <option value="merkez">Kütahya Merkez</option>
+                <option value="tavsanli">Tavşanlı</option>
+            </select>
+            <button onclick="updateAnalytics()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-arrows-rotate"></i> Güncelle
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-l-4 border-l-indigo-500">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Ort. m² Fiyatı</p>
+            <h3 class="text-2xl font-black text-navy" id="stat-avg-price">₺0</h3>
+            <p class="text-[10px] text-green-500 font-bold mt-1"><i class="fa-solid fa-arrow-up mr-1"></i> %4.2 (Geçen Ay)</p>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-l-4 border-l-emerald-500">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Pazar Arzı (Shadow)</p>
+            <h3 class="text-2xl font-black text-navy" id="stat-market-supply">0</h3>
+            <p class="text-[10px] text-gray-400 font-bold mt-1">Aktif taranan ilanlar</p>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-l-4 border-l-amber-500">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Ortalama ROI</p>
+            <h3 class="text-2xl font-black text-navy" id="stat-avg-roi">18 Yıl</h3>
+            <p class="text-[10px] text-amber-600 font-bold mt-1">Yatırım geri dönüş hızı</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-navy/5 border border-gray-100">
+            <h4 class="text-sm font-bold text-navy uppercase tracking-widest mb-6 border-b pb-4">Fiyat Trendi (6 Ay)</h4>
+            <div class="h-[300px] relative">
+                <canvas id="priceTrendChart"></canvas>
+            </div>
+        </div>
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-navy/5 border border-gray-100">
+            <h4 class="text-sm font-bold text-navy uppercase tracking-widest mb-6 border-b pb-4">Mahalle Bazlı Dağılım</h4>
+            <div class="h-[300px] relative">
+                <canvas id="neighborhoodChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<div id="rule-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-[2rem] w-full max-w-lg p-8 shadow-2xl relative">
+        <button onclick="document.getElementById('rule-modal').classList.add('hidden')" class="absolute top-6 right-6 text-gray-400 hover:text-navy"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <h3 class="text-2xl font-serif font-bold text-navy mb-6"><i class="fa-solid fa-robot text-gold mr-2"></i> Otomasyon Kuralı Ekle</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase">Kural Adı</label>
+                <input type="text" id="rule-name" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-gold" placeholder="Yeni Kayıt Karşılama">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase">Tetikleyici Olay</label>
+                <select id="rule-trigger" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-gold">
+                    <option value="lead_created">Yeni Müşteri Kaydı</option>
+                    <option value="appointment_created">Yeni Randevu Oluşturulduğunda</option>
+                    <option value="property_added">Yeni Portföy Eklendiğinde</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase">Yapılacak İşlem</label>
+                <select id="rule-action" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-gold">
+                    <option value="send_email">E-Posta Gönder</option>
+                    <option value="send_whatsapp">WhatsApp Mesajı Gönder</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-2 uppercase">Mesaj Şablonu</label>
+                <select id="rule-template" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-gold">
+                    <option value="1">Karşılama Şablonu (Email)</option>
+                    <option value="2">Randevu Onay Şablonu (SMS)</option>
+                </select>
+            </div>
+            <button onclick="saveAutomationRule()" class="w-full bg-navy text-gold py-4 rounded-xl font-bold uppercase text-xs shadow-lg shadow-navy/20">Kuralı Kaydet</button>
+        </div>
+    </div>
+</div>

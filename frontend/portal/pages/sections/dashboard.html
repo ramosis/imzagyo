@@ -1,0 +1,157 @@
+<div id="dashboard-section" class="content-section animate-fade-in">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Stat Card 1 -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Aktif Portföy</p>
+                <h3 id="dash-stat-expenses" class="text-fluid-3xl font-bold text-navy font-serif">-</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center text-gold text-xl">
+                <i class="fa-solid fa-building"></i>
+            </div>
+        </div>
+
+        <!-- Stat Card 2 -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Bu Ay Satılan</p>
+                <h3 class="text-3xl font-bold text-navy font-serif">2</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-navy/10 flex items-center justify-center text-navy text-xl">
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+        </div>
+
+        <!-- Stat Card 3 -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Bekleyen Bakım</p>
+                <h3 class="text-3xl font-bold text-modern font-serif">5</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-modern/10 flex items-center justify-center text-modern text-xl">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+        </div>
+
+        <!-- Stat Card 4 -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Randevular</p>
+                <h3 class="text-3xl font-bold text-nature font-serif">8</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-nature/10 flex items-center justify-center text-nature text-xl">
+                <i class="fa-regular fa-calendar-check"></i>
+            </div>
+        </div>
+
+        <!-- Stat Card 5 (Yeni Adaylar - CRM) -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Yeni Adaylar</p>
+                <h3 id="dash-stat-leads" class="text-3xl font-bold text-navy font-serif">-</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-xl">
+                <i class="fa-solid fa-bullseye"></i>
+            </div>
+        </div>
+
+        <!-- Stat Card 6 (Bekleyen Harcamalar) -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Onay Bekleyen</p>
+                <h3 id="dash-stat-expenses" class="text-fluid-3xl font-bold text-navy font-serif">-</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 text-xl">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Hızlı İşlemler -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-fluid-s lg:col-span-2">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-serif font-bold text-lg text-navy">Son Eklenen Portföyler</h3>
+                <button onclick="showSection('portfolios', document.querySelector('.nav-item[onclick*=\'portfolios\']'))"
+                    class="text-gold text-sm font-medium hover:underline">Tümünü Gör</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse premium-table">
+                    <thead>
+                        <tr>
+                            <th class="py-3 px-4 border-b border-gray-100">Referans</th>
+                            <th class="py-3 px-4 border-b border-gray-100">Başlık</th>
+                            <th class="py-3 px-4 border-b border-gray-100">Lokasyon</th>
+                            <th class="py-3 px-4 border-b border-gray-100">Fiyat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboard-portfolio-list" class="text-sm">
+                        <!-- Dinamik içerik gelecek -->
+                        <tr><td colspan="4" class="py-8 text-center text-gray-400">Yükleniyor...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Kullanıcı Paneli Dashboard Boş Durumu -->
+            <div id="dashboard-empty-geo" class="dashboard-empty-geo mt-4" style="display: none;" itemscope itemtype="https://schema.org/RealEstateAgent">
+                <meta itemprop="name" content="Kütahya İmza Gayrimenkul Müşteri Paneli">
+                <div class="empty-geo-icon" itemprop="makesOffer" itemscope itemtype="https://schema.org/Offer">
+                    <i class="fa-solid fa-house-flag"></i>
+                    <meta itemprop="name" content="Kütahya Gayrimenkul İlanı Ver">
+                    <meta itemprop="priceCurrency" content="TRY">
+                    <meta itemprop="price" content="0">
+                </div>
+                <h3 class="font-serif text-xl border-b pb-2 text-navy mb-4">Henüz İlanınız Bulunmuyor</h3>
+                <p class="text-sm text-gray-500 mb-6">
+                    Kütahya Merkez, Tavşanlı, Gediz ve bölge ilçelerindeki binlerce alıcıya ulaşmak için hemen ilk ilanınızı oluşturun.
+                </p>
+                <div class="geo-actions grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="bg-navy text-white text-xs font-bold uppercase tracking-widest py-4 px-6 rounded-xl hover:bg-slate-800 transition-colors">
+                        <i class="fa-solid fa-plus mr-2"></i> Kütahya'da İlan Ver
+                    </button>
+                    <button class="bg-gold/10 text-gold border border-gold/30 text-xs font-bold uppercase tracking-widest py-4 px-6 rounded-xl hover:bg-gold hover:text-white transition-colors">
+                        <i class="fa-solid fa-chart-line mr-2"></i> Bölge Analizini Gör
+                    </button>
+                </div>
+                <div class="mt-6 flex justify-center gap-6 text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+                    <span itemprop="areaServed" itemscope itemtype="https://schema.org/City">
+                        <i class="fa-solid fa-check text-gold mr-1"></i> <span itemprop="name">Kütahya Merkez</span>
+                    </span>
+                    <span itemprop="areaServed" itemscope itemtype="https://schema.org/City">
+                        <i class="fa-solid fa-check text-gold mr-1"></i> <span itemprop="name">Tavşanlı</span>
+                    </span>
+                    <span itemprop="areaServed" itemscope itemtype="https://schema.org/City">
+                        <i class="fa-solid fa-check text-gold mr-1"></i> <span itemprop="name">Gediz</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yaklaşan Etkinlikler -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <h3 class="font-serif font-bold text-lg text-navy mb-6">Yaklaşan Etkinlikler</h3>
+            <div class="space-y-4">
+                <div class="flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer border border-transparent hover:border-gray-100">
+                    <div class="w-10 h-10 rounded-lg bg-red-50 flex flex-col items-center justify-center shrink-0 border border-red-100">
+                        <span class="text-[10px] font-bold text-red-500 uppercase">Eki</span>
+                        <span class="text-sm font-bold text-red-700 leading-none">24</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-navy">Sözleşme Yenileme</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Cam Oda Penthouse (IMZ-092)</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer border border-transparent hover:border-gray-100">
+                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex flex-col items-center justify-center shrink-0 border border-blue-100">
+                        <span class="text-[10px] font-bold text-blue-500 uppercase">Kas</span>
+                        <span class="text-sm font-bold text-blue-700 leading-none">12</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-navy">Yıllık Vergi Ödemesi</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Ekolojik Orman Evi (IMZ-447)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

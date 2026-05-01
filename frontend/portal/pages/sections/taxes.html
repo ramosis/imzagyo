@@ -1,0 +1,46 @@
+<section id="taxes-section" class="content-section flex flex-col h-full bg-white hidden">
+    <div class="px-8 py-6 border-b border-gray-100 shrink-0">
+        <div class="flex justify-between items-end">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-serif font-bold text-navy">Finans ve Vergi</h2>
+                <p class="text-sm text-gray-500">Mülk vergisi, beyanname, aidat ve diğer mali
+                    yükümlülükleri
+                    izleyin.</p>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="showSection('taxes-calculator', this)"
+                    class="bg-gray-50 border border-gray-300 hover:bg-gray-100 text-navy font-bold py-3 px-6 rounded-lg transition-all text-xs flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-calculator text-gold"></i> TCMB Hesaplayıcı
+                </button>
+                <button onclick="openTaxModal()"
+                    class="bg-navy hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-lg transition-all uppercase tracking-[0.15em] text-xs flex items-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-plus text-gold"></i> Kayıt Ekle
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-auto p-8 relative">
+        <div
+            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto relative z-10">
+            <div
+                class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative z-10">
+                <table class="w-full text-left premium-table">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4 font-bold text-xs">ID</th>
+                            <th class="px-6 py-4 font-bold text-xs">Portföy</th>
+                            <th class="px-6 py-4 font-bold text-xs">Ödeme Tipi</th>
+                            <th class="px-6 py-4 font-bold text-xs">Tutar (₺)</th>
+                            <th class="px-6 py-4 font-bold text-xs">Son Ödeme</th>
+                            <th class="px-6 py-4 font-bold text-xs">Durum</th>
+                            <th class="px-6 py-4 text-right">Aksiyonlar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taxes-table-body" class="text-sm">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,15 @@
+<div id="lead-modal" class="fixed inset-0 bg-black/50 z-[2000] hidden flex items-center justify-center">
+    <div class="bg-white rounded-xl p-8 w-full max-w-md">
+        <h3 class="text-xl font-bold text-navy mb-4">Yeni Müşteri Adayı</h3>
+        <div class="space-y-4">
+            <input type="text" id="lead-name" placeholder="Ad Soyad" class="w-full border p-2 rounded">
+            <input type="text" id="lead-phone" placeholder="Telefon" class="w-full border p-2 rounded">
+            <input type="email" id="lead-email" placeholder="E-posta" class="w-full border p-2 rounded">
+            <textarea id="lead-notes" placeholder="Notlar" class="w-full border p-2 rounded"></textarea>
+        </div>
+        <div class="mt-6 flex justify-end gap-2">
+            <button onclick="closeLeadModal()" class="px-4 py-2 text-gray-500">İptal</button>
+            <button onclick="saveLead()" class="px-4 py-2 bg-navy text-white rounded">Kaydet</button>
+        </div>
+    </div>
+</div>

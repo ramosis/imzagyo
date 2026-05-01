@@ -22,7 +22,8 @@ def create_app(config_name='development'):
             dsn=os.getenv('SENTRY_DSN'),
             integrations=[FlaskIntegration()],
             traces_sample_rate=0.1,
-            environment=config_name
+            environment=config_name,
+            release=os.getenv('GIT_COMMIT', 'unknown')
         )
 
     app = Flask(__name__, 

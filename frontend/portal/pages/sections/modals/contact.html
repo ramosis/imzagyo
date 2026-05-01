@@ -1,0 +1,70 @@
+<div id="contact-modal" class="fixed inset-0 bg-black/50 z-[2000] hidden flex items-center justify-center overflow-y-auto p-4">
+    <div class="bg-white rounded-[2rem] p-8 w-full max-w-2xl border border-gray-100 shadow-2xl relative my-auto">
+        <button onclick="closeContactModal()" class="absolute top-6 right-6 text-gray-400 hover:text-red-500 transition-colors text-xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h3 class="text-2xl font-bold font-serif text-navy mb-6">Yeni Kişi Ekle</h3>
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Ad Soyad *</label>
+                    <input type="text" id="cont-name" class="w-full border p-2.5 rounded-lg text-sm focus:border-gold outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Telefon</label>
+                    <input type="text" id="cont-phone" class="w-full border p-2.5 rounded-lg text-sm focus:border-gold outline-none">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">E-Posta</label>
+                    <input type="email" id="cont-email" class="w-full border p-2.5 rounded-lg text-sm focus:border-gold outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Meslek</label>
+                    <input type="text" id="cont-occupation" class="w-full border p-2.5 rounded-lg text-sm focus:border-gold outline-none">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">Adres</label>
+                <input type="text" id="cont-address" class="w-full border p-2.5 rounded-lg text-sm focus:border-gold outline-none">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl">
+                <div>
+                    <label class="block text-xs font-bold text-navy mb-1">Müsaitlik Saati</label>
+                    <input type="text" id="cont-avail" placeholder="Örn: 18:00 sonrası" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-navy mb-1">Aile Kişi Sayısı</label>
+                    <input type="number" id="cont-family" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-navy mb-1">Yaş</label>
+                    <input type="number" id="cont-age" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-navy mb-1">Doğum Tarihi</label>
+                    <input type="date" id="cont-birthdate" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-red-50/50 p-4 rounded-xl border border-red-100">
+                <div>
+                    <label class="block text-xs font-bold text-red-800 mb-1">Politik Görüş (Özel)</label>
+                    <input type="text" id="cont-pol" class="w-full border border-red-100 p-2 rounded-lg text-sm focus:border-red-300 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-red-800 mb-1">Dini Görüş (Özel)</label>
+                    <input type="text" id="cont-rel" class="w-full border border-red-100 p-2 rounded-lg text-sm focus:border-red-300 outline-none">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">Notlar / Hobiler / Diğer</label>
+                <textarea id="cont-notes" rows="3" class="w-full border p-2.5 rounded-lg text-sm focus:border-gold outline-none"></textarea>
+            </div>
+        </div>
+        <div class="mt-8 flex justify-end gap-3">
+            <button onclick="closeContactModal()" class="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-200">İptal</button>
+            <button onclick="saveContact()" class="px-6 py-2.5 bg-navy text-gold rounded-lg font-bold text-sm hover:bg-slate-800 shadow-lg shadow-navy/20">Kaydet</button>
+        </div>
+    </div>
+</div>

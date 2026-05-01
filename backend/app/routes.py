@@ -34,8 +34,17 @@ def customer_portal():
 
 @main_bp.route('/health')
 def health_check():
+    db_status = 'healthy'
+    try:
+        from backend.shared.database import db_session
+        from sqlalchemy import text
+        db_session.execute(text("SELECT 1"))
+    except Exception as e:
+        db_status = f'unhealthy: {str(e)}'
+
     return jsonify({
-        'status': 'healthy',
-        'version': '1.0.0',
+        'status': 'healthy' if db_status == 'healthy' else 'degraded',
+        'database': db_status,
+        'version': os.getenv('GIT_COMMIT', '1.0.0')[:8],
         'timestamp': datetime.utcnow().isoformat()
-    }), 200
+    }), 200 if db_status == 'healthy' else 503

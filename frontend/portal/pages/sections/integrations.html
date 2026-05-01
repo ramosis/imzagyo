@@ -1,0 +1,66 @@
+<section id="integrations-section"
+    class="content-section flex flex-col h-full bg-white hidden">
+    <div class="px-8 py-6 border-b border-gray-100 shrink-0">
+        <div class="flex justify-between items-end">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-serif font-bold text-navy">Entegrasyon Merkezi
+                </h2>
+                <p class="text-sm text-gray-500">İlan siteleri, sosyal medya ve tasarım
+                    araçlarına tek
+                    noktadan paylaşım.</p>
+            </div>
+            <button onclick="openPublishWizard()"
+                class="bg-navy hover:bg-slate-800 text-gold font-bold py-3 px-6 rounded-lg transition-all text-xs uppercase tracking-widest">
+                <i class="fa-solid fa-paper-plane mr-2"></i> Yeni Paylaşım
+            </button>
+        </div>
+    </div>
+    <div class="flex-1 overflow-auto p-8">
+        <!-- Platform Kartları -->
+        <div class="mb-8">
+            <h3 class="text-sm font-bold text-navy uppercase tracking-wider mb-4"><i
+                    class="fa-solid fa-house-laptop mr-2 text-gold"></i> İlan Siteleri
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4"
+                id="listing-platforms-grid"></div>
+        </div>
+        <div class="mb-8">
+            <h3 class="text-sm font-bold text-navy uppercase tracking-wider mb-4"><i
+                    class="fa-brands fa-instagram mr-2 text-gold"></i> Sosyal Medya</h3>
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4"
+                id="social-platforms-grid"></div>
+        </div>
+        <div class="mb-8">
+            <h3 class="text-sm font-bold text-navy uppercase tracking-wider mb-4"><i
+                    class="fa-solid fa-palette mr-2 text-gold"></i> Tasarım Araçları
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4"
+                id="design-platforms-grid"></div>
+        </div>
+
+        <!-- Son Paylaşımlar -->
+        <div class="mt-8">
+            <h3 class="text-sm font-bold text-navy uppercase tracking-wider mb-4"><i
+                    class="fa-solid fa-clock-rotate-left mr-2 text-gold"></i> Son
+                Paylaşımlar</h3>
+            <div
+                class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr
+                                class="border-b border-gray-100 text-[10px] uppercase font-bold text-gray-500 tracking-wider">
+                                <th class="px-6 py-3">Portföy</th>
+                                <th class="px-6 py-3">Platform</th>
+                                <th class="px-6 py-3">Tarih</th>
+                                <th class="px-6 py-3">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publications-table-body" class="text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

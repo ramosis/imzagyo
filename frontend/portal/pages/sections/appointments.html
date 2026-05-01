@@ -1,0 +1,40 @@
+<section id="appointments-section" class="content-section flex flex-col h-full bg-white hidden">
+    <div class="px-8 py-6 border-b border-gray-100 shrink-0">
+        <div class="flex justify-between items-end">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-serif font-bold text-navy">Randevular ve Keşifler</h2>
+                <p class="text-sm text-gray-500">Oluşturulan gösterim randevularını onaylayın ve
+                    takip edin.
+                </p>
+            </div>
+            <button onclick="openAppointmentModal()"
+                class="bg-navy border border-gold hover:bg-slate-800 text-gold font-bold py-3 px-6 rounded-lg transition-all uppercase tracking-[0.15em] text-xs flex items-center gap-2">
+                <i class="fa-regular fa-calendar-plus"></i> Manuel Randevu
+            </button>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-auto p-8 relative">
+        <div
+            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto relative z-10">
+            <div
+                class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative z-10">
+                <table class="w-full text-left premium-table">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4 font-bold text-xs">ID</th>
+                            <th class="px-6 py-4 font-bold text-xs">Mülk (Portföy)</th>
+                            <th class="px-6 py-4 font-bold text-xs">Müşteri</th>
+                            <th class="px-6 py-4 font-bold text-xs">Konu</th>
+                            <th class="px-6 py-4 font-bold text-xs">Tarih / Saat</th>
+                            <th class="px-6 py-4 font-bold text-xs">Durum</th>
+                            <th class="px-6 py-4 text-right">Aksiyonlar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointments-table-body" class="text-sm">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,59 @@
+<div id="media-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-[2rem] w-full max-w-7xl h-[85vh] shadow-2xl relative flex overflow-hidden">
+        <button onclick="closeMediaManager()" class="absolute top-6 right-6 text-gray-400 hover:text-navy z-50 transition-colors bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+        
+        <!-- Left Side: Existing Media -->
+        <div class="w-1/2 p-8 border-r border-gray-100 flex flex-col h-full bg-white relative">
+            <h3 class="text-2xl font-serif font-bold text-navy mb-2">Medya Arşivi</h3>
+            <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-wider font-bold">Portföye Ekli İçerikler</p>
+            
+            <div id="media-list-container" class="grid grid-cols-2 gap-4 overflow-y-auto custom-scrollbar flex-1 content-start pr-2">
+                <!-- Fetch results mapped here -->
+            </div>
+        </div>
+
+        <!-- Right Side: New Upload -->
+        <div class="w-1/2 p-8 flex flex-col h-full bg-gray-50/50 relative">
+            <h3 class="text-2xl font-serif font-bold text-navy mb-2">Yeni Yükle</h3>
+            <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-wider font-bold">Kırpma ve Optimizasyon</p>
+            
+            <div class="mb-4">
+                <label class="block text-[10px] font-bold text-navy uppercase mb-2">Görsel Kategorisi</label>
+                <div class="relative">
+                    <select id="media-category-select" class="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl appearance-none outline-none focus:border-gold transition-colors font-semibold text-gray-700 bg-white shadow-sm">
+                        <option value="Dış Çekim">Dış Çekim (Dış Cephe / Bahçe)</option>
+                        <option value="İç Mekan">İç Mekan (Odalar / Mutfak)</option>
+                        <option value="Drone / Kuşbakışı">Drone / Kuşbakışı</option>
+                        <option value="Plan / Kroki">Kat Planı / Kroki</option>
+                        <option value="Video / Sanal Tur">Sanal Tur / Kapak Fotoğrafı</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col mb-6 relative group border-2 border-dashed border-gray-300 rounded-2xl bg-white hover:bg-gray-50 hover:border-gold/50 transition-colors overflow-hidden">
+                <div id="media-upload-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
+                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center shadow-sm border border-gray-100 mb-4 text-gold group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                    </div>
+                    <p class="font-bold text-navy mb-1 text-sm tracking-wide">Görsel Seçin veya Sürükleyin</p>
+                    <p class="text-[9px] uppercase font-bold text-gray-400 tracking-widest">En Fazla 10 MB (JPG, PNG)</p>
+                    <input type="file" id="media-upload-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleMediaSelect(event)">
+                </div>
+
+                <div id="media-crop-container" class="absolute inset-0 flex flex-col hidden bg-black">
+                    <img id="media-crop-image" src="" alt="Kesilecek Görsel" class="max-w-full max-h-full block opacity-0">
+                </div>
+            </div>
+
+            <div class="flex gap-4 shrink-0 mt-auto">
+                <button onclick="resetUploadForm()" class="px-6 py-4 bg-white border border-gray-200 text-gray-600 font-bold uppercase tracking-widest text-[10px] rounded-xl hover:bg-gray-50 transition-colors shadow-sm relative z-10">İptal / Temizle</button>
+                <button id="media-upload-btn" onclick="uploadMedia()" class="flex-1 bg-navy text-gold py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] shadow-xl shadow-navy/20 hover:bg-slate-800 transition-colors flex justify-center items-center relative z-10">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2 text-sm"></i> Kırp, Yükle & Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+<div id="user-modal" class="fixed inset-0 z-[100] hidden">
+    <div class="absolute inset-0 bg-navy/40 backdrop-blur-sm transition-opacity opacity-0" id="user-overlay" onclick="closeUserModal()"></div>
+    <div class="absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" id="user-panel">
+        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-soft shrink-0">
+            <h2 id="user-modal-title" class="text-xl font-serif font-bold text-navy">Yeni Kullanıcı Ekle</h2>
+            <button onclick="closeUserModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-500 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="p-8 overflow-y-auto space-y-6 flex-1">
+            <input type="hidden" id="user-id">
+            <div>
+                <label class="block text-[10px] font-bold text-navy uppercase tracking-wider mb-2">Kullanıcı Adı</label>
+                <input type="text" id="user-username" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold focus:bg-white transition-all text-sm font-medium text-navy" placeholder="Kullanıcı Adı">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-navy uppercase tracking-wider mb-2">Şifre</label>
+                <input type="password" id="user-password" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold focus:bg-white transition-all text-sm font-medium text-navy" placeholder="Şifre (Boş bırakırsanız değişmez)">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-navy uppercase tracking-wider mb-2">Rol</label>
+                <select id="user-role" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold focus:bg-white transition-all text-sm font-medium text-navy">
+                    <option value="admin">Yönetici (Admin)</option>
+                    <option value="employee">Personel (Employee)</option>
+                    <option value="partner">İş Ortağı (Partner)</option>
+                    <option value="client">Müşteri (Client)</option>
+                    <option value="tenant">Kiracı (Tenant)</option>
+                    <option value="owner">Mülk Sahibi (Owner)</option>
+                    <option value="seller">Satıcı (Seller)</option>
+                    <option value="contractor">Hizmet Sağlayıcı (Contractor)</option>
+                </select>
+            </div>
+        </div>
+        <div class="px-8 py-6 border-t border-gray-100 bg-gray-50 shrink-0 flex gap-4">
+            <button onclick="closeUserModal()" class="flex-1 py-3 px-4 bg-white border border-gray-200 text-navy font-bold rounded-lg hover:bg-gray-50 transition-colors text-sm">İptal</button>
+            <button onclick="saveUser()" class="flex-1 py-3 px-4 bg-navy text-gold font-bold rounded-lg hover:bg-slate-800 transition-colors shadow-lg shadow-navy/20 text-sm">Kaydet</button>
+        </div>
+    </div>
+</div>

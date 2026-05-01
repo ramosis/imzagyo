@@ -1,0 +1,38 @@
+<section id="notices-section" class="content-section hidden animate-fade-in p-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h2 class="text-3xl font-black text-navy tracking-tighter uppercase mb-1 italic">Duyuru <span class="text-emerald-500">Panosu</span></h2>
+            <p class="text-gray-500 text-sm font-medium">Ev sahipleri, kiracılar ve ekip arkadaşlarınız için özel duyurular.</p>
+        </div>
+        <button onclick="console.log('Open Notice Modal')" class="px-6 py-3 border border-emerald-100 text-emerald-600 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-emerald-50 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-broadcast-tower"></i> Yayınla
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-50 bg-gray-50/30">
+                <h3 class="text-xs font-black text-navy uppercase tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Son Yayınlananlar
+                </h3>
+            </div>
+            <div id="notices-container" class="divide-y divide-gray-50">
+                <div class="p-20 text-center text-gray-400">Duyurular taranıyor...</div>
+            </div>
+        </div>
+        <div class="bg-navy rounded-3xl p-8 text-white shadow-xl shadow-navy/20 relative overflow-hidden group">
+           <!-- Ajanda Placeholder -->
+           <h3 class="text-lg font-black uppercase mb-4 tracking-tighter">Ofis Ajandası</h3>
+           <p class="text-navy-100/60 text-xs mb-8">Dahili toplantılar ve saha görevleri.</p>
+           <div class="space-y-4 opacity-50">
+               <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                   <span class="text-[10px] font-bold text-gold uppercase tracking-widest">Pazartesi 09:00</span>
+                   <p class="font-bold text-sm mt-1">Haftalık Vizyon Toplantısı</p>
+               </div>
+           </div>
+           <div class="absolute bottom-[-20%] right-[-10%] opacity-10 pointer-events-none group-hover:scale-110 transition-transform">
+               <i class="fa-solid fa-calendar-days text-[150px]"></i>
+           </div>
+        </div>
+    </div>
+</section>

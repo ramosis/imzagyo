@@ -1,0 +1,35 @@
+<section id="portfolios-section" class="content-section flex flex-col h-full bg-white hidden">
+    <div class="px-8 py-6 border-b border-gray-100 shrink-0">
+        <div class="flex justify-between items-end">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-serif font-bold text-navy">Portföy Yönetimi</h2>
+                <p class="text-sm text-gray-500">Mevcut ilanlarınızı yönetin, düzenleyin ve paylaşın.</p>
+            </div>
+            <button onclick="openPropertyModal()"
+                class="bg-navy hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-lg transition-all text-xs uppercase tracking-widest">
+                <i class="fa-solid fa-plus text-gold mr-2"></i> Yeni İlan Ekle
+            </button>
+        </div>
+    </div>
+    <div class="flex-1 overflow-auto p-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left premium-table">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4 font-bold text-xs">Görsel</th>
+                            <th class="px-6 py-4 font-bold text-xs">Başlık / Ref</th>
+                            <th class="px-6 py-4 font-bold text-xs">Lokasyon</th>
+                            <th class="px-6 py-4 font-bold text-xs">Fiyat</th>
+                            <th class="px-6 py-4 font-bold text-xs">Durum</th>
+                            <th class="px-6 py-4 text-right">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portfolios-table-body" class="text-sm">
+                        <!-- Portföyler buraya render edilecek -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

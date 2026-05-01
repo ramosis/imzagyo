@@ -1,0 +1,120 @@
+<div id="portfolio-modal" class="fixed inset-0 bg-black/50 z-[9999] hidden flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 pointer-events-auto">
+    <div class="bg-white rounded-[2rem] p-8 w-full max-w-3xl border border-gray-100 shadow-2xl relative my-auto">
+        <button onclick="closePortfolioModal()" class="absolute top-6 right-6 text-gray-400 hover:text-red-500 transition-colors text-xl">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+
+        <h3 id="portfolio-modal-title" class="text-2xl font-bold font-serif text-navy mb-6 tracking-tight">Yeni Portföy Ekle</h3>
+
+        <form id="portfolio-form" class="space-y-6 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar text-left text-sm">
+            <input type="hidden" id="p-id" value="">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Temel Bilgiler -->
+                <div class="space-y-4 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                    <p class="text-[10px] font-black uppercase text-gold tracking-widest"><i class="fa-solid fa-circle-info mr-1"></i> Temel Bilgiler</p>
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase mb-1">Referans No / Kategori</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="p-refNo" placeholder="IMZ-001" class="w-1/3 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors font-mono">
+                            <select id="p-ozellik_kategori" class="w-2/3 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                                <option value="Satılık">Satılık</option>
+                                <option value="Kiralık">Kiralık</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase mb-1">Başlık (Örn: Cam Oda / Penthouse)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="p-baslik1" placeholder="Cam Oda" class="w-1/2 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors font-serif font-bold">
+                            <input type="text" id="p-baslik2" placeholder="Penthouse" class="w-1/2 border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors text-gray-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase mb-1">Koleksiyon (Tema)</label>
+                        <select id="p-koleksiyon" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors uppercase font-medium text-xs">
+                            <option value="Konut">Konut (Standart, Daire vb.)</option>
+                            <option value="Arsa">Arsa</option>
+                            <option value="Tarla">Tarla / Bahçe</option>
+                            <option value="Çiftlik">Çiftlik / Tesis</option>
+                            <option value="İş Yeri">İş Yeri / Ofis / Dükkan</option>
+                            <option value="Sanayi">Sanayi Tesisi / Depo</option>
+                            <option value="Turizm">Turizm Tesisi / Otel</option>
+                            <option value="K.Dönüşüm">Kentsel Dönüşüm</option>
+                            <option value="Bina">Bina (Komple)</option>
+                            <option value="Devremülk">Devremülk</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase mb-1">Fiyat (Metin, Örn: 12.000.000 ₺)</label>
+                        <input type="text" id="p-fiyat" placeholder="25.000 ₺" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors font-bold text-green-700">
+                    </div>
+                </div>
+
+                <!-- Detaylar -->
+                <div class="space-y-4 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                    <p class="text-[10px] font-black uppercase text-gold tracking-widest"><i class="fa-solid fa-list mr-1"></i> Teknik Detaylar</p>
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase mb-1">Lokasyon</label>
+                        <input type="text" id="p-lokasyon" placeholder="İlçe, İl" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-navy uppercase mb-1">Oda Sayısı</label>
+                            <input type="text" id="p-oda" placeholder="3+1" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-navy uppercase mb-1">Brüt/Net Alan</label>
+                            <input type="text" id="p-alan" placeholder="150m²" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-navy uppercase mb-1">Isıtma</label>
+                            <input type="text" id="p-isitma" placeholder="Kombi" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-navy uppercase mb-1">Bulunduğu Kat</label>
+                            <input type="text" id="p-kat" placeholder="Ara Kat" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Görseller & Açıklama -->
+            <div class="space-y-4 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                <p class="text-[10px] font-black uppercase text-gold tracking-widest"><i class="fa-solid fa-images mr-1"></i> Medya & Metin</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase mb-1">Ana Görsel (Hero URL)</label>
+                        <input type="text" id="p-resim_hero" placeholder="https://" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-navy uppercase mb-1">İkincil Görsel (Hikaye URL)</label>
+                        <input type="text" id="p-resim_hikaye" placeholder="https://" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-navy uppercase mb-1">Özellikler (Etiketler - Virgülle Ayırın)</label>
+                    <input type="text" id="p-ozellikler_arr" placeholder="Havuz, Güvenlik, Otopark" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-navy uppercase">Hikaye / İçerik</label>
+                        <button type="button" id="btn-ai-generate" onclick="generateStoryFromAI()" class="text-[10px] font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-1 rounded-full hover:from-purple-700 hover:to-indigo-700 transition flex items-center gap-1 shadow-md shadow-purple-500/20">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI ile Üret
+                        </button>
+                    </div>
+                    <textarea id="p-hikaye" rows="4" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:border-gold transition-colors"></textarea>
+                </div>
+            </div>
+        </form>
+
+        <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-100">
+            <button onclick="closePortfolioModal()" class="px-6 py-3 bg-white border border-gray-200 text-gray-500 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-gray-50 transition-colors">İptal</button>
+            <button onclick="submitPortfolioForm()" class="px-6 py-3 bg-navy text-gold font-bold uppercase tracking-widest text-[10px] rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-navy/20 items-center justify-center flex gap-2">
+                <i class="fa-solid fa-save"></i> Kaydet
+            </button>
+        </div>
+    </div>
+</div>

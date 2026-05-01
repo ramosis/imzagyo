@@ -1,0 +1,57 @@
+<div id="campaign-modal" class="fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+    <div class="bg-white w-full max-w-3xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <h3 class="text-xl font-serif font-bold text-navy" id="campaign-modal-title">Yeni Müşteri E-Postası (Kampanya)</h3>
+            <button onclick="closeCampaignModal()" class="w-10 h-10 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-navy hover:text-red-500 hover:border-red-500 transition-all shadow-sm">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <form id="campaign-form" onsubmit="submitCampaignForm(event)" class="p-8 flex-1 overflow-y-auto w-full grid grid-cols-1 gap-6">
+            <div class="grid grid-cols-2 gap-6">
+                <div class="w-full">
+                    <label class="block text-xs font-bold text-navy uppercase tracking-widest mb-2">Kampanya Adı <span class="text-gray-400 normal-case tracking-normal">(Panoluk Başlık)</span></label>
+                    <input type="text" id="cmp-title" required class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors" placeholder="Örn: Haziran Merkez Konut Fırsatı">
+                </div>
+                <div class="w-full">
+                    <label class="block text-xs font-bold text-navy uppercase tracking-widest mb-2">E-Posta Konusu <span class="text-gray-400 normal-case tracking-normal">(Müşteri Görecek)</span></label>
+                    <input type="text" id="cmp-subject" required class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors" placeholder="Kadıköy'de Sizin İçin Seçtiğimiz Fırsatlar!">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="w-full">
+                    <label class="block text-xs font-bold text-navy uppercase tracking-widest mb-2">Gönderim Türü</label>
+                    <select id="cmp-type" required class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold transition-colors bg-white">
+                        <option value="newsletter">Toplu Haber Bülteni (Kampanya)</option>
+                        <option value="portfolio_presentation">Özel Portföy Sunumu</option>
+                        <option value="collection_reminder">Finansal/Tahsilat Bildirimi</option>
+                    </select>
+                </div>
+                <div class="w-full">
+                    <label class="block text-xs font-bold text-navy uppercase tracking-widest mb-2">Hedef Kitle</label>
+                    <select id="cmp-audience" required class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold transition-colors text-modern font-bold bg-modern/5">
+                        <option value="all_users">Tüm Standart Kullanıcılar (Outer Circle)</option>
+                        <option value="leads">Sadece Müşteri Adayları (Leads)</option>
+                        <option value="test">Test Gönderimi (Sadece Kendime)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="w-full">
+                <label class="block text-xs font-bold text-navy uppercase tracking-widest mb-2">E-Posta Mesajı (HTML İçerik)</label>
+                <textarea id="cmp-content" required rows="6" class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors font-mono" placeholder="<h1>Merhaba!</h1><p>İmza Gayrimenkul'den yepyeni fırsatlar...</p>"></textarea>
+                <p class="text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-code"></i> HTML etiketleri kullanılarak şık tasarımlar yapılabilir.</p>
+            </div>
+
+            <div id="campaign-submit-error" class="text-red-500 text-sm hidden font-medium">Lütfen tüm alanları doldurunuz.</div>
+
+            <div class="pt-6 border-t border-gray-100 flex justify-end gap-4 mt-auto">
+                <button type="button" onclick="closeCampaignModal()" class="px-6 py-3 rounded-full text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors uppercase tracking-wider">İptal</button>
+                <button type="submit" id="cmp-submit-btn" class="bg-navy hover:bg-slate-800 text-gold px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wider transition-colors shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Gönderimi Başlat
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

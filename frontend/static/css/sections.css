@@ -1,0 +1,29 @@
+/* sections.css — Section görünürlük ve geçiş animasyonları */
+.content-section {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.content-section.active {
+    display: flex; /* Çoğu section flex flex-col h-full yapısında */
+    opacity: 1;
+}
+
+/* Fallback for block layouts */
+.content-section.active.block {
+    display: block;
+}
+
+.section-hidden {
+    display: none !important;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
