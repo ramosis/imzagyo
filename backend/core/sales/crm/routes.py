@@ -76,5 +76,34 @@ def get_transaction_timeline(id):
         'title': e.title_tr,
         'description': e.description_tr,
         'date': e.event_date.isoformat(),
-        'type': e.type
+        'type': e.type,
+        'icon': e.icon
     } for e in events]), 200
+
+@crm_bp.route('/api/v1/customer/transactions/<int:id>/documents', methods=['GET'])
+def get_transaction_documents(id):
+    """Müşterinin belirli bir işleme ait dökümanlarını getirir."""
+    user = getattr(g, 'user', None)
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    from .models import Contact, Transaction, Document
+    from backend.shared.database import db_session
+    
+    contact = db_session.query(Contact).filter_by(user_id=user['id']).first()
+    transaction = db_session.query(Transaction).get(id)
+    
+    if not transaction or (transaction.client_id != contact.id and user['role'] != 'admin'):
+        return jsonify({'error': 'Access denied'}), 403
+        
+    documents = db_session.query(Document).filter_by(transaction_id=id).all()
+    
+    return jsonify([{
+        'id': d.id,
+        'title': d.title,
+        'url': d.file_url,
+        'size': d.file_size,
+        'type': d.file_type,
+        'category': d.category,
+        'created_at': d.created_at.isoformat()
+    } for d in documents]), 200

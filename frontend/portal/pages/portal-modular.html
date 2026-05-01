@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İmza Admin Portal | Modular Premium Panel</title>
+    <link rel="stylesheet" href="/static/css/fluid.css?v=2.0">
+    <link rel="stylesheet" href="/static/css/z-index.css?v=2.0">
+    <link rel="stylesheet" href="/static/css/sections.css?v=2.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0a192f',
+                        gold: '#c5a059',
+                        modern: '#1e293b',
+                        nature: '#0f172a'
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="/static/js/lmetrics.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="/static/js/mobile_polish.js?v=2.0" defer></script>
+    <script src="/static/js/media_manager.js?v=2.0"></script>
+
+    <style>
+        html, body {
+            background-color: #f8fafc;
+            overflow-x: hidden !important;
+            width: 100%;
+            position: relative;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .glass-dark {
+            background: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brand-pattern {
+            background-image: radial-gradient(#c5a059 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
+        }
+
+        .premium-table th {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: #475569;
+            background-color: #f8fafc;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .premium-table tr {
+            transition: all 0.2s ease;
+        }
+
+        .premium-table tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .nav-item.active {
+            background: rgba(197, 160, 89, 0.1);
+            color: #c5a059;
+            border-right: 3px solid #c5a059;
+        }
+
+        .split-layout {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .split-left {
+            flex: 1;
+            background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .split-left::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(10, 25, 47, 0.9), rgba(10, 25, 47, 0.4));
+        }
+
+        .split-right {
+            flex: 1;
+            background-color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .slide-up-anim {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        #portal-app.show-app {
+            display: flex !important;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .nav-item.active {
+            background-color: rgba(197, 160, 89, 0.1);
+            color: #c5a059 !important;
+            border-left: 3px solid #c5a059;
+            border-radius: 9999px;
+            font-weight: 700;
+        }
+
+        .nav-item.active i {
+            color: #c5a059;
+        }
+
+        .lens-tab-btn.active, .campaign-tab-btn.active, .hub-tab-btn.active {
+            background-color: white !important;
+            color: #0a192f !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .premium-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.75rem;
+            min-width: 160px;
+            background: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(197, 160, 89, 0.1);
+            color: #c5a059;
+        }
+
+        .dropdown-item.active {
+            color: #c5a059;
+            background: rgba(197, 160, 89, 0.05);
+        }
+
+        .role-badge-trigger {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .role-badge-trigger:hover .role-text {
+            color: white;
+        }
+
+        .role-badge-trigger:hover .role-chevron {
+            transform: rotate(180deg);
+        }
+    </style>
+
+    <script src="/static/js/imza-settings.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="text-slate-800 antialiased font-sans bg-gray-50 flex h-screen overflow-hidden">
+    <div id="vibe-fix-check" data-version="2.0" class="hidden"></div>
+
+    <!-- LOGIN EKRANI -->
+    <div id="login-section" class="fixed inset-0 z-50 bg-navy transition-all duration-700">
+        <div class="split-layout">
+            <div class="split-left hidden md:flex">
+                <div class="absolute inset-0 brand-pattern opacity-20"></div>
+                <div class="relative z-10 p-12 max-w-2xl w-full text-left">
+                    <div class="mb-12 slide-up-anim">
+                        <i class="fa-solid fa-signature text-gold text-5xl mb-4 group-hover/portal-logo:scale-110 transition-transform"></i>
+                        <h1 class="text-fluid-4xl md:text-7xl font-bold font-serif text-white leading-tight drop-shadow-xl">
+                            Sadece Bir Ev Değil, <br>
+                            <span class="text-gold italic">Yeni Bir Hayat.</span>
+                        </h1>
+                    </div>
+                    <div class="space-y-6 slide-up-anim delay-100 border-l-2 border-gold/50 pl-6">
+                        <p class="text-gray-300 text-sm md:text-base leading-relaxed max-w-md">
+                            İmza Gayrimenkul Premium Yönetim paneline hoş geldiniz. Portföyünüzü, sözleşmelerinizi ve
+                            yatırımlarınızı lüksün getirdiği konforla yönetin.
+                        </p>
+                        <div class="flex items-center gap-4 text-xs font-bold text-gold uppercase tracking-[0.2em]">
+                            <span><i class="fa-solid fa-check mr-2"></i> Güvenli</span>
+                            <span><i class="fa-solid fa-check mr-2"></i> Şeffaf</span>
+                            <span><i class="fa-solid fa-check mr-2"></i> Ayrıcalıklı</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="split-right relative">
+                <div class="absolute top-8 right-8 z-20">
+                    <a href="/" class="flex items-center gap-2 text-white/40 hover:text-gold transition-all text-[10px] font-black uppercase tracking-widest border border-white/10 hover:border-gold/50 px-5 py-2 rounded-full backdrop-blur-md">
+                        <i class="fa-solid fa-arrow-left"></i> Web Sitesine Dön
+                    </a>
+                </div>
+
+                <div class="w-full max-w-md slide-up-anim delay-200">
+                    <div class="bg-white p-10 rounded-2xl shadow-xl shadow-navy/5 border border-gray-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-navy via-gold to-navy"></div>
+                        <div class="mb-8 text-center">
+                            <h3 class="text-2xl font-bold text-navy font-serif mb-2">Sisteme Giriş Yapın</h3>
+                            <p class="text-sm text-gray-500">Premium yönetim alanına erişmek için yetkili bilgilerinizi giriniz.</p>
+                        </div>
+
+                        <form id="login-form" class="space-y-5">
+                            <div>
+                                <label for="username" class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Kullanıcı Adı</label>
+                                <div class="relative group">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <i class="fa-regular fa-user text-gray-500 group-focus-within:text-gold transition-colors"></i>
+                                    </div>
+                                    <input type="text" id="username" name="username" required
+                                        class="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold focus:bg-white transition-all text-sm font-medium text-navy placeholder-gray-400"
+                                        placeholder="admin">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="password" class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">Şifre</label>
+                                <div class="relative group">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-lock text-gray-500 group-focus-within:text-gold transition-colors"></i>
+                                    </div>
+                                    <input type="password" id="password" name="password" required
+                                        class="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold focus:bg-white transition-all text-sm font-medium text-navy placeholder-gray-400"
+                                        placeholder="••••••••">
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <button type="submit" class="w-full bg-navy hover:bg-slate-800 text-gold font-bold py-4 rounded-lg transition-all gold-glow uppercase tracking-[0.15em] text-xs flex items-center justify-center gap-3">
+                                    <span>Güvenli Giriş</span> <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANA PORTAL ARAYÜZÜ -->
+    <div id="portal-app" class="flex w-full h-full hidden">
+        <div id="sidebar-overlay" class="fixed inset-0 bg-navy/60 backdrop-blur-sm z-[2000] hidden lg:hidden"></div>
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="w-72 glass-dark flex flex-col h-full shrink-0 fixed inset-y-0 left-0 lg:relative lg:inset-0 transition-transform duration-300 z-[2001]">
+            <div class="h-20 flex items-center px-8 border-b border-white/10 relative z-10 cursor-pointer" onclick="router.showSection('dashboard')">
+                <i class="fa-solid fa-signature text-gold text-2xl mr-3"></i>
+                <div class="flex flex-col">
+                    <span class="font-serif font-bold text-xl tracking-widest text-white leading-none uppercase">İMZA</span>
+                    <span class="text-gray-400 text-[9px] tracking-[0.3em] uppercase mt-1">Portal</span>
+                </div>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1 relative z-10 custom-scrollbar">
+                <div class="pb-2 px-4"><p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Yönetim</p></div>
+                <button data-section="dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-gauge-high w-8 flex items-center justify-center text-lg"></i> Dashboard
+                </button>
+                <button data-section="portfolios" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-building-columns w-8 flex items-center justify-center text-lg"></i> Portföy
+                </button>
+                <button data-section="pipeline" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-diagram-project w-8 flex items-center justify-center text-lg"></i> Pipeline
+                </button>
+                <button data-section="finance" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-calculator w-8 flex items-center justify-center text-lg"></i> Finans
+                </button>
+                <button data-section="ai" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-brain w-8 flex items-center justify-center text-lg"></i> AI Analiz
+                </button>
+                <button data-section="analytics" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-chart-pie w-8 flex items-center justify-center text-lg"></i> Analitik
+                </button>
+                <button data-section="settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-gears w-8 flex items-center justify-center text-lg"></i> Ayarlar
+                </button>
+
+                <div class="pt-4 pb-2 px-4"><p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Müşteri</p></div>
+                <button data-section="customer-portal" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <i class="fa-solid fa-user-tie w-8 flex items-center justify-center text-lg"></i> Süreç Takibi
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-white/10 relative z-10 space-y-1">
+                <button id="logout-btn" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-modern hover:bg-modern/10 transition-all text-sm font-bold">
+                    <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Güvenli Çıkış
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-gray-50 relative">
+            <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0">
+                <h2 id="page-title" class="text-xl font-serif font-bold text-navy flex items-center gap-3">
+                    <i class="fa-solid fa-chart-pie text-gold text-lg"></i> Dashboard
+                </h2>
+            </header>
+
+            <!-- SECTION CONTAINER (LAZY LOAD TARGET) -->
+            <div id="section-container" class="flex-1 overflow-y-auto p-8 relative">
+                <div class="flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <i class="fa-solid fa-spinner fa-spin text-3xl text-gold mb-4"></i>
+                        <p class="text-navy font-bold uppercase tracking-widest text-xs">Yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL CONTAINER -->
+    <div id="modal-container"></div>
+
+    <!-- SCRIPTS -->
+    <script src="/static/js/pages/portal.js" type="module"></script>
+</body>
+</html>

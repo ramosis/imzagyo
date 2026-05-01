@@ -1,6 +1,19 @@
 // --- PORTAL PAGES JS ---
 document.addEventListener('DOMContentLoaded', () => {
     console.log('[İmza Portal] DOM Yüklendi, init ediliyor...');
+
+    // Sidebar Navigation Listener
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.addEventListener('click', (e) => {
+            const btn = e.target.closest('.nav-item');
+            if (btn && btn.dataset.section) {
+                if (typeof showSection === 'function') {
+                    showSection(btn.dataset.section, btn);
+                }
+            }
+        });
+    }
     
     // Check Auth when portal loads
     if (typeof checkAuth === 'function') {
@@ -19,10 +32,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Listen for custom 'sectionShown' events dispatched by router.js
-    document.addEventListener('sectionShown', (e) => {
+    document.addEventListener('sectionShown', async (e) => {
         const sectionId = e.detail.sectionId;
         console.log(`[Portal] Event Captured: sectionShown -> ${sectionId}`);
-        // Optionally bind specific page-level logic here if needed
+        
+        // Dinamik modül yükleme (Phase 9 ve sonrası için)
+        if (sectionId === 'customer-portal') {
+            try {
+                const { customer_portal } = await import('/static/js/modules/customer_portal.js');
+                if (customer_portal && customer_portal.init) {
+                    await customer_portal.init();
+                }
+            } catch (err) {
+                console.error("Modül yükleme hatası:", err);
+            }
+        }
+        
+        // Mevcut global fonksiyonlu modülleri de buradan çağırabiliriz
+        if (sectionId === 'leads' && typeof fetchLeads === 'function') fetchLeads();
     });
     
     // Close dropdowns on outside click (premium UI helper)

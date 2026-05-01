@@ -44,6 +44,7 @@ class TransactionEvent(db.Model):
     description_tr = db.Column(db.Text)
     description_en = db.Column(db.Text)
     type = db.Column(db.String(50)) # milestone, update, document_added
+    icon = db.Column(db.String(50), default='fa-circle') # fontawesome icon
     event_date = db.Column(db.DateTime, default=datetime.utcnow)
     is_public = db.Column(db.Boolean, default=True) # Müşteri görebilir mi?
 
@@ -53,5 +54,7 @@ class Document(db.Model):
     transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.id', ondelete='CASCADE'), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     file_url = db.Column(db.String(255), nullable=False)
+    file_size = db.Column(db.String(50)) # e.g. "2.4 MB"
+    file_type = db.Column(db.String(50)) # e.g. "pdf", "jpg"
     category = db.Column(db.String(50)) # contract, title_deed, id_card
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -1,13 +1,42 @@
-function showSection(sectionId, btnElement) {
-    console.log("[İmza Portal] showSection çağrıldı:", sectionId);
+const SECTIONS = {
+    'dashboard': '/portal/sections/dashboard',
+    'imza-lens': '/portal/sections/imza-lens',
+    'portfolios': '/portal/sections/portfolios',
+    'leads': '/portal/sections/leads',
+    'finance': '/portal/sections/finance',
+    'ai-reports': '/portal/sections/ai-reports',
+    'analytics': '/portal/sections/analytics',
+    'settings': '/portal/sections/settings',
+    'campaigns': '/portal/sections/campaigns',
+    'market-analytics': '/portal/sections/market-analytics',
+    'contract-builder': '/portal/sections/contract-builder',
+    'global-sync': '/portal/sections/global-sync',
+    'barter-wizard': '/portal/sections/barter-wizard',
+    'projects': '/portal/sections/projects',
+    'users': '/portal/sections/users',
+    'contracts': '/portal/sections/contracts',
+    'taxes': '/portal/sections/taxes',
+    'maintenance': '/portal/sections/maintenance',
+    'appointments': '/portal/sections/appointments',
+    'integrations': '/portal/sections/integrations',
+    'contacts': '/portal/sections/contacts',
+    'expenses': '/portal/sections/expenses',
+    'system-settings': '/portal/sections/system-settings',
+    'project-hub': '/portal/sections/project-hub',
+    'media-center': '/portal/sections/media-center',
+    'cms': '/portal/sections/cms',
+    'notices': '/portal/sections/notices',
+    'neighborhood': '/portal/sections/neighborhood',
+    'apartments': '/portal/sections/apartments',
+    'customer-portal': '/portal/sections/customer-portal'
+};
 
-    // Normalize ID: Ensure the section ID ends with '-section' for DOM lookup
-    let targetId = sectionId;
-    if (!sectionId.endsWith('-section')) {
-        const potentialTargetId = sectionId + '-section';
-        if (document.getElementById(potentialTargetId)) {
-            targetId = potentialTargetId;
-        }
+async function showSection(sectionId, btnElement) {
+    console.log("[İmza Portal] showSection (Lazy Load) çağrıldı:", sectionId);
+    const container = document.getElementById('section-container');
+    if (!container) {
+        console.error("Shell hatası: #section-container bulunamadı.");
+        return;
     }
 
     // Role Check
@@ -19,21 +48,21 @@ function showSection(sectionId, btnElement) {
             if (typeof showToast === 'function') showToast('Bu bölüme erişim yetkiniz yok.', 'error');
             return;
         }
-        if (requiredAccess === 'broker' && currentRole === 'standart') {
-            if (typeof showToast === 'function') showToast('Bu bölüm Broker ve üzeri yetki gerektirir.', 'error');
-            return;
-        }
     }
 
-    // Section visibility
-    const allSections = document.querySelectorAll('.content-section');
-    allSections.forEach(s => s.classList.add('hidden'));
-
-    const target = document.getElementById(targetId);
-    if (target) {
-        target.classList.remove('hidden');
-    } else {
-        console.warn("[İmza Portal] HATA: Hedef bölüm bulunamadı ->", targetId);
+    // Lazy Load HTML
+    const url = SECTIONS[sectionId];
+    if (url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const html = await response.text();
+            container.innerHTML = html;
+        } catch (err) {
+            console.error('Section load error:', err);
+            if (typeof showToast === 'function') showToast('Sayfa parçası yüklenemedi.', 'error');
+            return;
+        }
     }
 
     // Sidebar highlight
@@ -45,7 +74,7 @@ function showSection(sectionId, btnElement) {
     }
 
     // Dispatch a custom event so specific modules can load data when their section is shown
-    const event = new CustomEvent('sectionShown', { detail: { sectionId: targetId } });
+    const event = new CustomEvent('sectionShown', { detail: { sectionId: sectionId } });
     document.dispatchEvent(event);
 }
 
